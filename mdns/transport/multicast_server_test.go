@@ -73,7 +73,7 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface) {
 	}
 
 	sock := NewUnicastUDPSocket()
-	nSent, err := sock.SendMessage(MulticastAddress, Port, msg)
+	nSent, err := sock.SendMessage(MulticastIPv4Address, Port, msg)
 	if err != nil {
 		t.Error(err)
 	}
