@@ -62,6 +62,11 @@ func (msg *Message) Copy() *Message {
 	}
 }
 
+// Bytes returns the binary representation.
+func (msg *Message) Bytes() []byte {
+	return msg.Header.Bytes()
+}
+
 // String returns the string representation.
 func (msg *Message) String() string {
 	return hex.EncodeToString(msg.Header.bytes)
