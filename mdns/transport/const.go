@@ -25,11 +25,6 @@ const (
 	MaxPacketSize        = 1024
 )
 
-//  Extension for Echonet Lite
-const (
-	UDPPortRange = 100
-)
-
 const (
 	MessageFormatSpecified = 0x01
 	MessageFormatArbitrary = 0x02
