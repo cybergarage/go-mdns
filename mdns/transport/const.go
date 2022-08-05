@@ -20,7 +20,6 @@ import (
 
 const (
 	Port                 = 5353
-	UDPPort              = Port
 	TCPPort              = Port
 	MulticastIPv4Address = "224.0.0.251"
 	MulticastIPv6Address = "ff02::fb"
