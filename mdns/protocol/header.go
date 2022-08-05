@@ -15,6 +15,7 @@
 package protocol
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -55,6 +56,11 @@ func (header *Header) Parse(reader io.Reader) error {
 		return fmt.Errorf(errorHeaderShortLength, n)
 	}
 	return nil
+}
+
+// Equals returns true if the header is same as the specified header, otherwise false.
+func (header *Header) Equals(other *Header) bool {
+	return bytes.Equal(header.bytes, other.bytes)
 }
 
 // Copy returns the copy header instance.
