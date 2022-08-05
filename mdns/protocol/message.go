@@ -15,6 +15,7 @@
 package protocol
 
 import (
+	"bytes"
 	"io"
 )
 
@@ -31,10 +32,26 @@ func NewMessage() *Message {
 	return msg
 }
 
+// NewMessage returns a message instance.
+func NewMessageWithBytes(msgBytes []byte) (*Message, error) {
+	msg := NewMessage()
+	if err := msg.Parse(bytes.NewReader(msgBytes)); err != nil {
+		return nil, err
+	}
+	return msg, nil
+}
+
 // Parse parses the specified reader.
 func (msg *Message) Parse(reader io.Reader) error {
 	if err := msg.Header.Parse(reader); err != nil {
 		return err
 	}
 	return nil
+}
+
+// Copy returns the copy message instance.
+func (msg *Message) Copy() *Message {
+	return &Message{
+		Header: NewHeaderWithBytes(msg.Header.bytes),
+	}
 }
