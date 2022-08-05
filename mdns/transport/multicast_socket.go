@@ -15,6 +15,7 @@
 package transport
 
 import (
+	"errors"
 	"fmt"
 	"net"
 )
@@ -63,7 +64,14 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface) error {
 		return err
 	}
 
-	sock.SetBoundStatus(ifi, MulticastIPv4Address, Port)
+	switch {
+	case IsIPv4Interface(ifi):
+		sock.SetBoundStatus(ifi, MulticastIPv4Address, Port)
+	case IsIPv6Interface(ifi):
+		sock.SetBoundStatus(ifi, MulticastIPv6Address, Port)
+	default:
+		return errors.New(errorAvailableAddressNotFound)
+	}
 
 	return nil
 }
