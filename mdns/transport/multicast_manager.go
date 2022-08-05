@@ -1,0 +1,129 @@
+// Copyright (C) 2022 The go-mdns Authors All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package transport
+
+import (
+	"net"
+)
+
+const (
+	errorMulticastServerNoAvailableInterface = "No available interface"
+)
+
+// A MulticastManager represents a multicast server manager.
+type MulticastManager struct {
+	Servers []*MulticastServer
+	Handler MulticastHandler
+}
+
+// NewMulticastManager returns a new MulticastManager.
+func NewMulticastManager() *MulticastManager {
+	mgr := &MulticastManager{
+		Servers: make([]*MulticastServer, 0),
+		Handler: nil,
+	}
+	return mgr
+}
+
+// SetHandler set a listener to all servers.
+func (mgr *MulticastManager) SetHandler(l MulticastHandler) {
+	mgr.Handler = l
+}
+
+// GetBoundAddresses returns the listen addresses.
+func (mgr *MulticastManager) GetBoundAddresses() []string {
+	boundAddrs := make([]string, 0)
+	for _, server := range mgr.Servers {
+		boundAddrs = append(boundAddrs, server.GetBoundAddresses()...)
+	}
+	return boundAddrs
+}
+
+// GetBoundInterfaces returns the listen interfaces.
+func (mgr *MulticastManager) GetBoundInterfaces() []*net.Interface {
+	boundIfs := make([]*net.Interface, 0)
+	for _, server := range mgr.Servers {
+		boundIfs = append(boundIfs, server.Interface)
+	}
+	return boundIfs
+}
+
+// StartWithInterface starts this server on the specified interface.
+func (mgr *MulticastManager) StartWithInterface(ifi *net.Interface) (*MulticastServer, error) {
+	server := NewMulticastServer()
+	server.Handler = mgr.Handler
+	if err := server.Start(ifi); err != nil {
+		return nil, err
+	}
+	mgr.Servers = append(mgr.Servers, server)
+	return server, nil
+}
+
+// Start starts servers on the all avairable interfaces.
+func (mgr *MulticastManager) Start() error {
+	err := mgr.Stop()
+	if err != nil {
+		return err
+	}
+
+	ifis, err := GetAvailableInterfaces()
+	if err != nil {
+		return err
+	}
+
+	for _, ifi := range ifis {
+		_, err := mgr.StartWithInterface(ifi)
+		if err != nil {
+			mgr.Stop()
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Stop stops this server.
+func (mgr *MulticastManager) Stop() error {
+	var lastErr error
+
+	for _, server := range mgr.Servers {
+		err := server.Stop()
+		if err != nil {
+			lastErr = err
+		}
+	}
+
+	mgr.Servers = make([]*MulticastServer, 0)
+
+	return lastErr
+}
+
+// IsRunning returns true whether the local servers are running, otherwise false.
+func (mgr *MulticastManager) IsRunning() bool {
+	return len(mgr.Servers) != 0
+}
+
+// setUnicastManager sets appropriate unicast servers to all multicast servers to response the multicast messages.
+func (mgr *MulticastManager) setUnicastManager(unicastMgr *UnicastManager) error {
+	for _, multicastServer := range mgr.Servers {
+		unicastServer, err := unicastMgr.getAppropriateServerForInterface(multicastServer.Interface)
+		if err != nil {
+			mgr.Stop()
+			return err
+		}
+		multicastServer.SetUnicastServer(unicastServer)
+	}
+	return nil
+}
