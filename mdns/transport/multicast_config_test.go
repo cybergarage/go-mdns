@@ -18,13 +18,13 @@ import (
 	"testing"
 )
 
-func TestNewDefaultExtensionConfigConfig(t *testing.T) {
-	NewDefaultExtensionConfig()
+func TestNewDefaultConfigConfig(t *testing.T) {
+	NewDefaultConfig()
 }
 
-func TestExtensionConfigEquals(t *testing.T) {
-	conf01 := NewDefaultExtensionConfig()
-	conf02 := NewDefaultExtensionConfig()
+func TestConfigEquals(t *testing.T) {
+	conf01 := NewDefaultMulticastConfig()
+	conf02 := NewDefaultMulticastConfig()
 
 	// Testing Set*()
 
@@ -38,7 +38,7 @@ func TestExtensionConfigEquals(t *testing.T) {
 
 	// Testing SetConfig()
 
-	conf03 := NewDefaultExtensionConfig()
+	conf03 := NewDefaultMulticastConfig()
 	conf03.SetConfig(conf01)
 	if !conf01.Equals(conf03) {
 		t.Errorf("%v != %v", conf01, conf03)

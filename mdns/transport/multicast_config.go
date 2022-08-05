@@ -16,35 +16,35 @@ package transport
 
 import "reflect"
 
-// ExtensionConfig represents a cofiguration for extended specifications.
-type ExtensionConfig struct {
+// MulticastConfig represents a cofiguration for extended specifications.
+type MulticastConfig struct {
 	EachInterfaceBindingEnabled bool
 }
 
-// NewDefaultExtensionConfig returns a default configuration.
-func NewDefaultExtensionConfig() *ExtensionConfig {
-	conf := &ExtensionConfig{
+// NewDefaultMulticastConfig returns a default configuration.
+func NewDefaultMulticastConfig() *MulticastConfig {
+	conf := &MulticastConfig{
 		EachInterfaceBindingEnabled: true,
 	}
 	return conf
 }
 
 // SetConfig sets all flags.
-func (conf *ExtensionConfig) SetConfig(newConfig *ExtensionConfig) {
-	conf.EachInterfaceBindingEnabled = newConfig.EachInterfaceBindingEnabled
+func (conf *MulticastConfig) SetConfig(newMulticastConfig *MulticastConfig) {
+	conf.EachInterfaceBindingEnabled = newMulticastConfig.EachInterfaceBindingEnabled
 }
 
 // SetEachInterfaceBindingEnabled sets a flag for binding functions.
-func (conf *ExtensionConfig) SetEachInterfaceBindingEnabled(flag bool) {
+func (conf *MulticastConfig) SetEachInterfaceBindingEnabled(flag bool) {
 	conf.EachInterfaceBindingEnabled = flag
 }
 
 // IsEachInterfaceBindingEnabled returns true whether the binding functions is enabled, otherwise false.
-func (conf *ExtensionConfig) IsEachInterfaceBindingEnabled() bool {
+func (conf *MulticastConfig) IsEachInterfaceBindingEnabled() bool {
 	return conf.EachInterfaceBindingEnabled
 }
 
 // Equals returns true whether the specified other class is same, otherwise false.
-func (conf *ExtensionConfig) Equals(otherConf *ExtensionConfig) bool {
+func (conf *MulticastConfig) Equals(otherConf *MulticastConfig) bool {
 	return reflect.DeepEqual(conf, otherConf)
 }
