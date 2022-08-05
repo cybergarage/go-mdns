@@ -20,7 +20,6 @@ import (
 
 // A MessageManager represents a multicast server list.
 type MessageManager struct {
-	Port           uint
 	messageHandler protocol.MessageHandler
 	multicastMgr   *MulticastManager
 }
@@ -28,7 +27,6 @@ type MessageManager struct {
 // NewMessageManager returns a new message manager.
 func NewMessageManager() *MessageManager {
 	mgr := &MessageManager{
-		Port:           UDPPort,
 		messageHandler: nil,
 		multicastMgr:   NewMulticastManager(),
 	}

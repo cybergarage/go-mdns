@@ -63,7 +63,7 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface) error {
 		return err
 	}
 
-	sock.SetBoundStatus(ifi, MulticastIPv4Address, UDPPort)
+	sock.SetBoundStatus(ifi, MulticastIPv4Address, Port)
 
 	return nil
 }
