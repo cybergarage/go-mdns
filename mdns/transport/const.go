@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	Port             = 3610
+	Port             = 5353
 	UDPPort          = Port
 	TCPPort          = Port
 	MulticastAddress = "224.0.23.0"
