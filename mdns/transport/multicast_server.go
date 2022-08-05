@@ -24,20 +24,18 @@ import (
 // A MulticastServer represents a multicast server.
 type MulticastServer struct {
 	*Server
-	Socket        *MulticastSocket
-	Channel       chan interface{}
-	Handler       MulticastHandler
-	UnicastServer *UnicastServer
+	Socket  *MulticastSocket
+	Channel chan interface{}
+	Handler MulticastHandler
 }
 
 // NewMulticastServer returns a new MulticastServer.
 func NewMulticastServer() *MulticastServer {
 	server := &MulticastServer{
-		Server:        NewServer(),
-		Socket:        NewMulticastSocket(),
-		Channel:       nil,
-		Handler:       nil,
-		UnicastServer: nil,
+		Server:  NewServer(),
+		Socket:  NewMulticastSocket(),
+		Channel: nil,
+		Handler: nil,
 	}
 	return server
 }
@@ -45,11 +43,6 @@ func NewMulticastServer() *MulticastServer {
 // SetHandler set a listener.
 func (server *MulticastServer) SetHandler(l MulticastHandler) {
 	server.Handler = l
-}
-
-// SetUnicastServer set a unicast server to response received messages.
-func (server *MulticastServer) SetUnicastServer(s *UnicastServer) {
-	server.UnicastServer = s
 }
 
 // Start starts this server.
@@ -78,13 +71,6 @@ func handleMulticastRequestMessage(server *MulticastServer, reqMsg *protocol.Mes
 	if server.Handler == nil {
 		return
 	}
-
-	resMsg, err := server.Handler.ProtocolMessageReceived(reqMsg)
-	if server.UnicastServer == nil || err != nil || resMsg == nil {
-		return
-	}
-
-	server.UnicastServer.UDPSocket.ResponseMessageForRequestMessage(reqMsg, resMsg)
 }
 
 func handleMulticastConnection(server *MulticastServer, cancel chan interface{}) {
