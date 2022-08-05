@@ -15,7 +15,7 @@
 package transport
 
 import (
-	"github.com/cybergarage/uecho-go/net/echonet/protocol"
+	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 // A MessageManager represents a multicast server list.
