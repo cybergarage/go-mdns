@@ -32,8 +32,6 @@ func TestExtensionConfigEquals(t *testing.T) {
 		t.Errorf("%v != %v", conf01, conf02)
 	}
 
-	conf01.SetAutoPortBindingEnabled(true)
-	conf02.SetAutoPortBindingEnabled(false)
 	if conf01.Equals(conf02) {
 		t.Errorf("%v == %v", conf01, conf02)
 	}
