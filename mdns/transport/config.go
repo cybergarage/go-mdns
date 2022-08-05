@@ -16,14 +16,12 @@ package transport
 
 // Config represents a cofiguration for transport.
 type Config struct {
-	*UnicastConfig
 	*MulticastConfig
 }
 
 // NewDefaultConfig returns a default configuration.
 func NewDefaultConfig() *Config {
 	conf := &Config{
-		UnicastConfig:   NewDefaultUnicastConfig(),
 		MulticastConfig: NewDefaultMulticastConfig(),
 	}
 	return conf
@@ -31,17 +29,10 @@ func NewDefaultConfig() *Config {
 
 // SetConfig sets all configuration flags.
 func (conf *Config) SetConfig(newConfig *Config) {
-	conf.UnicastConfig.SetConfig(newConfig.UnicastConfig)
 	conf.MulticastConfig.SetConfig(newConfig.MulticastConfig)
 }
 
 // Equals returns true whether the specified other class is same, otherwise false.
 func (conf *Config) Equals(other *Config) bool {
-	if !conf.UnicastConfig.Equals(other.UnicastConfig) {
-		return false
-	}
-	if !conf.MulticastConfig.Equals(other.MulticastConfig) {
-		return false
-	}
-	return true
+	return conf.MulticastConfig.Equals(other.MulticastConfig)
 }
