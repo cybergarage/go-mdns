@@ -22,7 +22,7 @@ func TestNewDefaultConfigConfig(t *testing.T) {
 	NewDefaultConfig()
 }
 
-func TestConfigEquals(t *testing.T) {
+func TestMulticastConfigEquals(t *testing.T) {
 	conf01 := NewDefaultMulticastConfig()
 	conf02 := NewDefaultMulticastConfig()
 
@@ -32,7 +32,8 @@ func TestConfigEquals(t *testing.T) {
 		t.Errorf("%v != %v", conf01, conf02)
 	}
 
-	if conf01.Equals(conf02) {
+	conf01.SetEachInterfaceBindingEnabled(false)
+	if conf02.Equals(conf01) {
 		t.Errorf("%v == %v", conf01, conf02)
 	}
 
