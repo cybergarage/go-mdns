@@ -17,14 +17,13 @@ package transport
 import (
 	"net"
 
-	"github.com/cybergarage/uecho-go/net/echonet/log"
-	"github.com/cybergarage/uecho-go/net/echonet/protocol"
+	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 // A MulticastServer represents a multicast server.
 type MulticastServer struct {
 	*Server
-	Socket  *MulticastSocket
+	*MulticastSocket
 	Channel chan interface{}
 	Handler MulticastHandler
 }
@@ -32,22 +31,22 @@ type MulticastServer struct {
 // NewMulticastServer returns a new MulticastServer.
 func NewMulticastServer() *MulticastServer {
 	server := &MulticastServer{
-		Server:  NewServer(),
-		Socket:  NewMulticastSocket(),
-		Channel: nil,
-		Handler: nil,
+		Server:          NewServer(),
+		MulticastSocket: NewMulticastSocket(),
+		Channel:         nil,
+		Handler:         nil,
 	}
 	return server
 }
 
 // SetHandler set a listener.
-func (server *MulticastServer) SetHandler(l MulticastHandler) {
-	server.Handler = l
+func (server *MulticastServer) SetHandler(handler MulticastHandler) {
+	server.Handler = handler
 }
 
 // Start starts this server.
 func (server *MulticastServer) Start(ifi *net.Interface) error {
-	if err := server.Socket.Bind(ifi); err != nil {
+	if err := server.MulticastSocket.Bind(ifi); err != nil {
 		return err
 	}
 	server.SetBoundInterface(ifi)
@@ -58,7 +57,7 @@ func (server *MulticastServer) Start(ifi *net.Interface) error {
 
 // Stop stops this server.
 func (server *MulticastServer) Stop() error {
-	if err := server.Socket.Close(); err != nil {
+	if err := server.MulticastSocket.Close(); err != nil {
 		return err
 	}
 	server.SetBoundInterface(nil)
@@ -66,8 +65,6 @@ func (server *MulticastServer) Stop() error {
 }
 
 func handleMulticastRequestMessage(server *MulticastServer, reqMsg *protocol.Message) {
-	server.Socket.outputReadLog(log.LevelTrace, logSocketTypeUDPMulticast, reqMsg.From.String(), reqMsg.String(), reqMsg.Size())
-
 	if server.Handler == nil {
 		return
 	}
@@ -80,12 +77,10 @@ func handleMulticastConnection(server *MulticastServer, cancel chan interface{})
 		case <-cancel:
 			return
 		default:
-			reqMsg, err := server.Socket.ReadMessage()
+			reqMsg, err := server.MulticastSocket.ReadMessage()
 			if err != nil {
 				break
 			}
-			reqMsg.SetPacketType(protocol.MulticastPacket)
-
 			go handleMulticastRequestMessage(server, reqMsg)
 		}
 	}
