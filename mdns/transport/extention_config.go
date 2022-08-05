@@ -20,7 +20,6 @@ import "reflect"
 type ExtensionConfig struct {
 	AutoPortBindingEnabled      bool
 	EachInterfaceBindingEnabled bool
-	AutoInterfaceBindingEnabled bool
 }
 
 // NewDefaultExtensionConfig returns a default configuration.
@@ -28,7 +27,6 @@ func NewDefaultExtensionConfig() *ExtensionConfig {
 	conf := &ExtensionConfig{
 		AutoPortBindingEnabled:      false,
 		EachInterfaceBindingEnabled: true,
-		AutoInterfaceBindingEnabled: true,
 	}
 	return conf
 }
@@ -37,7 +35,6 @@ func NewDefaultExtensionConfig() *ExtensionConfig {
 func (conf *ExtensionConfig) SetConfig(newConfig *ExtensionConfig) {
 	conf.AutoPortBindingEnabled = newConfig.AutoPortBindingEnabled
 	conf.EachInterfaceBindingEnabled = newConfig.EachInterfaceBindingEnabled
-	conf.AutoInterfaceBindingEnabled = newConfig.AutoInterfaceBindingEnabled
 }
 
 // SetAutoPortBindingEnabled sets a flag for TCP functions.
@@ -58,16 +55,6 @@ func (conf *ExtensionConfig) SetEachInterfaceBindingEnabled(flag bool) {
 // IsEachInterfaceBindingEnabled returns true whether the binding functions is enabled, otherwise false.
 func (conf *ExtensionConfig) IsEachInterfaceBindingEnabled() bool {
 	return conf.EachInterfaceBindingEnabled
-}
-
-// SetAutoInterfaceBindingEnabled sets a flag for the auto interface binding.
-func (conf *ExtensionConfig) SetAutoInterfaceBindingEnabled(flag bool) {
-	conf.AutoInterfaceBindingEnabled = flag
-}
-
-// IsAutoInterfaceBindingEnabled returns true whether the the auto interface binding is enabled, otherwise false.
-func (conf *ExtensionConfig) IsAutoInterfaceBindingEnabled() bool {
-	return conf.AutoInterfaceBindingEnabled
 }
 
 // Equals returns true whether the specified other class is same, otherwise false.
