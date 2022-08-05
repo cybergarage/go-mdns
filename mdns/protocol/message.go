@@ -33,13 +33,18 @@ func NewMessage() *Message {
 	return msg
 }
 
-// NewMessage returns a message instance.
-func NewMessageWithBytes(msgBytes []byte) (*Message, error) {
+// NewMessageWithReader returns a message instance with the specified reader.
+func NewMessageWithReader(reader io.Reader) (*Message, error) {
 	msg := NewMessage()
-	if err := msg.Parse(bytes.NewReader(msgBytes)); err != nil {
+	if err := msg.Parse(reader); err != nil {
 		return nil, err
 	}
 	return msg, nil
+}
+
+// NewMessageWithBytes returns a message instance with the specified bytes.
+func NewMessageWithBytes(msgBytes []byte) (*Message, error) {
+	return NewMessageWithReader(bytes.NewReader(msgBytes))
 }
 
 // Parse parses the specified reader.
