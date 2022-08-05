@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cybergarage/uecho-go/net/echonet/protocol"
+	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 type testMulticastServer struct {
@@ -37,14 +37,10 @@ func newTestMulticastServer() *testMulticastServer {
 	return server
 }
 
-func (server *testMulticastServer) ProtocolMessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+func (server *testMulticastServer) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
 	if isTestMessage(msg) {
-		copyMsg, err := protocol.NewMessageWithMessage(msg)
-		if err == nil {
-			server.lastMessage = copyMsg
-		}
+		server.lastMessage = msg.Copy()
 	}
-
 	return nil, nil
 }
 
@@ -72,8 +68,7 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface) {
 		return
 	}
 
-	sock := NewUnicastUDPSocket()
-	nSent, err := sock.SendMessage(MulticastIPv4Address, Port, msg)
+	nSent, err := server.SendMessage(MulticastIPv4Address, Port, msg)
 	if err != nil {
 		t.Error(err)
 	}
