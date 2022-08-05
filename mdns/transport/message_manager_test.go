@@ -18,64 +18,36 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cybergarage/uecho-go/net/echonet/encoding"
-	"github.com/cybergarage/uecho-go/net/echonet/log"
-	"github.com/cybergarage/uecho-go/net/echonet/protocol"
+	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 type testMessageManager struct {
 	*MessageManager
-	FromPort                int
-	FromPacketType          int
 	lastNotificationMessage *protocol.Message
 }
 
 func newTestMessage(tid uint) (*protocol.Message, error) {
-	tidBytes := make([]byte, 2)
-	encoding.IntegerToByte(tid, tidBytes)
-
-	testMessageBytes := []byte{
-		protocol.EHD1Echonet,
-		protocol.EHD2Format1,
-		tidBytes[0], tidBytes[1],
-		0xA0, 0xB0, 0xC0,
-		0xD0, 0xE0, 0xF0,
-		protocol.ESVWriteReadRequest,
-		3,
-		1, 1, 'a',
-		2, 2, 'b', 'c',
-		3, 3, 'c', 'd', 'e',
-	}
-
+	testMessageBytes := []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01}
 	return protocol.NewMessageWithBytes(testMessageBytes)
 }
 
 func isTestMessage(msg *protocol.Message) bool {
-	return msg.IsESV(protocol.ESVWriteReadRequest)
+	return true
 }
 
-// NewMessageManager returns a new message manager.
+// newTestMessageManager returns a new message manager.
 func newTestMessageManager() *testMessageManager {
 	mgr := &testMessageManager{
 		MessageManager:          NewMessageManager(),
-		FromPort:                0,
-		FromPacketType:          protocol.UnknownPacket,
 		lastNotificationMessage: nil,
 	}
 	return mgr
 }
 
-func (mgr *testMessageManager) ProtocolMessageReceived(msg *protocol.Message) (*protocol.Message, error) {
-	// log.Trace("ProtocolMessageReceived (R) : %s", msg.String())
-
+func (mgr *testMessageManager) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
 	if isTestMessage(msg) {
-		copyMsg, err := protocol.NewMessageWithMessage(msg)
-		if err == nil {
-			// log.Trace("ProtocolMessageReceived (U) : %s", copyMsg.String())
-			mgr.lastNotificationMessage = copyMsg
-		}
+		mgr.lastNotificationMessage = msg.Copy()
 	}
-
 	return nil, nil
 }
 
@@ -86,11 +58,7 @@ func testMulticastMessagingWithRunningManagers(t *testing.T, mgrs []*testMessage
 	dstMgrs := []*testMessageManager{mgrs[1], mgrs[0]}
 
 	for n := 0; n < len(srcMgrs); n++ {
-		srcMgr := srcMgrs[n]
-		srcMgr.FromPacketType = protocol.UnknownPacket
-
 		dstMgr := dstMgrs[n]
-		dstMgr.FromPacketType = protocol.MulticastPacket
 		dstMgr.lastNotificationMessage = nil
 
 		msg, err := newTestMessage(uint(n | 0xF0))
@@ -113,10 +81,7 @@ func testMulticastMessagingWithRunningManagers(t *testing.T, mgrs []*testMessage
 			continue
 		}
 
-		log.Trace("CMP(M) : %s ?= %s", msg.String(), dstLastMsg.String())
-
 		if !msg.Equals(dstLastMsg) {
-			log.Trace("CMP(M) : %s != %s", msg.String(), dstLastMsg.String())
 			t.Errorf("CMP(M) : %s != %s", msg.String(), dstLastMsg.String())
 			continue
 		}
