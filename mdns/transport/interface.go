@@ -24,12 +24,11 @@ const (
 	libvirtInterfaceName = "virbr0"
 )
 
-// IsIPv6Address returns true whether the specified address is a IPv6 address.
+// IsIPv6Interface returns true whether the specified interface has a IPv6 address.
 func IsIPv6Address(addr string) bool {
 	if len(addr) == 0 {
 		return false
 	}
-
 	if 0 <= strings.Index(addr, ":") {
 		return true
 	}
@@ -42,6 +41,24 @@ func IsIPv4Address(addr string) bool {
 		return false
 	}
 	return !IsIPv6Address(addr)
+}
+
+// IsIPv6Interface returns true whether the specified address is a IPv6 address.
+func IsIPv6Interface(ifi *net.Interface) bool {
+	addr, err := GetInterfaceAddress(ifi)
+	if err != nil {
+		return false
+	}
+	return IsIPv6Address(addr)
+}
+
+// IsIPv4Interface returns true whether the specified address is a IPv4 address.
+func IsIPv4Interface(ifi *net.Interface) bool {
+	addr, err := GetInterfaceAddress(ifi)
+	if err != nil {
+		return false
+	}
+	return IsIPv4Address(addr)
 }
 
 // IsLoopbackAddress returns true whether the specified address is a loopback addresses.
