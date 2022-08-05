@@ -114,16 +114,3 @@ func (mgr *MulticastManager) Stop() error {
 func (mgr *MulticastManager) IsRunning() bool {
 	return len(mgr.Servers) != 0
 }
-
-// setUnicastManager sets appropriate unicast servers to all multicast servers to response the multicast messages.
-func (mgr *MulticastManager) setUnicastManager(unicastMgr *UnicastManager) error {
-	for _, multicastServer := range mgr.Servers {
-		unicastServer, err := unicastMgr.getAppropriateServerForInterface(multicastServer.Interface)
-		if err != nil {
-			mgr.Stop()
-			return err
-		}
-		multicastServer.SetUnicastServer(unicastServer)
-	}
-	return nil
-}
