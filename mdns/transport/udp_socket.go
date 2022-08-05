@@ -15,7 +15,6 @@
 package transport
 
 import (
-	"encoding/hex"
 	"errors"
 	"net"
 	"time"
@@ -76,11 +75,6 @@ func (sock *UDPSocket) Close() error {
 	return nil
 }
 
-func (sock *UDPSocket) outputReadLog(logLevel log.Level, logType string, msgFrom string, msg string, msgSize int) {
-	msgTo, _ := sock.GetBoundIPAddr()
-	outputSocketLog(logLevel, logType, logSocketDirectionRead, msgFrom, msgTo, msg, msgSize)
-}
-
 // ReadMessage reads a message from the current opened socket.
 func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 	if sock.Conn == nil {
@@ -94,7 +88,6 @@ func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 
 	msg, err := protocol.NewMessageWithBytes(sock.ReadBuffer[:n])
 	if err != nil {
-		sock.outputReadLog(log.LevelError, logSocketTypeUDPUnicast, (*from).String(), hex.EncodeToString(sock.ReadBuffer[:n]), n)
 		log.Error(err.Error())
 		return nil, err
 	}
