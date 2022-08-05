@@ -37,17 +37,3 @@ func TestMulticastSocketBindWithInterface(t *testing.T) {
 		t.Error(err)
 	}
 }
-
-func TestMulticastSocketBindWithNoInterface(t *testing.T) {
-	sock := NewMulticastSocket()
-
-	err := sock.Bind(nil)
-	if err != nil {
-		t.Error(err)
-	}
-
-	err = sock.Close()
-	if err != nil {
-		t.Error(err)
-	}
-}
