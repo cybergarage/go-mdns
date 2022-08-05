@@ -15,9 +15,19 @@
 package protocol
 
 import (
+	"bytes"
 	"testing"
 )
 
 func TestNewHeader(t *testing.T) {
-	NewHeader()
+	testMsgs := [][]byte{
+		[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01},
+	}
+
+	header := NewHeader()
+	for _, testMsg := range testMsgs {
+		if err := header.Parse(bytes.NewReader(testMsg)); err != nil {
+			t.Error(err)
+		}
+	}
 }
