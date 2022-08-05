@@ -36,6 +36,13 @@ func NewHeader() *Header {
 	return header
 }
 
+// NewHeaderWithBytes returns a header instance with the specified bytes.
+func NewHeaderWithBytes(bytes []byte) *Header {
+	return &Header{
+		bytes: bytes,
+	}
+}
+
 // Parse parses the specified reader.
 func (header *Header) Parse(reader io.Reader) error {
 	header.bytes = make([]byte, headerSize)
@@ -47,4 +54,9 @@ func (header *Header) Parse(reader io.Reader) error {
 		return fmt.Errorf(errorHeaderShortLength, n)
 	}
 	return nil
+}
+
+// Copy returns the copy header instance.
+func (header *Header) Copy() *Header {
+	return NewHeaderWithBytes(header.bytes)
 }
