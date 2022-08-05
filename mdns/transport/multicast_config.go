@@ -14,8 +14,6 @@
 
 package transport
 
-import "reflect"
-
 // MulticastConfig represents a cofiguration for extended specifications.
 type MulticastConfig struct {
 	EachInterfaceBindingEnabled bool
@@ -46,5 +44,5 @@ func (conf *MulticastConfig) IsEachInterfaceBindingEnabled() bool {
 
 // Equals returns true whether the specified other class is same, otherwise false.
 func (conf *MulticastConfig) Equals(otherConf *MulticastConfig) bool {
-	return reflect.DeepEqual(conf, otherConf)
+	return conf.EachInterfaceBindingEnabled == otherConf.EachInterfaceBindingEnabled
 }
