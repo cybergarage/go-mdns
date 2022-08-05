@@ -15,6 +15,7 @@
 package protocol
 
 import (
+	"encoding/hex"
 	"fmt"
 	"io"
 )
@@ -59,4 +60,9 @@ func (header *Header) Parse(reader io.Reader) error {
 // Copy returns the copy header instance.
 func (header *Header) Copy() *Header {
 	return NewHeaderWithBytes(header.bytes)
+}
+
+// String returns the string representation.
+func (header *Header) String() string {
+	return hex.EncodeToString(header.bytes)
 }
