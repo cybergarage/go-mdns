@@ -14,12 +14,37 @@
 
 package protocol
 
+import (
+	"fmt"
+	"io"
+)
+
+const (
+	headerSize = 12
+)
+
 // Header represents a protocol header.
 type Header struct {
+	bytes []byte
 }
 
 // NewHeader returns a header instance.
 func NewHeader() *Header {
-	header := &Header{}
+	header := &Header{
+		bytes: nil,
+	}
 	return header
+}
+
+// Parse parses the specified reader.
+func (header *Header) Parse(reader io.Reader) error {
+	header.bytes = make([]byte, headerSize)
+	n, err := reader.Read(header.bytes)
+	if err != nil {
+		return err
+	}
+	if n != headerSize {
+		return fmt.Errorf(errorHeaderShortLength, n)
+	}
+	return nil
 }
