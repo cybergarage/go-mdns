@@ -105,7 +105,3 @@ func TestMulticastServerWithInterface(t *testing.T) {
 
 	testMulticastServerWithInterface(t, ifs[0])
 }
-
-func TestMulticastServerWithNoInterface(t *testing.T) {
-	testMulticastServerWithInterface(t, nil)
-}
