@@ -50,6 +50,11 @@ func (msg *Message) Parse(reader io.Reader) error {
 	return nil
 }
 
+// Equals returns true if the message is same as the specified message, otherwise false.
+func (msg *Message) Equals(other *Message) bool {
+	return msg.Header.Equals(other.Header)
+}
+
 // Copy returns the copy message instance.
 func (msg *Message) Copy() *Message {
 	return &Message{
