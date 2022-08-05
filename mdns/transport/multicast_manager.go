@@ -15,11 +15,8 @@
 package transport
 
 import (
+	"errors"
 	"net"
-)
-
-const (
-	errorMulticastServerNoAvailableInterface = "No available interface"
 )
 
 // A MulticastManager represents a multicast server manager.
@@ -60,14 +57,13 @@ func (mgr *MulticastManager) GetBoundInterfaces() []*net.Interface {
 	return boundIfs
 }
 
-// StartWithInterface starts this server on the specified interface.
-func (mgr *MulticastManager) StartWithInterface(ifi *net.Interface) (*MulticastServer, error) {
+// startWithInterface starts this server on the specified interface.
+func (mgr *MulticastManager) startWithInterface(ifi *net.Interface) (*MulticastServer, error) {
 	server := NewMulticastServer()
 	server.Handler = mgr.Handler
 	if err := server.Start(ifi); err != nil {
 		return nil, err
 	}
-	mgr.Servers = append(mgr.Servers, server)
 	return server, nil
 }
 
@@ -84,11 +80,15 @@ func (mgr *MulticastManager) Start() error {
 	}
 
 	for _, ifi := range ifis {
-		_, err := mgr.StartWithInterface(ifi)
+		server, err := mgr.startWithInterface(ifi)
 		if err != nil {
-			mgr.Stop()
-			return err
+			continue
 		}
+		mgr.Servers = append(mgr.Servers, server)
+	}
+
+	if len(mgr.Servers) == 0 {
+		return errors.New(errorAvailableInterfaceFound)
 	}
 
 	return nil
