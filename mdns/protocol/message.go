@@ -14,6 +14,10 @@
 
 package protocol
 
+import (
+	"io"
+)
+
 // Message represents a protocol message.
 type Message struct {
 	*Header
@@ -25,4 +29,12 @@ func NewMessage() *Message {
 		Header: NewHeader(),
 	}
 	return msg
+}
+
+// Parse parses the specified reader.
+func (msg *Message) Parse(reader io.Reader) error {
+	if err := msg.Header.Parse(reader); err != nil {
+		return err
+	}
+	return nil
 }
