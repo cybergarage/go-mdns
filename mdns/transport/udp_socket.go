@@ -17,10 +17,11 @@ package transport
 import (
 	"errors"
 	"net"
+	"strconv"
 	"time"
 
-	"github.com/cybergarage/uecho-go/net/echonet/log"
-	"github.com/cybergarage/uecho-go/net/echonet/protocol"
+	"github.com/cybergarage/go-logger/log"
+	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 // A UDPSocket represents a socket for UDP.
@@ -75,13 +76,26 @@ func (sock *UDPSocket) Close() error {
 	return nil
 }
 
+// SendMessage sends the message to the destination address.
+func (sock *UDPSocket) SendMessage(addr string, port int, msg *protocol.Message) (int, error) {
+	toAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(addr, strconv.Itoa(port)))
+	if err != nil {
+		return 0, err
+	}
+	n, err := sock.Conn.WriteToUDP(msg.Bytes(), toAddr)
+	if err != nil {
+		log.Error(err.Error())
+	}
+	return n, err
+}
+
 // ReadMessage reads a message from the current opened socket.
 func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 	if sock.Conn == nil {
 		return nil, errors.New(errorSocketClosed)
 	}
 
-	n, from, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)
+	n, _, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)
 	if err != nil {
 		return nil, err
 	}
@@ -91,10 +105,6 @@ func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 		log.Error(err.Error())
 		return nil, err
 	}
-
-	msg.From.IP = from.IP
-	msg.From.Port = from.Port
-	msg.Interface = sock.Socket.BoundInterface
 
 	return msg, nil
 }
