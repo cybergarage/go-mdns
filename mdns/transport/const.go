@@ -23,6 +23,7 @@ const (
 	UDPPort              = Port
 	TCPPort              = Port
 	MulticastIPv4Address = "224.0.0.251"
+	MulticastIPv6Address = "ff02::fb"
 	MaxPacketSize        = 1024
 )
 
