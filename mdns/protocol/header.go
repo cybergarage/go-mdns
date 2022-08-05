@@ -68,6 +68,11 @@ func (header *Header) Copy() *Header {
 	return NewHeaderWithBytes(header.bytes)
 }
 
+// Bytes returns the binary representation.
+func (header *Header) Bytes() []byte {
+	return header.bytes
+}
+
 // String returns the string representation.
 func (header *Header) String() string {
 	return hex.EncodeToString(header.bytes)
