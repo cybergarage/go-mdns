@@ -41,7 +41,6 @@ func IsIPv4Address(addr string) bool {
 	if len(addr) == 0 {
 		return false
 	}
-
 	return !IsIPv6Address(addr)
 }
 
@@ -51,13 +50,11 @@ func IsLoopbackAddress(addr string) bool {
 		"127.0.0.1",
 		"::1",
 	}
-
 	for _, localAddr := range localAddrs {
 		if localAddr == addr {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -66,11 +63,9 @@ func IsCommunicableAddress(addr string) bool {
 	if len(addr) == 0 {
 		return false
 	}
-
 	if IsLoopbackAddress(addr) {
 		return false
 	}
-
 	return true
 }
 
@@ -79,35 +74,26 @@ func IsBridgeInterface(ifi *net.Interface) bool {
 	return ifi.Name == libvirtInterfaceName
 }
 
-// GetInterfaceAddress returns a IPv4 address of the specivied interface.
+// GetInterfaceAddress returns a IPv4 or IPv6 address of the specivied interface.
 func GetInterfaceAddress(ifi *net.Interface) (string, error) {
 	addrs, err := ifi.Addrs()
 	if err != nil {
 		return "", err
 	}
-
 	for _, addr := range addrs {
 		addrStr := addr.String()
 		saddr := strings.Split(addrStr, "/")
 		if len(saddr) < 2 {
 			continue
 		}
-
-		// Disabled IPv6 interface
-		if IsIPv6Address(saddr[0]) {
-			continue
-		}
-
 		return saddr[0], nil
 	}
-
 	return "", errors.New(errorAvailableAddressNotFound)
 }
 
 // GetAvailableInterfaces returns all available interfaces in the node.
 func GetAvailableInterfaces() ([]*net.Interface, error) {
 	useIfs := make([]*net.Interface, 0)
-
 	localIfs, err := net.Interfaces()
 	if err != nil {
 		return useIfs, err
@@ -146,12 +132,10 @@ func GetAvailableInterfaces() ([]*net.Interface, error) {
 // GetAvailableAddresses returns all available IPv4 addresses in the node.
 func GetAvailableAddresses() ([]string, error) {
 	addrs := make([]string, 0)
-
 	ifis, err := GetAvailableInterfaces()
 	if err != nil {
 		return addrs, err
 	}
-
 	for _, ifi := range ifis {
 		addr, err := GetInterfaceAddress(ifi)
 		if err != nil {
@@ -159,7 +143,6 @@ func GetAvailableAddresses() ([]string, error) {
 		}
 		addrs = append(addrs, addr)
 	}
-
 	return addrs, nil
 }
 
@@ -167,18 +150,15 @@ func getMatchAddressBlockCount(ifAddr string, targetAddr string) int {
 	const addrSep = "."
 	targetAddrs := strings.Split(targetAddr, addrSep)
 	ifAddrs := strings.Split(ifAddr, addrSep)
-
 	if len(targetAddrs) != len(ifAddrs) {
 		return -1
 	}
-
 	addrSize := len(targetAddrs)
 	for n := 0; n < len(targetAddrs); n++ {
 		if targetAddrs[n] != ifAddrs[n] {
 			return n
 		}
 	}
-
 	return addrSize
 }
 
