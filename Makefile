@@ -21,10 +21,12 @@ PKG_ID=${MODULE_ROOT}/${PKG_NAME}
 PKG_SRC_DIR=${PKG_NAME}
 PKG_SRCS=\
 	${PKG_SRC_DIR} \
+	${PKG_SRC_DIR}/encoding \
 	${PKG_SRC_DIR}/protocol \
 	${PKG_SRC_DIR}/transport
 PKGS=\
 	${PKG_ID} \
+	${PKG_ID}/encoding \
 	${PKG_ID}/protocol \
 	${PKG_ID}/transport
 
