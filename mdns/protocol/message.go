@@ -16,6 +16,7 @@ package protocol
 
 import (
 	"bytes"
+	"encoding/hex"
 	"io"
 )
 
@@ -54,4 +55,9 @@ func (msg *Message) Copy() *Message {
 	return &Message{
 		Header: NewHeaderWithBytes(msg.Header.bytes),
 	}
+}
+
+// String returns the string representation.
+func (msg *Message) String() string {
+	return hex.EncodeToString(msg.Header.bytes)
 }
