@@ -20,9 +20,11 @@ PKG_NAME=mdns
 PKG_ID=${MODULE_ROOT}/${PKG_NAME}
 PKG_SRC_DIR=${PKG_NAME}
 PKG_SRCS=\
-        ${PKG_SRC_DIR}
+	${PKG_SRC_DIR} \
+	${PKG_SRC_DIR}/transport
 PKGS=\
-	${PKG_ID}
+	${PKG_ID} \
+	${PKG_ID}/transport
 
 TEST_PKG_NAME=${PKG_NAME}test
 TEST_PKG_ID=${MODULE_ROOT}/${TEST_PKG_NAME}
