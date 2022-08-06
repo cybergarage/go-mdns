@@ -15,9 +15,6 @@
 package transport
 
 import (
-	"testing"
-	"time"
-
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
@@ -27,12 +24,12 @@ type testMessageManager struct {
 }
 
 func newTestMessage(tid uint) (*protocol.Message, error) {
-	testMessageBytes := []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01}
+	testMessageBytes := []byte{0x00, 0x02, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01}
 	return protocol.NewMessageWithBytes(testMessageBytes)
 }
 
 func isTestMessage(msg *protocol.Message) bool {
-	return true
+	return msg.ID() == 0x02
 }
 
 // newTestMessageManager returns a new message manager.
@@ -49,41 +46,4 @@ func (mgr *testMessageManager) MessageReceived(msg *protocol.Message) (*protocol
 		mgr.lastNotificationMessage = msg.Copy()
 	}
 	return nil, nil
-}
-
-func testMulticastMessagingWithRunningManagers(t *testing.T, mgrs []*testMessageManager) {
-	t.Helper()
-
-	srcMgrs := []*testMessageManager{mgrs[0], mgrs[1]}
-	dstMgrs := []*testMessageManager{mgrs[1], mgrs[0]}
-
-	for n := 0; n < len(srcMgrs); n++ {
-		dstMgr := dstMgrs[n]
-		dstMgr.lastNotificationMessage = nil
-
-		msg, err := newTestMessage(uint(n | 0xF0))
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		// err = srcMgr.AnnounceMessage(msg)
-		// if err != nil {
-		// 	t.Error(err)
-		// 	continue
-		// }
-
-		time.Sleep(time.Second)
-
-		dstLastMsg := dstMgr.lastNotificationMessage
-		if dstLastMsg == nil {
-			t.Errorf("%s !=", msg.String())
-			continue
-		}
-
-		if !msg.Equals(dstLastMsg) {
-			t.Errorf("CMP(M) : %s != %s", msg.String(), dstLastMsg.String())
-			continue
-		}
-	}
 }
