@@ -137,6 +137,13 @@ func (header *Header) TC() bool {
 	return (header.bytes[2] & 0x02) == 0x02
 }
 
+// RD returns the recursion desired.
+// RFC 6762: 18.6. RD (Recursion Desired) Bit
+// In both multicast query and multicast response messages, the Recursion Desired bit SHOULD be zero on transmission, and MUST be ignored on reception.
+func (header *Header) RD() bool {
+	return (header.bytes[2] & 0x01) == 0x01
+}
+
 // Equals returns true if the header is same as the specified header, otherwise false.
 func (header *Header) Equals(other *Header) bool {
 	return bytes.Equal(header.bytes, other.bytes)
