@@ -31,6 +31,9 @@ func TestHeader(t *testing.T) {
 		if header.Opcode() != OpQuery {
 			t.Errorf("%d != %d", header.Opcode(), OpQuery)
 		}
+		if header.AA() {
+			t.Errorf("%t != %t", header.AA(), false)
+		}
 	})
 
 	t.Run("ResponseHeader", func(t *testing.T) {
@@ -43,6 +46,9 @@ func TestHeader(t *testing.T) {
 		}
 		if header.Opcode() != OpQuery {
 			t.Errorf("%d != %d", header.Opcode(), OpQuery)
+		}
+		if !header.AA() {
+			t.Errorf("%t != %t", header.AA(), true)
 		}
 	})
 
