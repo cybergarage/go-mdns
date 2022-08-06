@@ -27,6 +27,9 @@ func TestNewHeader(t *testing.T) {
 	if header.QR() != Query {
 		t.Errorf("%d != %d", header.QR(), Query)
 	}
+	if header.Opcode() != OpQuery {
+		t.Errorf("%d != %d", header.Opcode(), OpQuery)
+	}
 }
 
 func TestParseHeader(t *testing.T) {
