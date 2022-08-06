@@ -20,6 +20,13 @@ import (
 )
 
 func TestNewHeader(t *testing.T) {
+	header := NewHeader()
+	if header.ID() != 0 {
+		t.Errorf("%d != %d", header.ID(), 0)
+	}
+}
+
+func TestParseHeader(t *testing.T) {
 	testMsgs := [][]byte{
 		{0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01},
 	}
