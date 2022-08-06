@@ -47,6 +47,17 @@ const (
 	OpStatus Opcode = 2
 )
 
+type ResponseCode byte
+
+const (
+	NoError        ResponseCode = 0
+	FormatError    ResponseCode = 1
+	ServerFailure  ResponseCode = 2
+	NameError      ResponseCode = 3
+	NotImplemented ResponseCode = 4
+	Refused        ResponseCode = 5
+)
+
 // Header represents a protocol header.
 type Header struct {
 	bytes []byte
@@ -163,6 +174,20 @@ func (header *Header) Z() bool {
 // In both multicast query and multicast response messages, the Authentic Data bit [RFC2535] MUST be zero on transmission, and MUST be ignored on reception.
 func (header *Header) AD() bool {
 	return (header.bytes[3] & 0x20) == 0x20
+}
+
+// CD returns the checking disabled bit.
+// RFC 6762: 18.10. CD (Checking Disabled) Bit
+// In both multicast query and multicast response messages, the Checking Disabled bit [RFC2535] MUST be zero on transmission, and MUST be ignored on reception.
+func (header *Header) CD() bool {
+	return (header.bytes[3] & 0x10) == 0x10
+}
+
+// ResponseCode returns the checking disabled bit.
+// RFC 6762: 18.11. RCODE (Response Code)
+// In both multicast query and multicast response messages, the Response Code MUST be zero on transmission. Multicast DNS messages received with non-zero Response Codes MUST be silently ignored.
+func (header *Header) ResponseCode() ResponseCode {
+	return ResponseCode(header.bytes[3] & 0x0F)
 }
 
 // Equals returns true if the header is same as the specified header, otherwise false.
