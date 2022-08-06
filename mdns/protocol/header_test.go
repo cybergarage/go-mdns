@@ -68,6 +68,9 @@ func TestHeader(t *testing.T) {
 		if header.AR() != 0 {
 			t.Errorf("%d != %d", header.AR(), 0)
 		}
+		if !header.IsQuery() {
+			t.Errorf("%b", header.QR())
+		}
 	})
 
 	t.Run("ResponseHeader", func(t *testing.T) {
@@ -117,6 +120,9 @@ func TestHeader(t *testing.T) {
 		if header.AR() != 0 {
 			t.Errorf("%d != %d", header.AR(), 0)
 		}
+		if !header.IsResponse() {
+			t.Errorf("%b", header.QR())
+		}
 	})
 
 	t.Run("ParseRequest", func(t *testing.T) {
@@ -130,6 +136,22 @@ func TestHeader(t *testing.T) {
 				t.Error(err)
 			}
 			if !header.IsQuery() {
+				t.Errorf("%b", header.QR())
+			}
+		}
+	})
+
+	t.Run("ParseResponse", func(t *testing.T) {
+		testMsgs := [][]byte{
+			{0x00, 0x00, 0x84, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x04},
+		}
+
+		for _, testMsg := range testMsgs {
+			header, err := NewHeaderWithReader(bytes.NewReader(testMsg))
+			if err != nil {
+				t.Error(err)
+			}
+			if !header.IsResponse() {
 				t.Errorf("%b", header.QR())
 			}
 		}
