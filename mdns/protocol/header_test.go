@@ -119,14 +119,14 @@ func TestHeader(t *testing.T) {
 		}
 	})
 
-	t.Run("Parse", func(t *testing.T) {
+	t.Run("ParseRequest", func(t *testing.T) {
 		testMsgs := [][]byte{
 			{0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01},
 		}
 
-		header := NewRequestHeader()
 		for _, testMsg := range testMsgs {
-			if err := header.Parse(bytes.NewReader(testMsg)); err != nil {
+			_, err := NewHeaderWithReader(bytes.NewReader(testMsg))
+			if err != nil {
 				t.Error(err)
 			}
 		}
