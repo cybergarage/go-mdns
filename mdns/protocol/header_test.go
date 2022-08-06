@@ -40,6 +40,12 @@ func TestHeader(t *testing.T) {
 		if header.RD() {
 			t.Errorf("%t != %t", header.AA(), false)
 		}
+		if header.RA() {
+			t.Errorf("%t != %t", header.AA(), false)
+		}
+		if header.Z() {
+			t.Errorf("%t != %t", header.AA(), false)
+		}
 	})
 
 	t.Run("ResponseHeader", func(t *testing.T) {
@@ -60,6 +66,12 @@ func TestHeader(t *testing.T) {
 			t.Errorf("%t != %t", header.AA(), false)
 		}
 		if header.RD() {
+			t.Errorf("%t != %t", header.AA(), false)
+		}
+		if header.RA() {
+			t.Errorf("%t != %t", header.AA(), false)
+		}
+		if header.Z() {
 			t.Errorf("%t != %t", header.AA(), false)
 		}
 	})
