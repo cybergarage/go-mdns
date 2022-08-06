@@ -52,10 +52,18 @@ type Header struct {
 	bytes []byte
 }
 
-// NewRequestHeader returns a header instance.
+// NewRequestHeader returns a request header instance.
 func NewRequestHeader() *Header {
 	header := &Header{
 		bytes: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00},
+	}
+	return header
+}
+
+// NewResponseHeader returns a response header instance.
+func NewResponseHeader() *Header {
+	header := &Header{
+		bytes: []byte{0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00},
 	}
 	return header
 }
@@ -92,7 +100,7 @@ func (header *Header) ID() uint {
 // RFC 6762: 18.2. QR (Query/Response) Bit
 // In query messages the QR bit MUST be zero. In response messages the QR bit MUST be one.
 func (header *Header) QR() QR {
-	if (header.bytes[3] & 0x8) == 0 {
+	if (header.bytes[2] & 0x80) == 0 {
 		return Query
 	}
 	return Response
