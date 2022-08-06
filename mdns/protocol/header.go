@@ -39,6 +39,14 @@ const (
 	Response QR = 1
 )
 
+type Opcode int
+
+const (
+	OpQuery  Opcode = 0
+	OpIQuery Opcode = 1
+	OpStatus Opcode = 2
+)
+
 // Header represents a protocol header.
 type Header struct {
 	bytes []byte
@@ -88,6 +96,13 @@ func (header *Header) QR() QR {
 		return Query
 	}
 	return Response
+}
+
+// Opcode returns the kind of query.
+// RFC 6762: 18.3. OPCODE
+// In both multicast query and multicast response messages, the OPCODE MUST be zero on transmission (only standard queries are currently supported over multicast).
+func (header *Header) Opcode() Opcode {
+	return Opcode(header.bytes[3] & 0x07)
 }
 
 // Equals returns true if the header is same as the specified header, otherwise false.
