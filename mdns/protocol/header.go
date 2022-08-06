@@ -52,6 +52,14 @@ type Header struct {
 	bytes []byte
 }
 
+// NewHeader returns a nil header instance.
+func NewHeader() *Header {
+	header := &Header{
+		bytes: nil,
+	}
+	return header
+}
+
 // NewRequestHeader returns a request header instance.
 func NewRequestHeader() *Header {
 	header := &Header{
