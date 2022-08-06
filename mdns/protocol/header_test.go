@@ -125,9 +125,12 @@ func TestHeader(t *testing.T) {
 		}
 
 		for _, testMsg := range testMsgs {
-			_, err := NewHeaderWithReader(bytes.NewReader(testMsg))
+			header, err := NewHeaderWithReader(bytes.NewReader(testMsg))
 			if err != nil {
 				t.Error(err)
+			}
+			if !header.IsQuery() {
+				t.Errorf("%b", header.QR())
 			}
 		}
 	})

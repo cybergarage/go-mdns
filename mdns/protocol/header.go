@@ -218,6 +218,11 @@ func (header *Header) AR() uint {
 	return encoding.BytesToInteger(header.bytes[10:11])
 }
 
+// IsQuery returns true the QR bit is zero, otherwise false.
+func (header *Header) IsQuery() bool {
+	return header.QR() == Query
+}
+
 // Equals returns true if the header is same as the specified header, otherwise false.
 func (header *Header) Equals(other *Header) bool {
 	return bytes.Equal(header.bytes, other.bytes)
