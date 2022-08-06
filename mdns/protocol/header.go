@@ -190,6 +190,11 @@ func (header *Header) ResponseCode() ResponseCode {
 	return ResponseCode(header.bytes[3] & 0x0F)
 }
 
+// QD returns the the number of entries in the question section..
+func (header *Header) QD() uint {
+	return encoding.BytesToInteger(header.bytes[4:5])
+}
+
 // Equals returns true if the header is same as the specified header, otherwise false.
 func (header *Header) Equals(other *Header) bool {
 	return bytes.Equal(header.bytes, other.bytes)
