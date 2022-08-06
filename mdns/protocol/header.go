@@ -14,11 +14,18 @@
 
 package protocol
 
+// RFC 1035: Domain names - implementation and specification
+// https://www.rfc-editor.org/rfc/rfc1035.html
+// RFC 6762: Multicast DNS
+// https://www.rfc-editor.org/rfc/rfc6762.html
+
 import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
 	"io"
+
+	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
 const (
@@ -33,7 +40,7 @@ type Header struct {
 // NewHeader returns a header instance.
 func NewHeader() *Header {
 	header := &Header{
-		bytes: nil,
+		bytes: make([]byte, headerSize),
 	}
 	return header
 }
@@ -56,6 +63,14 @@ func (header *Header) Parse(reader io.Reader) error {
 		return fmt.Errorf(errorHeaderShortLength, n)
 	}
 	return nil
+}
+
+// ID returns the query identifier.
+// RFC 6762: 18.1. ID (Query Identifier)
+// In multicast query messages, the Query Identifier SHOULD be set to zero on transmission.
+// In multicast responses, including unsolicited multicast responses, the Query Identifier MUST be set to zero on transmission, and MUST be ignored on reception.
+func (header *Header) ID() uint {
+	return encoding.BytesToInteger(header.bytes[:2])
 }
 
 // Equals returns true if the header is same as the specified header, otherwise false.
