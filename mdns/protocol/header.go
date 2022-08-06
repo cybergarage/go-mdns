@@ -32,6 +32,13 @@ const (
 	headerSize = 12
 )
 
+type QR uint
+
+const (
+	Query    QR = 0
+	Response QR = 1
+)
+
 // Header represents a protocol header.
 type Header struct {
 	bytes []byte
@@ -71,6 +78,16 @@ func (header *Header) Parse(reader io.Reader) error {
 // In multicast responses, including unsolicited multicast responses, the Query Identifier MUST be set to zero on transmission, and MUST be ignored on reception.
 func (header *Header) ID() uint {
 	return encoding.BytesToInteger(header.bytes[:2])
+}
+
+// QR returns the query type.
+// RFC 6762: 18.2. QR (Query/Response) Bit
+// In query messages the QR bit MUST be zero. In response messages the QR bit MUST be one.
+func (header *Header) QR() QR {
+	if (header.bytes[3] & 0x8) == 0 {
+		return Query
+	}
+	return Response
 }
 
 // Equals returns true if the header is same as the specified header, otherwise false.
