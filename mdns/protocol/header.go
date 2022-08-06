@@ -129,6 +129,14 @@ func (header *Header) AA() bool {
 	return (header.bytes[2] & 0x04) == 0x04
 }
 
+// TC returns the truncated bit.
+// RFC 6762: 18.5. TC (Truncated) Bit
+// In query messages, if the TC bit is set, it means that additional Known-Answer records may be following shortly. A responder SHOULD record this fact, and wait for those additional Known-Answer records, before deciding whether to respond. If the TC bit is clear, it means that the querying host has no additional Known Answers.
+// In multicast response messages, the TC bit MUST be zero on transmission, and MUST be ignored on reception.
+func (header *Header) TC() bool {
+	return (header.bytes[2] & 0x02) == 0x02
+}
+
 // Equals returns true if the header is same as the specified header, otherwise false.
 func (header *Header) Equals(other *Header) bool {
 	return bytes.Equal(header.bytes, other.bytes)
