@@ -33,6 +33,19 @@ func TestHeader(t *testing.T) {
 		}
 	})
 
+	t.Run("ResponseHeader", func(t *testing.T) {
+		header := NewResponseHeader()
+		if header.ID() != 0 {
+			t.Errorf("%d != %d", header.ID(), 0)
+		}
+		if header.QR() != Response {
+			t.Errorf("%d != %d", header.QR(), Response)
+		}
+		if header.Opcode() != OpQuery {
+			t.Errorf("%d != %d", header.Opcode(), OpQuery)
+		}
+	})
+
 	t.Run("Parse", func(t *testing.T) {
 		testMsgs := [][]byte{
 			{0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01},
