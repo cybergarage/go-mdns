@@ -41,6 +41,14 @@ func NewRequestMessage() *Message {
 	return msg
 }
 
+// NewResponseMessage returns a response message instance.
+func NewResponseMessage() *Message {
+	msg := &Message{
+		Header: NewResponseHeader(),
+	}
+	return msg
+}
+
 // NewMessageWithReader returns a message instance with the specified reader.
 func NewMessageWithReader(reader io.Reader) (*Message, error) {
 	msg := NewMessage()
