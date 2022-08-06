@@ -25,6 +25,14 @@ type Message struct {
 	*Header
 }
 
+// NewMessage returns a nil message instance.
+func NewMessage() *Message {
+	msg := &Message{
+		Header: NewHeader(),
+	}
+	return msg
+}
+
 // NewRequestMessage returns a request message instance.
 func NewRequestMessage() *Message {
 	msg := &Message{
@@ -35,7 +43,7 @@ func NewRequestMessage() *Message {
 
 // NewMessageWithReader returns a message instance with the specified reader.
 func NewMessageWithReader(reader io.Reader) (*Message, error) {
-	msg := NewRequestMessage()
+	msg := NewMessage()
 	if err := msg.Parse(reader); err != nil {
 		return nil, err
 	}
