@@ -19,5 +19,5 @@ import (
 )
 
 func TestNewMessage(t *testing.T) {
-	NewMessage()
+	NewRequestMessage()
 }
