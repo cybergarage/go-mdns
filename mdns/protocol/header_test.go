@@ -58,6 +58,9 @@ func TestHeader(t *testing.T) {
 		if header.QD() != 0 {
 			t.Errorf("%d != %d", header.QD(), 0)
 		}
+		if header.AN() != 0 {
+			t.Errorf("%d != %d", header.QD(), 0)
+		}
 	})
 
 	t.Run("ResponseHeader", func(t *testing.T) {
@@ -96,6 +99,9 @@ func TestHeader(t *testing.T) {
 			t.Errorf("%b != %b", header.ResponseCode(), NoError)
 		}
 		if header.QD() != 0 {
+			t.Errorf("%d != %d", header.QD(), 0)
+		}
+		if header.AN() != 0 {
 			t.Errorf("%d != %d", header.QD(), 0)
 		}
 	})

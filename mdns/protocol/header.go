@@ -190,8 +190,13 @@ func (header *Header) ResponseCode() ResponseCode {
 	return ResponseCode(header.bytes[3] & 0x0F)
 }
 
-// QD returns the the number of entries in the question section..
+// QD returns the the number of entries in the question section.
 func (header *Header) QD() uint {
+	return encoding.BytesToInteger(header.bytes[4:5])
+}
+
+// AN returns the the number of entries in in the answer section.
+func (header *Header) AN() uint {
 	return encoding.BytesToInteger(header.bytes[4:5])
 }
 
