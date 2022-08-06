@@ -19,6 +19,7 @@ import (
 	"testing"
 )
 
+// nolint: gocyclo
 func TestHeader(t *testing.T) {
 	t.Run("RequestHeader", func(t *testing.T) {
 		header := NewRequestHeader()
@@ -59,7 +60,13 @@ func TestHeader(t *testing.T) {
 			t.Errorf("%d != %d", header.QD(), 0)
 		}
 		if header.AN() != 0 {
-			t.Errorf("%d != %d", header.QD(), 0)
+			t.Errorf("%d != %d", header.AN(), 0)
+		}
+		if header.NS() != 0 {
+			t.Errorf("%d != %d", header.NS(), 0)
+		}
+		if header.AR() != 0 {
+			t.Errorf("%d != %d", header.AR(), 0)
 		}
 	})
 
@@ -102,7 +109,13 @@ func TestHeader(t *testing.T) {
 			t.Errorf("%d != %d", header.QD(), 0)
 		}
 		if header.AN() != 0 {
-			t.Errorf("%d != %d", header.QD(), 0)
+			t.Errorf("%d != %d", header.AN(), 0)
+		}
+		if header.NS() != 0 {
+			t.Errorf("%d != %d", header.NS(), 0)
+		}
+		if header.AR() != 0 {
+			t.Errorf("%d != %d", header.AR(), 0)
 		}
 	})
 

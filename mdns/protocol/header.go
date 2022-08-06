@@ -197,7 +197,17 @@ func (header *Header) QD() uint {
 
 // AN returns the the number of entries in in the answer section.
 func (header *Header) AN() uint {
-	return encoding.BytesToInteger(header.bytes[4:5])
+	return encoding.BytesToInteger(header.bytes[6:7])
+}
+
+// NS returns the number of name server resource records in the authority records section.
+func (header *Header) NS() uint {
+	return encoding.BytesToInteger(header.bytes[8:9])
+}
+
+// AR returns the number of resource records in the additional records section.
+func (header *Header) AR() uint {
+	return encoding.BytesToInteger(header.bytes[10:11])
 }
 
 // Equals returns true if the header is same as the specified header, otherwise false.
