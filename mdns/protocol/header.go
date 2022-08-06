@@ -94,6 +94,14 @@ func NewHeaderWithBytes(bytes []byte) *Header {
 	}
 }
 
+// NewHeaderWithReader returns a header instance with the specified reader.
+func NewHeaderWithReader(reader io.Reader) (*Header, error) {
+	header := &Header{
+		bytes: nil,
+	}
+	return header, header.Parse(reader)
+}
+
 // Parse parses the specified reader.
 func (header *Header) Parse(reader io.Reader) error {
 	header.bytes = make([]byte, headerSize)
