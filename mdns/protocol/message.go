@@ -28,7 +28,7 @@ type Message struct {
 // NewMessage returns a message instance.
 func NewMessage() *Message {
 	msg := &Message{
-		Header: NewHeader(),
+		Header: NewRequestHeader(),
 	}
 	return msg
 }
