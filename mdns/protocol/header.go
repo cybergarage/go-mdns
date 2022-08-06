@@ -52,10 +52,10 @@ type Header struct {
 	bytes []byte
 }
 
-// NewHeader returns a header instance.
-func NewHeader() *Header {
+// NewRequestHeader returns a header instance.
+func NewRequestHeader() *Header {
 	header := &Header{
-		bytes: make([]byte, headerSize),
+		bytes: []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00},
 	}
 	return header
 }

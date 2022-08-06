@@ -19,28 +19,30 @@ import (
 	"testing"
 )
 
-func TestNewHeader(t *testing.T) {
-	header := NewHeader()
-	if header.ID() != 0 {
-		t.Errorf("%d != %d", header.ID(), 0)
-	}
-	if header.QR() != Query {
-		t.Errorf("%d != %d", header.QR(), Query)
-	}
-	if header.Opcode() != OpQuery {
-		t.Errorf("%d != %d", header.Opcode(), OpQuery)
-	}
-}
-
-func TestParseHeader(t *testing.T) {
-	testMsgs := [][]byte{
-		{0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01},
-	}
-
-	header := NewHeader()
-	for _, testMsg := range testMsgs {
-		if err := header.Parse(bytes.NewReader(testMsg)); err != nil {
-			t.Error(err)
+func TestHeader(t *testing.T) {
+	t.Run("RequestHeader", func(t *testing.T) {
+		header := NewRequestHeader()
+		if header.ID() != 0 {
+			t.Errorf("%d != %d", header.ID(), 0)
 		}
-	}
+		if header.QR() != Query {
+			t.Errorf("%d != %d", header.QR(), Query)
+		}
+		if header.Opcode() != OpQuery {
+			t.Errorf("%d != %d", header.Opcode(), OpQuery)
+		}
+	})
+
+	t.Run("Parse", func(t *testing.T) {
+		testMsgs := [][]byte{
+			{0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01},
+		}
+
+		header := NewRequestHeader()
+		for _, testMsg := range testMsgs {
+			if err := header.Parse(bytes.NewReader(testMsg)); err != nil {
+				t.Error(err)
+			}
+		}
+	})
 }
