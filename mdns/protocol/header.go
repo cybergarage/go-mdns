@@ -158,6 +158,13 @@ func (header *Header) Z() bool {
 	return (header.bytes[3] & 0x40) == 0x40
 }
 
+// AD returns the authentic data bit.
+// RFC 6762: 18.9. AD (Authentic Data) Bit
+// In both multicast query and multicast response messages, the Authentic Data bit [RFC2535] MUST be zero on transmission, and MUST be ignored on reception.
+func (header *Header) AD() bool {
+	return (header.bytes[3] & 0x20) == 0x20
+}
+
 // Equals returns true if the header is same as the specified header, otherwise false.
 func (header *Header) Equals(other *Header) bool {
 	return bytes.Equal(header.bytes, other.bytes)
