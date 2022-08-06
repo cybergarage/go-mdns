@@ -34,6 +34,9 @@ func TestHeader(t *testing.T) {
 		if header.AA() {
 			t.Errorf("%t != %t", header.AA(), false)
 		}
+		if header.TC() {
+			t.Errorf("%t != %t", header.AA(), false)
+		}
 	})
 
 	t.Run("ResponseHeader", func(t *testing.T) {
@@ -49,6 +52,9 @@ func TestHeader(t *testing.T) {
 		}
 		if !header.AA() {
 			t.Errorf("%t != %t", header.AA(), true)
+		}
+		if header.TC() {
+			t.Errorf("%t != %t", header.AA(), false)
 		}
 	})
 
