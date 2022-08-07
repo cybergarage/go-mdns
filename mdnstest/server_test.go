@@ -16,7 +16,16 @@ package mdnstest
 
 import (
 	"testing"
+
+	"github.com/cybergarage/go-mdns/mdns"
 )
 
 func TestServer(t *testing.T) {
+	server := mdns.NewServer()
+	if err := server.Start(); err != nil {
+		t.Error(err)
+	}
+	if err := server.Stop(); err != nil {
+		t.Error(err)
+	}
 }

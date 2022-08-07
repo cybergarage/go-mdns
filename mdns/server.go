@@ -14,13 +14,20 @@
 
 package mdns
 
+import (
+	"github.com/cybergarage/go-mdns/mdns/transport"
+)
+
 // Server represents a server node instance.
 type Server struct {
+	*transport.MessageManager
 }
 
 // NewServer returns a new server instance.
 func NewServer() *Server {
-	server := &Server{}
+	server := &Server{
+		MessageManager: transport.NewMessageManager(),
+	}
 	return server
 }
 
@@ -29,12 +36,12 @@ func (server *Server) Start() error {
 	if err := server.Stop(); err != nil {
 		return err
 	}
-	return nil
+	return server.MessageManager.Start()
 }
 
 // Stop stops the server instance.
 func (server *Server) Stop() error {
-	return nil
+	return server.MessageManager.Stop()
 }
 
 // Restart restarts the server instance.
