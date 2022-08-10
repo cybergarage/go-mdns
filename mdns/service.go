@@ -16,10 +16,18 @@ package mdns
 
 // Service represents a SRV record.
 type Service struct {
+	Instance string
+	Service  string
+	Domain   string
+	Port     int
 }
 
 // NewService returns a new service instance.
-func NewService() *Service {
-	service := &Service{}
-	return service
+func NewService(instance, service, domain string, port int) *Service {
+	return &Service{
+		Instance: instance,
+		Service:  service,
+		Domain:   domain,
+		Port:     port,
+	}
 }
