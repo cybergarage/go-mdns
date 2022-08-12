@@ -31,9 +31,12 @@ func TestQuestion(t *testing.T) {
 			},
 		}
 		for _, test := range tests {
-			_, err := NewQuestionWithReader(bytes.NewReader(test.query))
+			q, err := NewQuestionWithReader(bytes.NewReader(test.query))
 			if err != nil {
 				t.Error(err)
+			}
+			if q.DomainName != test.expected {
+				t.Errorf("%s != %s", q.DomainName, test.expected)
 			}
 		}
 	})
