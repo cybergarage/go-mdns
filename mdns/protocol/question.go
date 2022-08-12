@@ -83,6 +83,17 @@ func (q *Question) Parse(reader io.Reader) error {
 
 // Bytes returns the binary representation.
 func (q *Question) Bytes() []byte {
-	bytes := []byte{}
+	bytes := nameToBytes(q.Name)
+
+	typeBytes := make([]byte, 2)
+	bytes = append(bytes, encoding.IntegerToBytes(uint(q.Type), typeBytes)...)
+
+	classBytes := make([]byte, 2)
+	class := q.Class
+	if q.UnicastResponse {
+		class |= unicastResponseMask
+	}
+	bytes = append(bytes, encoding.IntegerToBytes(uint(class), classBytes)...)
+
 	return bytes
 }
