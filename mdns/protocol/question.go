@@ -24,33 +24,41 @@ type QuestionType uint
 
 const (
 	unknownQuestion QuestionType = 0
-	A               QuestionType = 0x01
-	NS              QuestionType = 0x02
-	CNAME           QuestionType = 0x05
-	PTR             QuestionType = 0x0C
-	HINFO           QuestionType = 0x0D
-	MX              QuestionType = 0x0F
-	AXFR            QuestionType = 0xFC
-	ANY             QuestionType = 0xFF
+	A               QuestionType = 0x0001
+	NS              QuestionType = 0x0002
+	CNAME           QuestionType = 0x0005
+	PTR             QuestionType = 0x000C
+	HINFO           QuestionType = 0x000D
+	MX              QuestionType = 0x000F
+	AXFR            QuestionType = 0x00FC
+	ANY             QuestionType = 0x00FF
+)
+
+type QuestionClass uint
+
+const (
+	unknownClass        QuestionClass = 0
+	IN                  QuestionClass = 0x0001
+	unicastResponseMask               = 0x8000
+	classMask                         = 0x7FFF
 )
 
 // Question represents a question.
 type Question struct {
-	Type       QuestionType
-	DomainName string
-}
-
-// NewQuestionWithType returns a new question innstance with the specified type.
-func NewQuestionWithType(t QuestionType) *Question {
-	return &Question{
-		Type:       t,
-		DomainName: "",
-	}
+	DomainName      string
+	Type            QuestionType
+	UnicastResponse bool
+	Class           QuestionClass
 }
 
 // NewQuestion returns a new question innstance.
 func NewQuestion() *Question {
-	return NewQuestionWithType(unknownQuestion)
+	return &Question{
+		DomainName:      "",
+		Type:            unknownQuestion,
+		UnicastResponse: false,
+		Class:           unknownClass,
+	}
 }
 
 // NewQuestionWithReader returns a new question innstance with the specified reader.
@@ -91,6 +99,19 @@ func (q *Question) Parse(reader io.Reader) error {
 		return err
 	}
 	q.Type = QuestionType(encoding.BytesToInteger(queryTypeBuf))
+
+	// Parses c;ass type
+	queryClassBuf := make([]byte, 2)
+	_, err = reader.Read(queryClassBuf)
+	if err != nil {
+		return err
+	}
+	queryClass := encoding.BytesToInteger(queryClassBuf)
+	q.UnicastResponse = false
+	if (queryClass & unicastResponseMask) != 0 {
+		q.UnicastResponse = true
+	}
+	q.Class = QuestionClass(queryClass & classMask)
 
 	return nil
 }
