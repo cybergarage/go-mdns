@@ -226,6 +226,11 @@ func (header *Header) AN() uint {
 	return encoding.BytesToInteger(header.bytes[6:7])
 }
 
+// setNS sets the specified number to the NS field.
+func (header *Header) setNS(n uint) {
+	header.setNumberOfEntries(n, 8)
+}
+
 // NS returns the number of name server resource records in the authority records section.
 func (header *Header) NS() uint {
 	return encoding.BytesToInteger(header.bytes[8:9])
