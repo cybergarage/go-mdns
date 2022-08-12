@@ -28,6 +28,9 @@ type Question struct {
 	Class           Class
 }
 
+// Questions represents a question array.
+type Questions []*Question
+
 // NewQuestion returns a new question innstance.
 func NewQuestion() *Question {
 	return &Question{
