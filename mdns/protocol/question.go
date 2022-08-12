@@ -81,17 +81,17 @@ func (q *Question) Parse(reader io.Reader) error {
 	q.Type = Type(encoding.BytesToInteger(queryTypeBuf))
 
 	// Parses c;ass type
-	queryClassBuf := make([]byte, 2)
-	_, err = reader.Read(queryClassBuf)
+	classBuf := make([]byte, 2)
+	_, err = reader.Read(classBuf)
 	if err != nil {
 		return err
 	}
-	queryClass := encoding.BytesToInteger(queryClassBuf)
+	class := encoding.BytesToInteger(classBuf)
 	q.UnicastResponse = false
-	if (queryClass & unicastResponseMask) != 0 {
+	if (class & unicastResponseMask) != 0 {
 		q.UnicastResponse = true
 	}
-	q.Class = Class(queryClass & classMask)
+	q.Class = Class(class & classMask)
 
 	return nil
 }
