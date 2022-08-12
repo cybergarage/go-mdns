@@ -15,12 +15,13 @@
 package encoding
 
 // IntegerToBytes converts a specified integer to bytes.
-func IntegerToBytes(v uint, b []byte) {
+func IntegerToBytes(v uint, b []byte) []byte {
 	byteSize := len(b)
 	for n := 0; n < byteSize; n++ {
 		idx := ((byteSize - 1) - n)
 		b[idx] = byte((v >> (uint(n) * 8)) & 0xFF)
 	}
+	return b
 }
 
 // BytesToInteger converts specified bytes to a integer.
