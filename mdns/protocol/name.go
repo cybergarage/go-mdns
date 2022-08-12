@@ -53,6 +53,9 @@ func nameToBytes(name string) []byte {
 	bytes := []byte{}
 	tokens := strings.Split(name, nameSep)
 	for _, token := range tokens {
+		if len(token) == 0 {
+			continue
+		}
 		nameLen := byte(len(token) & 0xFF)
 		bytes = append(bytes, nameLen)
 		bytes = append(bytes, []byte(token)...)
