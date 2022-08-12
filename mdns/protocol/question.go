@@ -20,12 +20,18 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
-type QuestionType int
+type QuestionType uint
 
 const (
 	unknownQuestion QuestionType = 0
-	PTR             QuestionType = 1
-	ANY             QuestionType = 2
+	A               QuestionType = 0x01
+	NS              QuestionType = 0x02
+	CNAME           QuestionType = 0x05
+	PTR             QuestionType = 0x0C
+	HINFO           QuestionType = 0x0D
+	MX              QuestionType = 0x0F
+	AXFR            QuestionType = 0xFC
+	ANY             QuestionType = 0xFF
 )
 
 // Question represents a question.
@@ -55,6 +61,7 @@ func NewQuestionWithReader(reader io.Reader) (*Question, error) {
 
 // Parse parses the specified reader.
 func (q *Question) Parse(reader io.Reader) error {
+	// Parses domain names
 	nextNameLenBuf := make([]byte, 1)
 	_, err := reader.Read(nextNameLenBuf)
 	for err == nil {
@@ -76,5 +83,14 @@ func (q *Question) Parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
+
+	// Parses query type
+	queryTypeBuf := make([]byte, 2)
+	_, err = reader.Read(queryTypeBuf)
+	if err != nil {
+		return err
+	}
+	q.Type = QuestionType(encoding.BytesToInteger(queryTypeBuf))
+
 	return nil
 }
