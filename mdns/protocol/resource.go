@@ -49,25 +49,10 @@ func NewResourceWithReader(reader io.Reader) (*Resource, error) {
 
 // Parse parses the specified reader.
 func (res *Resource) Parse(reader io.Reader) error {
+	var err error
+
 	// Parses domain names
-	nextNameLenBuf := make([]byte, 1)
-	_, err := reader.Read(nextNameLenBuf)
-	for err == nil {
-		nextNameLen := encoding.BytesToInteger(nextNameLenBuf)
-		if nextNameLen == 0 {
-			break
-		}
-		nextName := make([]byte, nextNameLen)
-		_, err = reader.Read(nextName)
-		if err != nil {
-			return err
-		}
-		if 0 < len(res.Name) {
-			res.Name += "."
-		}
-		res.Name += string(nextName)
-		_, err = reader.Read(nextNameLenBuf)
-	}
+	res.Name, err = parseName(reader)
 	if err != nil {
 		return err
 	}
@@ -80,7 +65,7 @@ func (res *Resource) Parse(reader io.Reader) error {
 	}
 	res.Type = ResourceType(encoding.BytesToInteger(queryTypeBuf))
 
-	// Parses c;ass type
+	// Parses class type
 	classBuf := make([]byte, 2)
 	_, err = reader.Read(classBuf)
 	if err != nil {

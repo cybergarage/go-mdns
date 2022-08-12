@@ -49,25 +49,10 @@ func NewQuestionWithReader(reader io.Reader) (*Question, error) {
 
 // Parse parses the specified reader.
 func (q *Question) Parse(reader io.Reader) error {
+	var err error
+
 	// Parses domain names
-	nextNameLenBuf := make([]byte, 1)
-	_, err := reader.Read(nextNameLenBuf)
-	for err == nil {
-		nextNameLen := encoding.BytesToInteger(nextNameLenBuf)
-		if nextNameLen == 0 {
-			break
-		}
-		nextName := make([]byte, nextNameLen)
-		_, err = reader.Read(nextName)
-		if err != nil {
-			return err
-		}
-		if 0 < len(q.Name) {
-			q.Name += "."
-		}
-		q.Name += string(nextName)
-		_, err = reader.Read(nextNameLenBuf)
-	}
+	q.Name, err = parseName(reader)
 	if err != nil {
 		return err
 	}
@@ -80,7 +65,7 @@ func (q *Question) Parse(reader io.Reader) error {
 	}
 	q.Type = Type(encoding.BytesToInteger(queryTypeBuf))
 
-	// Parses c;ass type
+	// Parses class type
 	classBuf := make([]byte, 2)
 	_, err = reader.Read(classBuf)
 	if err != nil {
@@ -94,4 +79,10 @@ func (q *Question) Parse(reader io.Reader) error {
 	q.Class = Class(class & classMask)
 
 	return nil
+}
+
+// Bytes returns the binary representation.
+func (q *Question) Bytes() []byte {
+	bytes := []byte{}
+	return bytes
 }
