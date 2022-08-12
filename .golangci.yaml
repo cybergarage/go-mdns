@@ -28,4 +28,4 @@ linters:
     - gochecknoglobals
     - scopelint
     - typecheck
-    - exhaustruct
+    - dupl
