@@ -16,9 +16,12 @@ package protocol
 
 import (
 	"io"
+	"strings"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
+
+const nameSep = "."
 
 func parseName(reader io.Reader) (string, error) {
 	name := ""
@@ -35,7 +38,7 @@ func parseName(reader io.Reader) (string, error) {
 			return "", err
 		}
 		if 0 < len(name) {
-			name += "."
+			name += nameSep
 		}
 		name += string(nextName)
 		_, err = reader.Read(nextNameLenBuf)
@@ -44,4 +47,16 @@ func parseName(reader io.Reader) (string, error) {
 		return "", err
 	}
 	return name, nil
+}
+
+func nameToBytes(name string) []byte {
+	bytes := []byte{}
+	tokens := strings.Split(name, nameSep)
+	for _, token := range tokens {
+		nameLen := byte(len(token) & 0xFF)
+		bytes = append(bytes, nameLen)
+		bytes = append(bytes, []byte(token)...)
+	}
+	bytes = append(bytes, 0x00)
+	return bytes
 }
