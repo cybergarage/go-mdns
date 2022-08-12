@@ -34,7 +34,7 @@ func NewQuestion() *Question {
 		Name:            "",
 		Type:            0,
 		UnicastResponse: false,
-		Class:           unknownClass,
+		Class:           0,
 	}
 }
 
