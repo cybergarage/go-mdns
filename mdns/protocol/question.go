@@ -34,21 +34,12 @@ const (
 	ANY             QuestionType = 0x00FF
 )
 
-type QuestionClass uint
-
-const (
-	unknownClass        QuestionClass = 0
-	IN                  QuestionClass = 0x0001
-	unicastResponseMask               = 0x8000
-	classMask                         = 0x7FFF
-)
-
 // Question represents a question.
 type Question struct {
 	Name            string
 	Type            QuestionType
 	UnicastResponse bool
-	Class           QuestionClass
+	Class           Class
 }
 
 // NewQuestion returns a new question innstance.
@@ -111,7 +102,7 @@ func (q *Question) Parse(reader io.Reader) error {
 	if (queryClass & unicastResponseMask) != 0 {
 		q.UnicastResponse = true
 	}
-	q.Class = QuestionClass(queryClass & classMask)
+	q.Class = Class(queryClass & classMask)
 
 	return nil
 }
