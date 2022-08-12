@@ -16,6 +16,7 @@ package protocol
 
 import (
 	"bytes"
+	"encoding/hex"
 	"testing"
 )
 
@@ -40,6 +41,7 @@ func TestResource(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
+			// Checks each field
 			if q.Name != test.expectedName {
 				t.Errorf("%s != %s", q.Name, test.expectedName)
 			}
@@ -48,6 +50,10 @@ func TestResource(t *testing.T) {
 			}
 			if q.CacheFlush != test.expectedCache {
 				t.Errorf("%t != %t", q.CacheFlush, test.expectedCache)
+			}
+			// Checks all bytes
+			if !bytes.Equal(q.Bytes(), test.query) {
+				t.Errorf("%s != %s", hex.EncodeToString(q.Bytes()), hex.EncodeToString(test.query))
 			}
 		}
 	})
