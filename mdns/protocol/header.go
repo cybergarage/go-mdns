@@ -236,6 +236,11 @@ func (header *Header) NS() uint {
 	return encoding.BytesToInteger(header.bytes[8:9])
 }
 
+// setAR sets the specified number to the AR field.
+func (header *Header) setAR(n uint) {
+	header.setNumberOfEntries(n, 10)
+}
+
 // AR returns the number of resource records in the additional records section.
 func (header *Header) AR() uint {
 	return encoding.BytesToInteger(header.bytes[10:11])
