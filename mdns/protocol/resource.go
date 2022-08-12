@@ -29,6 +29,8 @@ type Resource struct {
 	Type       ResourceType
 	CacheFlush bool
 	Class      ResourceClass
+	TTL        uint
+	Data       []byte
 }
 
 // NewResource returns a new question innstance.
@@ -38,6 +40,8 @@ func NewResource() *Resource {
 		Type:       0,
 		CacheFlush: false,
 		Class:      0,
+		TTL:        0,
+		Data:       nil,
 	}
 }
 
@@ -58,25 +62,70 @@ func (res *Resource) Parse(reader io.Reader) error {
 	}
 
 	// Parses query type
-	queryTypeBuf := make([]byte, 2)
-	_, err = reader.Read(queryTypeBuf)
+	typeBytes := make([]byte, 2)
+	_, err = reader.Read(typeBytes)
 	if err != nil {
 		return err
 	}
-	res.Type = ResourceType(encoding.BytesToInteger(queryTypeBuf))
+	res.Type = ResourceType(encoding.BytesToInteger(typeBytes))
 
 	// Parses class type
-	classBuf := make([]byte, 2)
-	_, err = reader.Read(classBuf)
+	classBytes := make([]byte, 2)
+	_, err = reader.Read(classBytes)
 	if err != nil {
 		return err
 	}
-	class := encoding.BytesToInteger(classBuf)
+	class := encoding.BytesToInteger(classBytes)
 	res.CacheFlush = false
 	if (class & cacheFlushMask) != 0 {
 		res.CacheFlush = true
 	}
 	res.Class = ResourceClass(class & classMask)
 
+	// Parses TTL
+	ttlBytes := make([]byte, 4)
+	_, err = reader.Read(ttlBytes)
+	if err != nil {
+		return err
+	}
+	res.TTL = encoding.BytesToInteger(ttlBytes)
+
+	// Parses data
+	dataLenBytes := make([]byte, 2)
+	_, err = reader.Read(dataLenBytes)
+	if err != nil {
+		return err
+	}
+	dataLen := encoding.BytesToInteger(dataLenBytes)
+	res.Data = make([]byte, dataLen)
+	_, err = reader.Read(res.Data)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+// Bytes returns the binary representation.
+func (res *Resource) Bytes() []byte {
+	bytes := nameToBytes(res.Name)
+
+	typeBytes := make([]byte, 2)
+	bytes = append(bytes, encoding.IntegerToBytes(uint(res.Type), typeBytes)...)
+
+	classBytes := make([]byte, 2)
+	class := res.Class
+	if res.CacheFlush {
+		class |= cacheFlushMask
+	}
+	bytes = append(bytes, encoding.IntegerToBytes(uint(class), classBytes)...)
+
+	ttlBytes := make([]byte, 4)
+	bytes = append(bytes, encoding.IntegerToBytes(res.TTL, ttlBytes)...)
+
+	dataLenBytes := make([]byte, 2)
+	bytes = append(bytes, encoding.IntegerToBytes(uint(len(res.Data)), dataLenBytes)...)
+	bytes = append(bytes, res.Data...)
+
+	return bytes
 }
