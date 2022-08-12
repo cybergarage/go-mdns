@@ -22,12 +22,14 @@ import (
 func TestQuestion(t *testing.T) {
 	t.Run("ParseQuestion", func(t *testing.T) {
 		tests := []struct {
-			query    []byte
-			expected string
+			query        []byte
+			expectedName string
+			expectedType QuestionType
 		}{
 			{
-				query:    []byte{0x02, 0x6c, 0x62, 0x07, 0x5f, 0x64, 0x6e, 0x73, 0x2d, 0x73, 0x64, 0x04, 0x5f, 0x75, 0x64, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0x0c, 0x80, 0x01},
-				expected: "lb._dns-sd._udp.local",
+				query:        []byte{0x02, 0x6c, 0x62, 0x07, 0x5f, 0x64, 0x6e, 0x73, 0x2d, 0x73, 0x64, 0x04, 0x5f, 0x75, 0x64, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0x0c, 0x80, 0x01},
+				expectedName: "lb._dns-sd._udp.local",
+				expectedType: PTR,
 			},
 		}
 		for _, test := range tests {
@@ -35,8 +37,11 @@ func TestQuestion(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if q.DomainName != test.expected {
-				t.Errorf("%s != %s", q.DomainName, test.expected)
+			if q.DomainName != test.expectedName {
+				t.Errorf("%s != %s", q.DomainName, test.expectedName)
+			}
+			if q.Type != test.expectedType {
+				t.Errorf("%d != %d", q.Type, test.expectedType)
 			}
 		}
 	})
