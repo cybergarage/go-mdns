@@ -14,21 +14,59 @@
 
 package protocol
 
+import (
+	"io"
+
+	"github.com/cybergarage/go-mdns/mdns/encoding"
+)
+
 type QuestionType int
 
 const (
-	PTR QuestionType = 1
-	ANY QuestionType = 2
+	unknownQuestion QuestionType = 0
+	PTR             QuestionType = 1
+	ANY             QuestionType = 2
 )
 
 // Question represents a question.
 type Question struct {
-	Type QuestionType
+	Type       QuestionType
+	DomainName string
 }
 
-// NewQuestion returns a new question with the specified type.
+// NewQuestionWithType returns a new question innstance with the specified type.
 func NewQuestionWithType(t QuestionType) *Question {
 	return &Question{
-		Type: t,
+		Type:       t,
+		DomainName: "",
 	}
+}
+
+// NewQuestion returns a new question innstance.
+func NewQuestion() *Question {
+	return NewQuestionWithType(unknownQuestion)
+}
+
+// NewQuestionWithReader returns a new question innstance with the specified reader.
+func NewQuestionWithReader(reader io.Reader) (*Question, error) {
+	q := NewQuestion()
+	return q, q.Parse(reader)
+}
+
+// Parse parses the specified reader.
+func (q *Question) Parse(reader io.Reader) error {
+	nextNameLenBuf := make([]byte, 1)
+	_, err := reader.Read(nextNameLenBuf)
+	for err != nil {
+		nextNameLen := encoding.BytesToInteger(nextNameLenBuf)
+		if nextNameLen == 0 {
+			break
+		}
+		nextName := make([]byte, nextNameLen)
+		_, err = reader.Read(nextNameLenBuf)
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }

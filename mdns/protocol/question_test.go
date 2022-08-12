@@ -15,21 +15,26 @@
 package protocol
 
 import (
+	"bytes"
 	"testing"
 )
 
 func TestQuestion(t *testing.T) {
-	tests := []struct {
-		query    []byte
-		expected string
-	}{
-		{
-			query:    []byte{},
-			expected: "",
-		},
-	}
-	// 02 6c 62 07 5f 64 6e 73 2d 73 64 04 5f 75 64 70 05 6c 6f 63 61 6c 00 00 0c 80 01
-	// lb._dns-sd._udp.local
-	for _, test := range tests {
-	}
+	t.Run("ParseQuestion", func(t *testing.T) {
+		tests := []struct {
+			query    []byte
+			expected string
+		}{
+			{
+				query:    []byte{0x02, 0x6c, 0x62, 0x07, 0x5f, 0x64, 0x6e, 0x73, 0x2d, 0x73, 0x64, 0x04, 0x5f, 0x75, 0x64, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0x0c, 0x80, 0x01},
+				expected: "lb._dns-sd._udp.local",
+			},
+		}
+		for _, test := range tests {
+			_, err := NewQuestionWithReader(bytes.NewReader(test.query))
+			if err != nil {
+				t.Error(err)
+			}
+		}
+	})
 }
