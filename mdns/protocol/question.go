@@ -32,7 +32,7 @@ type Question struct {
 func NewQuestion() *Question {
 	return &Question{
 		Name:            "",
-		Type:            unknownQuestion,
+		Type:            0,
 		UnicastResponse: false,
 		Class:           unknownClass,
 	}

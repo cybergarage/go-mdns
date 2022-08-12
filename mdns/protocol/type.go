@@ -17,13 +17,12 @@ package protocol
 type Type uint
 
 const (
-	unknownQuestion Type = 0
-	A               Type = 0x0001
-	NS              Type = 0x0002
-	CNAME           Type = 0x0005
-	PTR             Type = 0x000C
-	HINFO           Type = 0x000D
-	MX              Type = 0x000F
-	AXFR            Type = 0x00FC
-	ANY             Type = 0x00FF
+	A     Type = 0x0001
+	NS    Type = 0x0002
+	CNAME Type = 0x0005
+	PTR   Type = 0x000C
+	HINFO Type = 0x000D
+	MX    Type = 0x000F
+	AXFR  Type = 0x00FC
+	ANY   Type = 0x00FF
 )
