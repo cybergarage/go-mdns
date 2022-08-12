@@ -20,24 +20,10 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
-type QuestionType uint
-
-const (
-	unknownQuestion QuestionType = 0
-	A               QuestionType = 0x0001
-	NS              QuestionType = 0x0002
-	CNAME           QuestionType = 0x0005
-	PTR             QuestionType = 0x000C
-	HINFO           QuestionType = 0x000D
-	MX              QuestionType = 0x000F
-	AXFR            QuestionType = 0x00FC
-	ANY             QuestionType = 0x00FF
-)
-
 // Question represents a question.
 type Question struct {
 	Name            string
-	Type            QuestionType
+	Type            Type
 	UnicastResponse bool
 	Class           Class
 }
@@ -89,7 +75,7 @@ func (q *Question) Parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
-	q.Type = QuestionType(encoding.BytesToInteger(queryTypeBuf))
+	q.Type = Type(encoding.BytesToInteger(queryTypeBuf))
 
 	// Parses c;ass type
 	queryClassBuf := make([]byte, 2)
