@@ -198,6 +198,19 @@ func (header *Header) ResponseCode() ResponseCode {
 	return ResponseCode(header.bytes[3] & 0x0F)
 }
 
+// setNumberOfEntries sets the specified number to the specified offset field.
+func (header *Header) setNumberOfEntries(n uint, offset int) {
+	bytes := make([]byte, 2)
+	encoding.IntegerToBytes(n, bytes)
+	header.bytes[offset] = bytes[0]
+	header.bytes[offset+1] = bytes[1]
+}
+
+// setQD sets the specified number to the QD field.
+func (header *Header) setQD(n uint) {
+	header.setNumberOfEntries(n, 4)
+}
+
 // QD returns the the number of entries in the question section.
 func (header *Header) QD() uint {
 	return encoding.BytesToInteger(header.bytes[4:5])
