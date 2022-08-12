@@ -45,7 +45,7 @@ const (
 
 // Question represents a question.
 type Question struct {
-	DomainName      string
+	Name            string
 	Type            QuestionType
 	UnicastResponse bool
 	Class           QuestionClass
@@ -54,7 +54,7 @@ type Question struct {
 // NewQuestion returns a new question innstance.
 func NewQuestion() *Question {
 	return &Question{
-		DomainName:      "",
+		Name:            "",
 		Type:            unknownQuestion,
 		UnicastResponse: false,
 		Class:           unknownClass,
@@ -82,10 +82,10 @@ func (q *Question) Parse(reader io.Reader) error {
 		if err != nil {
 			return err
 		}
-		if 0 < len(q.DomainName) {
-			q.DomainName += "."
+		if 0 < len(q.Name) {
+			q.Name += "."
 		}
-		q.DomainName += string(nextName)
+		q.Name += string(nextName)
 		_, err = reader.Read(nextNameLenBuf)
 	}
 	if err != nil {

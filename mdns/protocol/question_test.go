@@ -41,8 +41,8 @@ func TestQuestion(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if q.DomainName != test.expectedName {
-				t.Errorf("%s != %s", q.DomainName, test.expectedName)
+			if q.Name != test.expectedName {
+				t.Errorf("%s != %s", q.Name, test.expectedName)
 			}
 			if q.Type != test.expectedType {
 				t.Errorf("%2X != %2X", q.Type, test.expectedType)
