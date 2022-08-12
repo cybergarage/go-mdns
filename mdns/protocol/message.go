@@ -23,12 +23,14 @@ import (
 // Message represents a protocol message.
 type Message struct {
 	*Header
+	Questions
 }
 
 // NewMessage returns a nil message instance.
 func NewMessage() *Message {
 	msg := &Message{
-		Header: NewHeader(),
+		Header:    NewHeader(),
+		Questions: Questions{},
 	}
 	return msg
 }
@@ -36,7 +38,8 @@ func NewMessage() *Message {
 // NewRequestMessage returns a request message instance.
 func NewRequestMessage() *Message {
 	msg := &Message{
-		Header: NewRequestHeader(),
+		Header:    NewRequestHeader(),
+		Questions: Questions{},
 	}
 	return msg
 }
@@ -44,7 +47,8 @@ func NewRequestMessage() *Message {
 // NewResponseMessage returns a response message instance.
 func NewResponseMessage() *Message {
 	msg := &Message{
-		Header: NewResponseHeader(),
+		Header:    NewResponseHeader(),
+		Questions: Questions{},
 	}
 	return msg
 }
@@ -68,6 +72,14 @@ func (msg *Message) Parse(reader io.Reader) error {
 	if err := msg.Header.Parse(reader); err != nil {
 		return err
 	}
+	// Parses questions
+	for n := 0; n < int(msg.QD()); n++ {
+		q, err := NewQuestionWithReader(reader)
+		if err != nil {
+			return nil
+		}
+		msg.Questions = append(msg.Questions, q)
+	}
 	return nil
 }
 
@@ -79,7 +91,8 @@ func (msg *Message) Equals(other *Message) bool {
 // Copy returns the copy message instance.
 func (msg *Message) Copy() *Message {
 	return &Message{
-		Header: NewHeaderWithBytes(msg.Header.bytes),
+		Header:    NewHeaderWithBytes(msg.Header.bytes),
+		Questions: msg.Questions,
 	}
 }
 
