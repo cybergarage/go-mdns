@@ -57,12 +57,20 @@ func NewQuestionWithReader(reader io.Reader) (*Question, error) {
 func (q *Question) Parse(reader io.Reader) error {
 	nextNameLenBuf := make([]byte, 1)
 	_, err := reader.Read(nextNameLenBuf)
-	for err != nil {
+	for err == nil {
 		nextNameLen := encoding.BytesToInteger(nextNameLenBuf)
 		if nextNameLen == 0 {
 			break
 		}
 		nextName := make([]byte, nextNameLen)
+		_, err = reader.Read(nextName)
+		if err != nil {
+			return err
+		}
+		if 0 < len(q.DomainName) {
+			q.DomainName += "."
+		}
+		q.DomainName += string(nextName)
 		_, err = reader.Read(nextNameLenBuf)
 	}
 	if err != nil {
