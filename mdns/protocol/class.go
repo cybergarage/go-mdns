@@ -17,8 +17,10 @@ package protocol
 type Class uint
 
 const (
-	unknownClass        Class = 0
-	IN                  Class = 0x0001
-	unicastResponseMask       = 0x8000
-	classMask                 = 0x7FFF
+	IN Class = 0x0001
+)
+
+const (
+	unicastResponseMask = 0x8000
+	classMask           = 0x7FFF
 )
