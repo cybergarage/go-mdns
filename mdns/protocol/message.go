@@ -70,6 +70,7 @@ func NewMessageWithBytes(msgBytes []byte) (*Message, error) {
 // AddQuestion adds the specified question into the message.
 func (msg *Message) AddQuestion(q *Question) {
 	msg.Questions = append(msg.Questions, q)
+	msg.setQD(uint(len(msg.Questions)))
 }
 
 // Parse parses the specified reader.
@@ -83,7 +84,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 		if err != nil {
 			return nil
 		}
-		msg.AddQuestion(q)
+		msg.Questions = append(msg.Questions, q)
 	}
 	return nil
 }
@@ -104,6 +105,9 @@ func (msg *Message) Copy() *Message {
 // Bytes returns the binary representation.
 func (msg *Message) Bytes() []byte {
 	bytes := msg.Header.Bytes()
+	for _, q := range msg.Questions {
+		bytes = append(bytes, q.Bytes()...)
+	}
 	return bytes
 }
 
