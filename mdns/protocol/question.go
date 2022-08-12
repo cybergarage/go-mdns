@@ -58,20 +58,20 @@ func (q *Question) Parse(reader io.Reader) error {
 	}
 
 	// Parses query type
-	queryTypeBuf := make([]byte, 2)
-	_, err = reader.Read(queryTypeBuf)
+	typeBytes := make([]byte, 2)
+	_, err = reader.Read(typeBytes)
 	if err != nil {
 		return err
 	}
-	q.Type = Type(encoding.BytesToInteger(queryTypeBuf))
+	q.Type = Type(encoding.BytesToInteger(typeBytes))
 
 	// Parses class type
-	classBuf := make([]byte, 2)
-	_, err = reader.Read(classBuf)
+	classBytes := make([]byte, 2)
+	_, err = reader.Read(classBytes)
 	if err != nil {
 		return err
 	}
-	class := encoding.BytesToInteger(classBuf)
+	class := encoding.BytesToInteger(classBytes)
 	q.UnicastResponse = false
 	if (class & unicastResponseMask) != 0 {
 		q.UnicastResponse = true
