@@ -216,6 +216,11 @@ func (header *Header) QD() uint {
 	return encoding.BytesToInteger(header.bytes[4:5])
 }
 
+// setAN sets the specified number to the AN field.
+func (header *Header) setAN(n uint) {
+	header.setNumberOfEntries(n, 6)
+}
+
 // AN returns the the number of entries in in the answer section.
 func (header *Header) AN() uint {
 	return encoding.BytesToInteger(header.bytes[6:7])
