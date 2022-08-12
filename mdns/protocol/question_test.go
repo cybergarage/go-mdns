@@ -24,7 +24,7 @@ func TestQuestion(t *testing.T) {
 		tests := []struct {
 			query           []byte
 			expectedName    string
-			expectedType    QuestionType
+			expectedType    Type
 			expectedUnicast bool
 			expectedClass   Class
 		}{
