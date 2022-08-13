@@ -14,6 +14,7 @@
 
 package protocol
 
+// Type represents a message type.
 type Type uint
 
 const (
