@@ -14,10 +14,19 @@
 
 package mdns
 
-// Services represents a SRV records.
-type Services []*Service
+// Services represents a ser records.
+type Services struct {
+	services []*Service
+}
 
-// NewServicess returns a blank services instance.
-func NewServicess() Services {
-	return Services{}
+// NewServicess returns a blank service array.
+func NewServicess() *Services {
+	return &Services{
+		services: []*Service{},
+	}
+}
+
+// AddService adds the specified service into th service array.
+func (services *Services) AddService(service *Service) {
+	services.services = append(services.services, service)
 }
