@@ -28,21 +28,25 @@ func TestMulticastSocketBindWithInterface(t *testing.T) {
 	}
 
 	for _, ifi := range ifis {
-		ifaddrs, err := GetInterfaceAddresses(ifi)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-		for _, ifaddr := range ifaddrs {
-			err = sock.Bind(ifi, ifaddr)
+		t.Run(ifi.Name, func(t *testing.T) {
+			ifaddrs, err := GetInterfaceAddresses(ifi)
 			if err != nil {
 				t.Error(err)
+				return
 			}
+			for _, ifaddr := range ifaddrs {
+				t.Run(ifaddr, func(t *testing.T) {
+					err = sock.Bind(ifi, ifaddr)
+					if err != nil {
+						t.Error(err)
+					}
 
-			err = sock.Close()
-			if err != nil {
-				t.Error(err)
+					err = sock.Close()
+					if err != nil {
+						t.Error(err)
+					}
+				})
 			}
-		}
+		})
 	}
 }
