@@ -49,7 +49,6 @@ func (server *MulticastServer) Start(ifi *net.Interface) error {
 	if err := server.MulticastSocket.Bind(ifi); err != nil {
 		return err
 	}
-	server.SetBoundInterface(ifi)
 	server.Channel = make(chan interface{})
 	go handleMulticastConnection(server, server.Channel)
 	return nil
