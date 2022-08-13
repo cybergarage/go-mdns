@@ -14,7 +14,15 @@
 
 package mdns
 
-// MessageListener represents a protocol message listiner interface.
-type MessageListener interface {
-	MessageReceived(*Message)
+import (
+	"github.com/cybergarage/go-mdns/mdns/protocol"
+)
+
+// Message represents a protocol message.
+type Message = protocol.Message
+
+func newRequestWithQuery(q *Query) *Message {
+	msg := protocol.NewRequestMessage()
+	msg.AddQuestion(protocol.NewQuestion().SetName(q.String()).SetType(protocol.PTR))
+	return msg
 }
