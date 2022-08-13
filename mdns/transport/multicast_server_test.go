@@ -104,13 +104,17 @@ func TestMulticastServerWithInterface(t *testing.T) {
 	}
 
 	for _, ifi := range ifis {
-		ifaddrs, err := GetInterfaceAddresses(ifi)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-		for _, ifaddr := range ifaddrs {
-			testMulticastServerWithInterface(t, ifi, ifaddr)
-		}
+		t.Run(ifi.Name, func(t *testing.T) {
+			ifaddrs, err := GetInterfaceAddresses(ifi)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			for _, ifaddr := range ifaddrs {
+				t.Run(ifaddr, func(t *testing.T) {
+					testMulticastServerWithInterface(t, ifi, ifaddr)
+				})
+			}
+		})
 	}
 }
