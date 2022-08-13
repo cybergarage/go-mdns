@@ -41,9 +41,11 @@ TEST_PKGS=\
 BIN_ROOT=examples
 BIN_ID=${MODULE_ROOT}/${BIN_ROOT}
 BIN_SRCS=\
-	${BIN_ROOT}/mdnssearch
+	${BIN_ROOT}/mdnssearch \
+	${BIN_ROOT}/mdnsserver
 BINS=\
-	${BIN_ID}/mdnssearch
+	${BIN_ID}/mdnssearch \
+	${BIN_ID}/mdnsserver
 
 .PHONY: format vet lint clean
 
