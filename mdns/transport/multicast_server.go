@@ -15,8 +15,11 @@
 package transport
 
 import (
+	"errors"
+	"io"
 	"net"
 
+	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
@@ -83,6 +86,9 @@ func handleMulticastConnection(server *MulticastServer, cancel chan interface{})
 		default:
 			msg, err := server.MulticastSocket.ReadMessage()
 			if err != nil {
+				if !errors.Is(err, io.EOF) {
+					log.Error(err.Error())
+				}
 				break
 			}
 			go handleMulticastRequestMessage(server, msg)

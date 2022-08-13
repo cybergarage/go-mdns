@@ -102,7 +102,6 @@ func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 
 	msg, err := protocol.NewMessageWithBytes(sock.ReadBuffer[:n])
 	if err != nil {
-		log.Error(err.Error())
 		return nil, err
 	}
 
