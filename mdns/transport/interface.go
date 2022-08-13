@@ -45,20 +45,30 @@ func IsIPv4Address(addr string) bool {
 
 // IsIPv6Interface returns true whether the specified address is a IPv6 address.
 func IsIPv6Interface(ifi *net.Interface) bool {
-	addr, err := GetInterfaceAddress(ifi)
+	addrs, err := GetInterfaceAddresses(ifi)
 	if err != nil {
 		return false
 	}
-	return IsIPv6Address(addr)
+	for _, addr := range addrs {
+		if IsIPv6Address(addr) {
+			return true
+		}
+	}
+	return false
 }
 
 // IsIPv4Interface returns true whether the specified address is a IPv4 address.
 func IsIPv4Interface(ifi *net.Interface) bool {
-	addr, err := GetInterfaceAddress(ifi)
+	addrs, err := GetInterfaceAddresses(ifi)
 	if err != nil {
 		return false
 	}
-	return IsIPv4Address(addr)
+	for _, addr := range addrs {
+		if IsIPv4Address(addr) {
+			return true
+		}
+	}
+	return false
 }
 
 // IsLoopbackAddress returns true whether the specified address is a loopback addresses.
@@ -108,21 +118,25 @@ func IsVirtualInterface(ifi *net.Interface) bool {
 	return false
 }
 
-// GetInterfaceAddress returns a IPv4 or IPv6 address of the specivied interface.
-func GetInterfaceAddress(ifi *net.Interface) (string, error) {
+// GetInterfaceAddresses returns a IPv4 or IPv6 address of the specivied interface.
+func GetInterfaceAddresses(ifi *net.Interface) ([]string, error) {
 	addrs, err := ifi.Addrs()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+	ipaddrs := []string{}
 	for _, addr := range addrs {
 		addrStr := addr.String()
 		saddr := strings.Split(addrStr, "/")
 		if len(saddr) < 2 {
 			continue
 		}
-		return saddr[0], nil
+		ipaddrs = append(ipaddrs, saddr[0])
 	}
-	return "", errors.New(errorAvailableAddressNotFound)
+	if len(ipaddrs) == 0 {
+		return nil, errors.New(errorAvailableAddressNotFound)
+	}
+	return ipaddrs, nil
 }
 
 // GetAvailableInterfaces returns all available interfaces in the node.
@@ -150,7 +164,7 @@ func GetAvailableInterfaces() ([]*net.Interface, error) {
 		if IsVirtualInterface(&localIf) {
 			continue
 		}
-		_, addrErr := GetInterfaceAddress(&localIf)
+		_, addrErr := GetInterfaceAddresses(&localIf)
 		if addrErr != nil {
 			continue
 		}
@@ -166,7 +180,7 @@ func GetAvailableInterfaces() ([]*net.Interface, error) {
 	return useIfs, err
 }
 
-// GetAvailableAddresses returns all available IPv4 addresses in the node.
+// GetAvailableAddresses returns all available IP addresses in the node.
 func GetAvailableAddresses() ([]string, error) {
 	addrs := make([]string, 0)
 	ifis, err := GetAvailableInterfaces()
@@ -174,60 +188,11 @@ func GetAvailableAddresses() ([]string, error) {
 		return addrs, err
 	}
 	for _, ifi := range ifis {
-		addr, err := GetInterfaceAddress(ifi)
+		ipaddrs, err := GetInterfaceAddresses(ifi)
 		if err != nil {
 			continue
 		}
-		addrs = append(addrs, addr)
+		addrs = append(addrs, ipaddrs...)
 	}
 	return addrs, nil
-}
-
-func getMatchAddressBlockCount(ifAddr string, targetAddr string) int {
-	const addrSep = "."
-	targetAddrs := strings.Split(targetAddr, addrSep)
-	ifAddrs := strings.Split(ifAddr, addrSep)
-	if len(targetAddrs) != len(ifAddrs) {
-		return -1
-	}
-	addrSize := len(targetAddrs)
-	for n := 0; n < len(targetAddrs); n++ {
-		if targetAddrs[n] != ifAddrs[n] {
-			return n
-		}
-	}
-	return addrSize
-}
-
-// GetAvailableInterfaceForAddr returns an interface of the specified address.
-func GetAvailableInterfaceForAddr(fromAddr string) (*net.Interface, error) {
-	ifis, err := GetAvailableInterfaces()
-	if err != nil {
-		return nil, err
-	}
-
-	switch len(ifis) {
-	case 0:
-		return nil, errors.New(errorAvailableInterfaceFound)
-	case 1:
-		return ifis[0], nil
-	}
-
-	ifAddrs := make([]string, len(ifis))
-	for n := 0; n < len(ifAddrs); n++ {
-		ifAddrs[n], _ = GetInterfaceAddress(ifis[n])
-	}
-
-	selIf := ifis[0]
-	selIfMatchBlocks := getMatchAddressBlockCount(fromAddr, ifAddrs[0])
-	for n := 0; n < len(ifAddrs); n++ {
-		matchBlocks := getMatchAddressBlockCount(fromAddr, ifAddrs[n])
-		if matchBlocks < selIfMatchBlocks {
-			continue
-		}
-		selIf = ifis[n]
-		selIfMatchBlocks = matchBlocks
-	}
-
-	return selIf, nil
 }
