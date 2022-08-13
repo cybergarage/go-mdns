@@ -14,10 +14,49 @@
 
 package mdns
 
+import (
+	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/transport"
+)
+
+// Client represents a client node instance.
 type Client struct {
+	*transport.MessageManager
 }
 
+// NewClient returns a new client instance.
 func NewClient() *Client {
-	client := &Client{}
+	client := &Client{
+		MessageManager: transport.NewMessageManager(),
+	}
+	client.SetMessageHandler(client)
 	return client
+}
+
+// Start starts the client instance.
+func (client *Client) Start() error {
+	if err := client.Stop(); err != nil {
+		return err
+	}
+	return client.MessageManager.Start()
+}
+
+// Stop stops the client instance.
+func (client *Client) Stop() error {
+	return client.MessageManager.Stop()
+}
+
+// Restart restarts the client instance.
+func (client *Client) Restart() error {
+	if err := client.Stop(); err != nil {
+		return err
+	}
+	return client.Start()
+}
+
+func (client *Client) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+	if msg.IsQuery() {
+		return nil, nil
+	}
+	return nil, nil
 }
