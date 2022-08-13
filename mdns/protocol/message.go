@@ -180,5 +180,8 @@ func (msg *Message) Bytes() []byte {
 
 // String returns the string representation.
 func (msg *Message) String() string {
+	if msg == nil {
+		return ""
+	}
 	return hex.EncodeToString(msg.Header.bytes)
 }
