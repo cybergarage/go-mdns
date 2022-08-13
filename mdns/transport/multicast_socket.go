@@ -18,6 +18,8 @@ import (
 	"errors"
 	"fmt"
 	"net"
+
+	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 // A MulticastSocket represents a socket.
@@ -74,4 +76,18 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface) error {
 	}
 
 	return nil
+}
+
+// AnnounceMessage announces the message to the bound multicast address.
+func (sock *MulticastSocket) AnnounceMessage(msg *protocol.Message) error {
+	addr, err := sock.GetBoundAddr()
+	if err != nil {
+		return err
+	}
+	port, err := sock.GetBoundPort()
+	if err != nil {
+		return err
+	}
+	_, err = sock.SendMessage(addr, port, msg)
+	return err
 }
