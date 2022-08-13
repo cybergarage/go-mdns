@@ -143,6 +143,9 @@ func (msg *Message) Parse(reader io.Reader) error {
 
 // Equals returns true if the message is same as the specified message, otherwise false.
 func (msg *Message) Equals(other *Message) bool {
+	if other == nil {
+		return false
+	}
 	return msg.Header.Equals(other.Header)
 }
 
