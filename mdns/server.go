@@ -15,6 +15,7 @@
 package mdns
 
 import (
+	"github.com/cybergarage/go-mdns/mdns/protocol"
 	"github.com/cybergarage/go-mdns/mdns/transport"
 )
 
@@ -28,6 +29,7 @@ func NewServer() *Server {
 	server := &Server{
 		MessageManager: transport.NewMessageManager(),
 	}
+	server.SetMessageHandler(server)
 	return server
 }
 
@@ -50,4 +52,8 @@ func (server *Server) Restart() error {
 		return err
 	}
 	return server.Start()
+}
+
+func (server *Server) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+	return nil, nil
 }
