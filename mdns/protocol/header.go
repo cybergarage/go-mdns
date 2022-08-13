@@ -258,6 +258,9 @@ func (header *Header) IsResponse() bool {
 
 // Equals returns true if the header is same as the specified header, otherwise false.
 func (header *Header) Equals(other *Header) bool {
+	if other == nil {
+		return false
+	}
 	return bytes.Equal(header.bytes, other.bytes)
 }
 
