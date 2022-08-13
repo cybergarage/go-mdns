@@ -18,6 +18,20 @@ import (
 	"strings"
 )
 
+// RFC 6765: 11. Discovery of Browsing and Registration Domains (Domain Enumeration).
+const (
+	// A list of domains recommended for browsing.
+	RecommendedBrowsingService = "b._dns-sd._udp"
+	// A single recommended default domain for browsing.
+	DefaultBrowsingService = "db._dns-sd._udp"
+	// A list of domains recommended for registering services using Dynamic Update.
+	RecommendedRegisteringService = "r._dns-sd._udp"
+	// A single recommended default domain for registering services.
+	DefaultRegisteringService = "dr._dns-sd._udp"
+	// The "legacy browsing" or "automatic browsing" domain(s).
+	AutomaticBrowsingService = "lb._dns-sd._udp"
+)
+
 // Query represents a question query.
 type Query struct {
 	Service string
