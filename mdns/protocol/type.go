@@ -20,6 +20,7 @@ const (
 	A     Type = 0x0001
 	NS    Type = 0x0002
 	CNAME Type = 0x0005
+	TXT   Type = 0x0010
 	SRV   Type = 0x0021
 	OPT   Type = 0x0029
 	PTR   Type = 0x000C
