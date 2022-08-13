@@ -213,7 +213,7 @@ func (header *Header) setQD(n uint) {
 
 // QD returns the the number of entries in the question section.
 func (header *Header) QD() uint {
-	return encoding.BytesToInteger(header.bytes[4:5])
+	return encoding.BytesToInteger(header.bytes[4:6])
 }
 
 // setAN sets the specified number to the AN field.
@@ -223,7 +223,7 @@ func (header *Header) setAN(n uint) {
 
 // AN returns the the number of entries in in the answer section.
 func (header *Header) AN() uint {
-	return encoding.BytesToInteger(header.bytes[6:7])
+	return encoding.BytesToInteger(header.bytes[6:8])
 }
 
 // setNS sets the specified number to the NS field.
@@ -233,7 +233,7 @@ func (header *Header) setNS(n uint) {
 
 // NS returns the number of name server resource records in the authority records section.
 func (header *Header) NS() uint {
-	return encoding.BytesToInteger(header.bytes[8:9])
+	return encoding.BytesToInteger(header.bytes[8:10])
 }
 
 // setAR sets the specified number to the AR field.
@@ -243,7 +243,7 @@ func (header *Header) setAR(n uint) {
 
 // AR returns the number of resource records in the additional records section.
 func (header *Header) AR() uint {
-	return encoding.BytesToInteger(header.bytes[10:11])
+	return encoding.BytesToInteger(header.bytes[10:12])
 }
 
 // IsQuery returns true the QR bit is zero, otherwise false.
