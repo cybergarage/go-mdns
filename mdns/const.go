@@ -16,4 +16,5 @@ package mdns
 
 const (
 	DefaultDomain = "local"
+	nameSep       = "."
 )
