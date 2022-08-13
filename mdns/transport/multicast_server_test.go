@@ -44,14 +44,14 @@ func (server *testMulticastServer) MessageReceived(msg *protocol.Message) (*prot
 	return nil, nil
 }
 
-func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface) {
+func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr string) {
 	t.Helper()
 
 	server := newTestMulticastServer()
 
 	// Start server
 
-	err := server.Start(ifi)
+	err := server.Start(ifi, ifaddr)
 	if err != nil {
 		t.Error(err)
 		return
@@ -104,11 +104,13 @@ func TestMulticastServerWithInterface(t *testing.T) {
 	}
 
 	for _, ifi := range ifis {
-		switch {
-		case IsIPv4Interface(ifi):
-			testMulticastServerWithInterface(t, ifi)
-		case IsIPv6Interface(ifi):
-			testMulticastServerWithInterface(t, ifi)
+		ifaddrs, err := GetInterfaceAddresses(ifi)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		for _, ifaddr := range ifaddrs {
+			testMulticastServerWithInterface(t, ifi, ifaddr)
 		}
 	}
 }

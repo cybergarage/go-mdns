@@ -62,10 +62,10 @@ func (mgr *MulticastManager) AnnounceMessage(msg *protocol.Message) error {
 }
 
 // startWithInterface starts this server on the specified interface.
-func (mgr *MulticastManager) startWithInterface(ifi *net.Interface) (*MulticastServer, error) {
+func (mgr *MulticastManager) startWithInterface(ifi *net.Interface, ifaddr string) (*MulticastServer, error) {
 	server := NewMulticastServer()
 	server.Handler = mgr.Handler
-	if err := server.Start(ifi); err != nil {
+	if err := server.Start(ifi, ifaddr); err != nil {
 		return nil, err
 	}
 	return server, nil
@@ -84,11 +84,17 @@ func (mgr *MulticastManager) Start() error {
 	}
 
 	for _, ifi := range ifis {
-		server, err := mgr.startWithInterface(ifi)
+		ifaddrs, err := GetInterfaceAddresses(ifi)
 		if err != nil {
 			continue
 		}
-		mgr.Servers = append(mgr.Servers, server)
+		for _, ifaddr := range ifaddrs {
+			server, err := mgr.startWithInterface(ifi, ifaddr)
+			if err != nil {
+				continue
+			}
+			mgr.Servers = append(mgr.Servers, server)
+		}
 	}
 
 	if len(mgr.Servers) == 0 {

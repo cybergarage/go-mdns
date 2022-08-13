@@ -45,8 +45,8 @@ func (server *MulticastServer) SetHandler(handler MulticastHandler) {
 }
 
 // Start starts this server.
-func (server *MulticastServer) Start(ifi *net.Interface) error {
-	if err := server.MulticastSocket.Bind(ifi); err != nil {
+func (server *MulticastServer) Start(ifi *net.Interface, ifaddr string) error {
+	if err := server.MulticastSocket.Bind(ifi, ifaddr); err != nil {
 		return err
 	}
 	server.Channel = make(chan interface{})
