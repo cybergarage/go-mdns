@@ -21,19 +21,24 @@ import (
 func TestMulticastSocketBindWithInterface(t *testing.T) {
 	sock := NewMulticastSocket()
 
-	ifs, err := GetAvailableInterfaces()
+	ifis, err := GetAvailableInterfaces()
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	err = sock.Bind(ifs[0])
-	if err != nil {
-		t.Error(err)
-	}
+	for _, ifi := range ifis {
+		ifaddrs, err := GetInterfaceAddresses(ifi)
+		for _, ifaddr := range ifaddrs {
+			err = sock.Bind(ifi, ifaddr)
+			if err != nil {
+				t.Error(err)
+			}
 
-	err = sock.Close()
-	if err != nil {
-		t.Error(err)
+			err = sock.Close()
+			if err != nil {
+				t.Error(err)
+			}
+		}
 	}
 }
