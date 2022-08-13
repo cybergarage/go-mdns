@@ -29,7 +29,7 @@ func (sock *MulticastSocket) Listen(ifi *net.Interface, ipaddr string, port int)
 
 	sock.Conn, err = net.ListenMulticastUDP("udp", ifi, addr)
 	if err != nil {
-		return fmt.Errorf("%w (%s)", err, ifi.Name)
+		return fmt.Errorf("%w (%s %s %d)", err, ifi.Name, ipaddr, port)
 	}
 
 	return nil
