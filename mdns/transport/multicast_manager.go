@@ -41,15 +41,6 @@ func (mgr *MulticastManager) SetHandler(l MulticastHandler) {
 	mgr.Handler = l
 }
 
-// GetBoundAddresses returns the listen addresses.
-func (mgr *MulticastManager) GetBoundAddresses() []string {
-	boundAddrs := make([]string, 0)
-	for _, server := range mgr.Servers {
-		boundAddrs = append(boundAddrs, server.GetBoundAddresses()...)
-	}
-	return boundAddrs
-}
-
 // GetBoundInterfaces returns the listen interfaces.
 func (mgr *MulticastManager) GetBoundInterfaces() []*net.Interface {
 	boundIfs := make([]*net.Interface, 0)
