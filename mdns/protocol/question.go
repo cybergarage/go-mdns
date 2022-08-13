@@ -53,6 +53,12 @@ func (q *Question) SetName(name string) *Question {
 	return q
 }
 
+// SetType sets the specified type to the question instance.
+func (q *Question) SetType(t Type) *Question {
+	q.Type = t
+	return q
+}
+
 // Parse parses the specified reader.
 func (q *Question) Parse(reader io.Reader) error {
 	var err error
