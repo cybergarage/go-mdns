@@ -97,11 +97,18 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface) {
 }
 
 func TestMulticastServerWithInterface(t *testing.T) {
-	ifs, err := GetAvailableInterfaces()
+	ifis, err := GetAvailableInterfaces()
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	testMulticastServerWithInterface(t, ifs[0])
+	for _, ifi := range ifis {
+		switch {
+		case IsIPv4Interface(ifi):
+			testMulticastServerWithInterface(t, ifi)
+		case IsIPv6Interface(ifi):
+			testMulticastServerWithInterface(t, ifi)
+		}
+	}
 }

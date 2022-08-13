@@ -93,7 +93,19 @@ func IsBridgeInterface(ifi *net.Interface) bool {
 
 // IsVirtualInterface returns true when the specified interface is a virtual interface, otherwise false.
 func IsVirtualInterface(ifi *net.Interface) bool {
-	return strings.HasPrefix(ifi.Name, "utun")
+	if strings.HasPrefix(ifi.Name, "utun") { // macOS
+		return true
+	}
+	if strings.HasPrefix(ifi.Name, "llw") { // VirtualBox
+		return true
+	}
+	if strings.HasPrefix(ifi.Name, "awdl") { // AirDrop (macOS)
+		return true
+	}
+	if strings.HasPrefix(ifi.Name, "en6") { // iPhone-USB (macOS)
+		return true
+	}
+	return false
 }
 
 // GetInterfaceAddress returns a IPv4 or IPv6 address of the specivied interface.
