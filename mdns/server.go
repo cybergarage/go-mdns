@@ -22,6 +22,7 @@ import (
 // Server represents a server node instance.
 type Server struct {
 	*transport.MessageManager
+	*Services
 	userListener MessageListener
 }
 
@@ -29,6 +30,7 @@ type Server struct {
 func NewServer() *Server {
 	server := &Server{
 		MessageManager: transport.NewMessageManager(),
+		Services:       NewServices(),
 		userListener:   nil,
 	}
 	server.SetMessageHandler(server)
