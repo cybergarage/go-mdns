@@ -14,6 +14,8 @@
 
 package mdns
 
+import "github.com/cybergarage/go-mdns/mdns/protocol"
+
 // Service represents a SRV record.
 type Service struct {
 	Instance string
@@ -30,4 +32,27 @@ func NewService(instance, service, domain string, port int) *Service {
 		Domain:   domain,
 		Port:     port,
 	}
+}
+
+// NewServiceWithMessage returns a new service instance.
+func NewServiceWithMessage(msg *Message) (*Service, error) {
+	srv := &Service{
+		Instance: "",
+		Service:  "",
+		Domain:   "",
+		Port:     0,
+	}
+
+	parseResouce := func(res *protocol.Resource) {
+	}
+
+	for _, answer := range msg.Answers {
+		parseResouce(answer)
+	}
+
+	for _, add := range msg.Additions {
+		parseResouce(add)
+	}
+
+	return srv, nil
 }
