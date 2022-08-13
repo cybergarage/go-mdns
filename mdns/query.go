@@ -14,6 +14,10 @@
 
 package mdns
 
+import (
+	"strings"
+)
+
 // Query represents a question query.
 type Query struct {
 	Service string
@@ -26,4 +30,9 @@ func NewQueryWithService(service string) *Query {
 		Service: service,
 		Domain:  DefaultDomain,
 	}
+}
+
+// String returns the string representation.
+func (q *Query) String() string {
+	return strings.Join([]string{q.Service, q.Domain}, nameSep)
 }
