@@ -64,11 +64,15 @@ func (server *MulticastServer) Stop() error {
 	return nil
 }
 
-func handleMulticastRequestMessage(server *MulticastServer, msg *protocol.Message) {
+func handleMulticastRequestMessage(server *MulticastServer, reqMsg *protocol.Message) {
 	if server.Handler == nil {
 		return
 	}
-	server.Handler.MessageReceived(msg)
+	resMsg, err := server.Handler.MessageReceived(reqMsg)
+	if err != nil || resMsg == nil {
+		return
+	}
+	server.AnnounceMessage(resMsg)
 }
 
 func handleMulticastConnection(server *MulticastServer, cancel chan interface{}) {
