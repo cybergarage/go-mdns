@@ -68,8 +68,13 @@ func (client *Client) Query(q *Query) {
 }
 
 func (client *Client) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+	if client.userListener != nil {
+		client.userListener.MessageReceived(msg)
+	}
+
 	if msg.IsQuery() {
 		return nil, nil
 	}
+
 	return nil, nil
 }
