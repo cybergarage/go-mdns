@@ -22,15 +22,22 @@ import (
 // Server represents a server node instance.
 type Server struct {
 	*transport.MessageManager
+	userListener MessageListener
 }
 
 // NewServer returns a new server instance.
 func NewServer() *Server {
 	server := &Server{
 		MessageManager: transport.NewMessageManager(),
+		userListener:   nil,
 	}
 	server.SetMessageHandler(server)
 	return server
+}
+
+// Set sets a message listner to listen raw protocol messages.
+func (server *Server) SetListener(l MessageListener) {
+	server.userListener = l
 }
 
 // Start starts the server instance.

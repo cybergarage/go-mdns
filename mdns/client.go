@@ -22,15 +22,22 @@ import (
 // Client represents a client node instance.
 type Client struct {
 	*transport.MessageManager
+	userListener MessageListener
 }
 
 // NewClient returns a new client instance.
 func NewClient() *Client {
 	client := &Client{
 		MessageManager: transport.NewMessageManager(),
+		userListener:   nil,
 	}
 	client.SetMessageHandler(client)
 	return client
+}
+
+// Set sets a message listner to listen raw protocol messages.
+func (client *Client) SetListener(l MessageListener) {
+	client.userListener = l
 }
 
 // Start starts the client instance.
