@@ -15,6 +15,7 @@
 package main
 
 import (
+	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
@@ -30,4 +31,5 @@ func NewClient() *Client {
 	return client
 }
 func (client *Client) MessageReceived(msg *protocol.Message) {
+	log.HexInfo(msg.Bytes())
 }

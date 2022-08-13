@@ -34,6 +34,7 @@ import (
 	"time"
 
 	"github.com/cybergarage/go-logger/log"
+	"github.com/cybergarage/go-mdns/mdns"
 )
 
 func main() {
@@ -59,16 +60,16 @@ func main() {
 		return
 	}
 
-	// Wait node responses in the local network
+	defer client.Stop()
 
-	time.Sleep(time.Second * 1)
-
-	// Output all found nodes
-
-	// Stop the controller
-
-	err = client.Stop()
+	err = client.Query(mdns.NewQueryWithService(mdns.AutomaticBrowsingService))
 	if err != nil {
 		return
 	}
+
+	// Wait node responses in the local network
+
+	time.Sleep(time.Second * 10)
+
+	// Output all found nodes
 }
