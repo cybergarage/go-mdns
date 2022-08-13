@@ -62,9 +62,10 @@ func (client *Client) Restart() error {
 }
 
 // Query sends a question message to the multicast address.
-func (client *Client) Query(q *Query) {
+func (client *Client) Query(q *Query) error {
 	msg := protocol.NewRequestMessage()
 	msg.AddQuestion(protocol.NewQuestion().SetName(q.String()).SetType(protocol.PTR))
+	return client.AnnounceMessage(msg)
 }
 
 func (client *Client) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
