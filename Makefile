@@ -52,7 +52,7 @@ BINS=\
 all: test
 
 format:
-	gofmt -s -w ${PKG_SRC_DIR} ${TEST_PKG_DIR}
+	gofmt -s -w ${PKG_SRC_DIR} ${TEST_PKG_DIR} ${BIN_ROOT}
 
 vet: format
 	go vet ${PKG_ID} ${TEST_PKG_ID} ${BINS}
