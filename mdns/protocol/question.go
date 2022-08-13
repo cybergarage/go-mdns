@@ -37,7 +37,7 @@ func NewQuestion() *Question {
 		Name:            "",
 		Type:            0,
 		UnicastResponse: false,
-		Class:           0,
+		Class:           IN,
 	}
 }
 
@@ -45,6 +45,12 @@ func NewQuestion() *Question {
 func NewQuestionWithReader(reader io.Reader) (*Question, error) {
 	q := NewQuestion()
 	return q, q.Parse(reader)
+}
+
+// SetName sets the specified name to the question instance.
+func (q *Question) SetName(name string) *Question {
+	q.Name = name
+	return q
 }
 
 // Parse parses the specified reader.
