@@ -101,7 +101,7 @@ func (sock *Socket) GetBoundIPAddr() (string, error) {
 
 // SetMulticastLoop sets a flag to IP_MULTICAST_LOOP.
 // nolint: nosnakecase
-func (sock *Socket) SetMulticastLoop(file *os.File, flag bool) error {
+func (sock *Socket) SetMulticastLoop(file *os.File, addr string, flag bool) error {
 	fd := file.Fd()
 
 	opt := 0
@@ -109,10 +109,8 @@ func (sock *Socket) SetMulticastLoop(file *os.File, flag bool) error {
 		opt = 1
 	}
 
-	err := syscall.SetsockoptInt(int(fd), syscall.IPPROTO_IP, syscall.IP_MULTICAST_LOOP, opt)
-	if err != nil {
-		return err
+	if IsIPv6Address(addr) {
+		return syscall.SetsockoptInt(int(fd), syscall.IPPROTO_IPV6, syscall.IPV6_MULTICAST_LOOP, opt)
 	}
-
-	return nil
+	return syscall.SetsockoptInt(int(fd), syscall.IPPROTO_IP, syscall.IP_MULTICAST_LOOP, opt)
 }

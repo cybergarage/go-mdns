@@ -71,7 +71,7 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface, ifaddr string) error {
 		return err
 	}
 
-	err = sock.SetMulticastLoop(f, true)
+	err = sock.SetMulticastLoop(f, ifaddr, true)
 	if err != nil {
 		return err
 	}
