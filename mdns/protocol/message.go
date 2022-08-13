@@ -146,7 +146,7 @@ func (msg *Message) Equals(other *Message) bool {
 	if other == nil {
 		return false
 	}
-	return msg.Header.Equals(other.Header)
+	return bytes.Equal(msg.Bytes(), other.Bytes())
 }
 
 // Copy returns the copy message instance.
