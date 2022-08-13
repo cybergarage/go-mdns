@@ -91,6 +91,11 @@ func IsBridgeInterface(ifi *net.Interface) bool {
 	return ifi.Name == libvirtInterfaceName
 }
 
+// IsVirtualInterface returns true when the specified interface is a virtual interface, otherwise false.
+func IsVirtualInterface(ifi *net.Interface) bool {
+	return strings.HasPrefix(ifi.Name, "utun")
+}
+
 // GetInterfaceAddress returns a IPv4 or IPv6 address of the specivied interface.
 func GetInterfaceAddress(ifi *net.Interface) (string, error) {
 	addrs, err := ifi.Addrs()
@@ -128,6 +133,9 @@ func GetAvailableInterfaces() ([]*net.Interface, error) {
 			continue
 		}
 		if IsBridgeInterface(&localIf) {
+			continue
+		}
+		if IsVirtualInterface(&localIf) {
 			continue
 		}
 		_, addrErr := GetInterfaceAddress(&localIf)
