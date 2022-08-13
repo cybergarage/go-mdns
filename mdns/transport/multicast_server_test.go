@@ -68,7 +68,11 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr s
 		return
 	}
 
-	nSent, err := server.SendMessage(MulticastIPv4Address, Port, msg)
+	toAddr := MulticastIPv4Address
+	if IsIPv6Address(ifaddr) {
+		toAddr = MulticastIPv6Address
+	}
+	nSent, err := server.SendMessage(toAddr, Port, msg)
 	if err != nil {
 		t.Error(err)
 	}
@@ -83,8 +87,6 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr s
 	time.Sleep(time.Second)
 
 	if !msg.Equals(server.lastMessage) {
-		ifi, _ := server.MulticastServer.Socket.GetBoundInterface()
-		t.Errorf("%v", ifi)
 		t.Errorf("%s != %s", msg.String(), server.lastMessage.String())
 	}
 
