@@ -17,6 +17,8 @@ package transport
 import (
 	"errors"
 	"net"
+
+	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 // A MulticastManager represents a multicast server manager.
@@ -55,6 +57,17 @@ func (mgr *MulticastManager) GetBoundInterfaces() []*net.Interface {
 		boundIfs = append(boundIfs, server.Interface)
 	}
 	return boundIfs
+}
+
+// AnnounceMessage announces the message from the all bound multicast interfaces.
+func (mgr *MulticastManager) AnnounceMessage(msg *protocol.Message) error {
+	var lastErr error
+	for _, server := range mgr.Servers {
+		if err := server.AnnounceMessage(msg); err != nil {
+			lastErr = err
+		}
+	}
+	return lastErr
 }
 
 // startWithInterface starts this server on the specified interface.
