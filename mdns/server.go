@@ -55,5 +55,8 @@ func (server *Server) Restart() error {
 }
 
 func (server *Server) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+	if msg.IsResponse() {
+		return nil, nil
+	}
 	return nil, nil
 }
