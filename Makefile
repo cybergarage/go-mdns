@@ -38,6 +38,13 @@ TEST_PKG_SRCS=\
 TEST_PKGS=\
 	${TEST_PKG_ID}
 
+BIN_ROOT=examples
+BIN_ID=${MODULE_ROOT}/${BIN_ROOT}
+BIN_SRCS=\
+	${BIN_ROOT}/mdnssearch
+BINS=\
+	${BIN_ID}/mdnssearch
+
 .PHONY: format vet lint clean
 
 all: test
@@ -49,10 +56,13 @@ vet: format
 	go vet ${PKG_ID} ${TEST_PKG_ID}
 
 lint: format
-	golangci-lint run ${PKG_SRCS} ${TEST_PKG_SRCS}
+	golangci-lint run ${PKG_SRCS} ${TEST_PKG_SRCS} ${BIN_SRCS}
 
 test: lint
 	go test -v -cover -timeout 60s ${PKGS} ${TEST_PKGS}
 
+install: test
+	go install ${BINS}
+
 clean:
-	go clean -i ${PKGS}  ${TEST_PKGS}
+	go clean -i ${PKGS}  ${TEST_PKGS} ${BINS}
