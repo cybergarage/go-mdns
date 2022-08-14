@@ -31,7 +31,7 @@ func NewARecord(res *resourceRecord) *ARecord {
 // IP returns the resource ip address.
 func (a *ARecord) IP() net.IP {
 	if len(a.data) < 4 {
-		return net.IPv4(0, 0, 0, 0)
+		return nil
 	}
 	return net.IPv4(a.data[0], a.data[1], a.data[2], a.data[3])
 }
