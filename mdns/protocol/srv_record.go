@@ -40,6 +40,14 @@ func (srv *SRVRecord) Priority() uint {
 	return encoding.BytesToInteger(srv.data[0:2])
 }
 
+// Weight returns the resource weight.
+func (srv *SRVRecord) Weight() uint {
+	if len(srv.data) < 4 {
+		return 0
+	}
+	return encoding.BytesToInteger(srv.data[2:4])
+}
+
 // Port returns the resource port.
 func (srv *SRVRecord) Port() uint {
 	if len(srv.data) < 6 {
