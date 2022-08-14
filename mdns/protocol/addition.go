@@ -15,7 +15,7 @@
 package protocol
 
 // Addition represents an additional resource record.
-type Addition = Resource
+type Addition = ResourceRecord
 
 // Additions represents an additional resource record array.
 type Additions []*Addition

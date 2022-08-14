@@ -25,9 +25,9 @@ func TestResource(t *testing.T) {
 		tests := []struct {
 			query         []byte
 			expectedName  string
-			expectedType  ResourceType
+			expectedType  Type
 			expectedCache bool
-			expectedClass ResourceClass
+			expectedClass Class
 		}{
 			{
 				query:         []byte{0x00, 0x00, 0x29, 0x05, 0xa0, 0x00, 0x00, 0x11, 0x94, 0x00, 0x12, 0x00, 0x04, 0x00, 0x0e, 0x00, 0x74, 0x52, 0x06, 0x8d, 0xcf, 0x54, 0x27, 0x86, 0xfd, 0xcd, 0x88, 0xe1, 0x43},
@@ -37,7 +37,7 @@ func TestResource(t *testing.T) {
 			},
 		}
 		for _, test := range tests {
-			q, err := NewResourceWithReader(bytes.NewReader(test.query))
+			q, err := NewResourceRecordWithReader(bytes.NewReader(test.query))
 			if err != nil {
 				t.Error(err)
 			}
