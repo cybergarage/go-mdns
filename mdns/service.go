@@ -14,7 +14,11 @@
 
 package mdns
 
-import "github.com/cybergarage/go-mdns/mdns/protocol"
+import (
+	"strings"
+
+	"github.com/cybergarage/go-mdns/mdns/protocol"
+)
 
 // Service represents a SRV record.
 type Service struct {
@@ -59,4 +63,9 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 	}
 
 	return srv, nil
+}
+
+// String returns the string representation.
+func (srv *Service) String() string {
+	return strings.Join([]string{srv.Name, srv.Domain}, nameSep)
 }
