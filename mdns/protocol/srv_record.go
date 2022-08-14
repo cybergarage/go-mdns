@@ -55,3 +55,11 @@ func (srv *SRVRecord) Port() uint {
 	}
 	return encoding.BytesToInteger(srv.data[4:6])
 }
+
+// Target returns the resource domain name of the target host.
+func (srv *SRVRecord) Target() string {
+	if len(srv.data) < 7 {
+		return ""
+	}
+	return string(srv.data[7:])
+}

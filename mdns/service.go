@@ -25,6 +25,7 @@ import (
 type Service struct {
 	Name   string
 	Domain string
+	Host   string
 	AddrV4 net.IP
 	AddrV6 net.IP
 	Port   uint
@@ -35,6 +36,7 @@ func NewService(name, domain string, port uint) *Service {
 	return &Service{
 		Name:   name,
 		Domain: domain,
+		Host:   "",
 		AddrV4: nil,
 		AddrV6: nil,
 		Port:   port,
@@ -43,19 +45,13 @@ func NewService(name, domain string, port uint) *Service {
 
 // NewServiceWithMessage returns a new service instance.
 func NewServiceWithMessage(msg *Message) (*Service, error) {
-	srv := &Service{
-		Name:   "",
-		Domain: "",
-		AddrV4: nil,
-		AddrV6: nil,
-		Port:   0,
-	}
-
+	srv := NewService("", "", 0)
 	parseResouce := func(res protocol.ResourceRecord) {
 		switch rr := res.(type) {
 		case *protocol.PTRRecord:
 			srv.Name = rr.DomainName()
 		case *protocol.SRVRecord:
+			srv.Host = rr.Target()
 			srv.Port = rr.Port()
 		}
 	}
