@@ -36,6 +36,7 @@ func NewService(name, domain string, port int) *Service {
 	}
 }
 
+// nolint: gocritic
 // NewServiceWithMessage returns a new service instance.
 func NewServiceWithMessage(msg *Message) (*Service, error) {
 	srv := &Service{
@@ -45,12 +46,9 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 	}
 
 	parseResouce := func(res protocol.ResourceRecord) {
-		switch res.Type() {
-		case protocol.PTR:
-			srv.Name = res.Name()
-		case protocol.SRV:
-		case protocol.TXT:
-		case protocol.A:
+		switch rr := res.(type) {
+		case *protocol.PTRRecord:
+			srv.Name = rr.DomainName()
 		}
 	}
 
