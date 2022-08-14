@@ -70,6 +70,8 @@ func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 		return NewSRVRecord(res), nil
 	case A:
 		return NewARecord(res), nil
+	case AAAA:
+		return NewAAAARecord(res), nil
 	}
 
 	return res, nil
