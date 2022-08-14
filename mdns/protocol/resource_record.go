@@ -64,9 +64,10 @@ func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 	}
 
 	switch res.Type() {
-	case SRV:
 	case PTR:
 		return NewPTRRecord(res), nil
+	case SRV:
+		return NewSRVRecord(res), nil
 	}
 
 	return res, nil

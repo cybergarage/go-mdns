@@ -17,6 +17,7 @@ package protocol
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"testing"
 )
 
@@ -55,6 +56,40 @@ func TestResourceRecord(t *testing.T) {
 				}
 				if ptr.DomainName() != test.expectedDomainName {
 					t.Skipf("Domain: %s != %s", ptr.DomainName(), test.expectedDomainName)
+				}
+			})
+		}
+	})
+
+	t.Run("SRV", func(t *testing.T) {
+		tests := []struct {
+			query        []byte
+			expectedTTL  uint
+			expectedPort uint
+		}{
+			{
+				query:        []byte{0xc0, 0x2e, 0x00, 0x21, 0x80, 0x01, 0x00, 0x00, 0x00, 0x78, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x49, 0x16, 0x66, 0x75, 0x63, 0x68, 0x73, 0x69, 0x61, 0x2d, 0x37, 0x63, 0x64, 0x39, 0x2d, 0x35, 0x63, 0x34, 0x39, 0x2d, 0x65, 0x30, 0x61, 0x37, 0xc0, 0x1d},
+				expectedTTL:  120,
+				expectedPort: 8009,
+			},
+		}
+		for _, test := range tests {
+			t.Run(fmt.Sprintf("%d", test.expectedPort), func(t *testing.T) {
+				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				if err != nil {
+					t.Error(err)
+				}
+				srv, ok := q.(*SRVRecord)
+				if !ok {
+					t.Errorf("%v", q)
+					return
+				}
+				// Checks each field
+				if srv.TTL() != test.expectedTTL {
+					t.Errorf("TTL: %d != %d", srv.TTL(), test.expectedTTL)
+				}
+				if srv.Port() != test.expectedPort {
+					t.Errorf("Port: %d != %d", srv.Port(), test.expectedPort)
 				}
 			})
 		}
