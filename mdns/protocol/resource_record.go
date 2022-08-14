@@ -20,22 +20,19 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
-type ResourceType = Type
-type ResourceClass = Class
-
-// Resource represents a question.
-type Resource struct {
+// ResourceRecord represents a resource record.
+type ResourceRecord struct {
 	Name       string
-	Type       ResourceType
+	Type       Type
 	CacheFlush bool
-	Class      ResourceClass
+	Class      Class
 	TTL        uint
 	Data       []byte
 }
 
-// NewResource returns a new question innstance.
-func NewResource() *Resource {
-	return &Resource{
+// NewResourceRecord returns a new resource record innstance.
+func NewResourceRecord() *ResourceRecord {
+	return &ResourceRecord{
 		Name:       "",
 		Type:       0,
 		CacheFlush: false,
@@ -45,14 +42,14 @@ func NewResource() *Resource {
 	}
 }
 
-// NewResourceWithReader returns a new question innstance with the specified reader.
-func NewResourceWithReader(reader io.Reader) (*Resource, error) {
-	res := NewResource()
+// NewResourceRecordWithReader returns a new question innstance with the specified reader.
+func NewResourceRecordWithReader(reader io.Reader) (*ResourceRecord, error) {
+	res := NewResourceRecord()
 	return res, res.Parse(reader)
 }
 
 // Parse parses the specified reader.
-func (res *Resource) Parse(reader io.Reader) error {
+func (res *ResourceRecord) Parse(reader io.Reader) error {
 	var err error
 
 	// Parses domain names
@@ -67,7 +64,7 @@ func (res *Resource) Parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
-	res.Type = ResourceType(encoding.BytesToInteger(typeBytes))
+	res.Type = Type(encoding.BytesToInteger(typeBytes))
 
 	// Parses class type
 	classBytes := make([]byte, 2)
@@ -80,7 +77,7 @@ func (res *Resource) Parse(reader io.Reader) error {
 	if (class & cacheFlushMask) != 0 {
 		res.CacheFlush = true
 	}
-	res.Class = ResourceClass(class & classMask)
+	res.Class = Class(class & classMask)
 
 	// Parses TTL
 	ttlBytes := make([]byte, 4)
@@ -107,7 +104,7 @@ func (res *Resource) Parse(reader io.Reader) error {
 }
 
 // Bytes returns the binary representation.
-func (res *Resource) Bytes() []byte {
+func (res *ResourceRecord) Bytes() []byte {
 	bytes := nameToBytes(res.Name)
 
 	typeBytes := make([]byte, 2)

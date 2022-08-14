@@ -15,7 +15,7 @@
 package protocol
 
 // NameServer represents an authoritative nameserver resource record.
-type NameServer = Resource
+type NameServer = ResourceRecord
 
 // NameServers represents an authoritative nameserver resource record array.
 type NameServers []*NameServer

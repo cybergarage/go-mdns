@@ -31,6 +31,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"time"
 
 	"github.com/cybergarage/go-logger/log"
@@ -72,4 +73,8 @@ func main() {
 	time.Sleep(time.Second * 10)
 
 	// Output all found nodes
+
+	for n, srv := range client.Services() {
+		fmt.Printf("[%d] %s", n, srv.String())
+	}
 }
