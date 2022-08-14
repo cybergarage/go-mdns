@@ -44,10 +44,10 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 		Port:   0,
 	}
 
-	parseResouce := func(res *protocol.ResourceRecord) {
-		switch res.Type {
+	parseResouce := func(res protocol.ResourceRecord) {
+		switch res.Type() {
 		case protocol.PTR:
-			srv.Name = res.Name
+			srv.Name = res.Name()
 		case protocol.SRV:
 		case protocol.TXT:
 		case protocol.A:

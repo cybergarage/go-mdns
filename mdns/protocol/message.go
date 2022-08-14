@@ -76,19 +76,19 @@ func (msg *Message) AddQuestion(q *Question) {
 }
 
 // AddAnswer adds the specified answer into the message.
-func (msg *Message) AddAnswer(a *Answer) {
+func (msg *Message) AddAnswer(a Answer) {
 	msg.Answers = append(msg.Answers, a)
 	msg.setAN(uint(len(msg.Answers)))
 }
 
 // AddNameServer adds the specified name server into the message.
-func (msg *Message) AddNameServer(ns *NameServer) {
+func (msg *Message) AddNameServer(ns NameServer) {
 	msg.NameServers = append(msg.NameServers, ns)
 	msg.setNS(uint(len(msg.NameServers)))
 }
 
 // AddAddition adds the specified additional record into the message.
-func (msg *Message) AddAddition(a *Addition) {
+func (msg *Message) AddAddition(a Addition) {
 	msg.Additions = append(msg.Additions, a)
 	msg.setAR(uint(len(msg.Additions)))
 }
@@ -108,7 +108,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses answers.
 	for n := 0; n < int(msg.AN()); n++ {
-		a, err := NewResourceRecordWithReader(reader)
+		a, err := newResourceRecordWithReader(reader)
 		if err != nil {
 			return err
 		}
@@ -116,7 +116,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses name servers.
 	for n := 0; n < int(msg.AN()); n++ {
-		a, err := NewResourceRecordWithReader(reader)
+		a, err := newResourceRecordWithReader(reader)
 		if err != nil {
 			return err
 		}
@@ -124,7 +124,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses name servers.
 	for n := 0; n < int(msg.NS()); n++ {
-		ns, err := NewResourceRecordWithReader(reader)
+		ns, err := newResourceRecordWithReader(reader)
 		if err != nil {
 			return err
 		}
@@ -132,7 +132,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses additional records.
 	for n := 0; n < int(msg.AR()); n++ {
-		a, err := NewResourceRecordWithReader(reader)
+		a, err := newResourceRecordWithReader(reader)
 		if err != nil {
 			return err
 		}

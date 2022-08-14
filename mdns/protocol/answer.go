@@ -18,4 +18,4 @@ package protocol
 type Answer = ResourceRecord
 
 // Answers represents an answer resource record array.
-type Answers []*Answer
+type Answers []Answer

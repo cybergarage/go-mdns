@@ -37,19 +37,19 @@ func TestResource(t *testing.T) {
 			},
 		}
 		for _, test := range tests {
-			q, err := NewResourceRecordWithReader(bytes.NewReader(test.query))
+			q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
 			if err != nil {
 				t.Error(err)
 			}
 			// Checks each field
-			if q.Name != test.expectedName {
-				t.Errorf("%s != %s", q.Name, test.expectedName)
+			if q.Name() != test.expectedName {
+				t.Errorf("%s != %s", q.Name(), test.expectedName)
 			}
-			if q.Type != test.expectedType {
-				t.Errorf("%2X != %2X", q.Type, test.expectedType)
+			if q.Type() != test.expectedType {
+				t.Errorf("%2X != %2X", q.Type(), test.expectedType)
 			}
-			if q.CacheFlush != test.expectedCache {
-				t.Errorf("%t != %t", q.CacheFlush, test.expectedCache)
+			if q.CacheFlush() != test.expectedCache {
+				t.Errorf("%t != %t", q.CacheFlush(), test.expectedCache)
 			}
 			// Checks all bytes
 			if !bytes.Equal(q.Bytes(), test.query) {
