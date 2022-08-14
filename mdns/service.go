@@ -15,6 +15,7 @@
 package mdns
 
 import (
+	"net"
 	"strings"
 
 	"github.com/cybergarage/go-mdns/mdns/protocol"
@@ -24,6 +25,8 @@ import (
 type Service struct {
 	Name   string
 	Domain string
+	AddrV4 net.IP
+	AddrV6 net.IP
 	Port   int
 }
 
@@ -32,6 +35,8 @@ func NewService(name, domain string, port int) *Service {
 	return &Service{
 		Name:   name,
 		Domain: domain,
+		AddrV4: nil,
+		AddrV6: nil,
 		Port:   port,
 	}
 }
@@ -42,6 +47,8 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 	srv := &Service{
 		Name:   "",
 		Domain: "",
+		AddrV4: nil,
+		AddrV6: nil,
 		Port:   0,
 	}
 
