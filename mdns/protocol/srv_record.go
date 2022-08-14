@@ -32,6 +32,14 @@ func NewSRVRecord(res *resourceRecord) *SRVRecord {
 	}
 }
 
+// Priority returns the resource priority.
+func (srv *SRVRecord) Priority() uint {
+	if len(srv.data) < 2 {
+		return 0
+	}
+	return encoding.BytesToInteger(srv.data[0:2])
+}
+
 // Port returns the resource port.
 func (srv *SRVRecord) Port() uint {
 	if len(srv.data) < 6 {
