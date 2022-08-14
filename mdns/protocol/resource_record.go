@@ -63,7 +63,7 @@ func newResourceRecord() *resourceRecord {
 // newResourceRecordWithReader returns a new question innstance with the specified reader.
 func newResourceRecordWithReader(reader io.Reader) (*resourceRecord, error) {
 	res := newResourceRecord()
-	if err := res.Parse(reader); err != nil {
+	if err := res.parse(reader); err != nil {
 		return nil, err
 	}
 
@@ -105,8 +105,8 @@ func (res *resourceRecord) Data() []byte {
 	return res.data
 }
 
-// Parse parses the specified reader.
-func (res *resourceRecord) Parse(reader io.Reader) error {
+// parse parses the specified reader.
+func (res *resourceRecord) parse(reader io.Reader) error {
 	var err error
 
 	// Parses domain names
