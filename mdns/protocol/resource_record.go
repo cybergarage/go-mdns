@@ -20,40 +20,97 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
-// ResourceRecord represents a resource record.
-type ResourceRecord struct {
-	Name       string
-	Type       Type
-	CacheFlush bool
-	Class      Class
-	TTL        uint
-	Data       []byte
+// ResourceRecord represents a resource record interface.
+type ResourceRecord interface {
+	// Name returns the resource record name.
+	Name() string
+	// Type returns the resource record type.
+	Type() Type
+	// Class returns the resource record class.
+	Class() Class
+	// Type returns the cache flush flag.
+	CacheFlush() bool
+	// TTL returns the TTL second.
+	TTL() uint
+	// Data returns the resource record data.
+	Data() []byte
+	// Bytes returns the binary representation.
+	Bytes() []byte
 }
 
-// NewResourceRecord returns a new resource record innstance.
-func NewResourceRecord() *ResourceRecord {
-	return &ResourceRecord{
-		Name:       "",
-		Type:       0,
-		CacheFlush: false,
-		Class:      0,
-		TTL:        0,
-		Data:       nil,
+// resourceRecord represents a resource record.
+type resourceRecord struct {
+	name       string
+	typ        Type
+	cacheFlush bool
+	class      Class
+	ttl        uint
+	data       []byte
+}
+
+// newResourceRecord returns a new resource record innstance.
+func newResourceRecord() *resourceRecord {
+	return &resourceRecord{
+		name:       "",
+		typ:        0,
+		cacheFlush: false,
+		class:      0,
+		ttl:        0,
+		data:       nil,
 	}
 }
 
-// NewResourceRecordWithReader returns a new question innstance with the specified reader.
-func NewResourceRecordWithReader(reader io.Reader) (*ResourceRecord, error) {
-	res := NewResourceRecord()
-	return res, res.Parse(reader)
+// newResourceRecordWithReader returns a new question innstance with the specified reader.
+func newResourceRecordWithReader(reader io.Reader) (*resourceRecord, error) {
+	res := newResourceRecord()
+	if err := res.Parse(reader); err != nil {
+		return nil, err
+	}
+
+	// switch res.Type {
+	// case SRV:
+	// 	return NewSRVRecord(res), nil
+	// }
+
+	return res, nil
+}
+
+// Name returns the resource record name.
+func (res *resourceRecord) Name() string {
+	return res.name
+}
+
+// Type returns the resource record type.
+func (res *resourceRecord) Type() Type {
+	return res.typ
+}
+
+// Class returns the resource record class.
+func (res *resourceRecord) Class() Class {
+	return res.class
+}
+
+// Type returns the cache flush flag.
+func (res *resourceRecord) CacheFlush() bool {
+	return res.cacheFlush
+}
+
+// TTL returns the TTL second.
+func (res *resourceRecord) TTL() uint {
+	return res.ttl
+}
+
+// Data returns the resource record data.
+func (res *resourceRecord) Data() []byte {
+	return res.data
 }
 
 // Parse parses the specified reader.
-func (res *ResourceRecord) Parse(reader io.Reader) error {
+func (res *resourceRecord) Parse(reader io.Reader) error {
 	var err error
 
 	// Parses domain names
-	res.Name, err = parseName(reader)
+	res.name, err = parseName(reader)
 	if err != nil {
 		return err
 	}
@@ -64,7 +121,7 @@ func (res *ResourceRecord) Parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
-	res.Type = Type(encoding.BytesToInteger(typeBytes))
+	res.typ = Type(encoding.BytesToInteger(typeBytes))
 
 	// Parses class type
 	classBytes := make([]byte, 2)
@@ -73,11 +130,11 @@ func (res *ResourceRecord) Parse(reader io.Reader) error {
 		return err
 	}
 	class := encoding.BytesToInteger(classBytes)
-	res.CacheFlush = false
+	res.cacheFlush = false
 	if (class & cacheFlushMask) != 0 {
-		res.CacheFlush = true
+		res.cacheFlush = true
 	}
-	res.Class = Class(class & classMask)
+	res.class = Class(class & classMask)
 
 	// Parses TTL
 	ttlBytes := make([]byte, 4)
@@ -85,7 +142,7 @@ func (res *ResourceRecord) Parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
-	res.TTL = encoding.BytesToInteger(ttlBytes)
+	res.ttl = encoding.BytesToInteger(ttlBytes)
 
 	// Parses data
 	dataLenBytes := make([]byte, 2)
@@ -94,8 +151,8 @@ func (res *ResourceRecord) Parse(reader io.Reader) error {
 		return err
 	}
 	dataLen := encoding.BytesToInteger(dataLenBytes)
-	res.Data = make([]byte, dataLen)
-	_, err = reader.Read(res.Data)
+	res.data = make([]byte, dataLen)
+	_, err = reader.Read(res.data)
 	if err != nil {
 		return err
 	}
@@ -104,25 +161,25 @@ func (res *ResourceRecord) Parse(reader io.Reader) error {
 }
 
 // Bytes returns the binary representation.
-func (res *ResourceRecord) Bytes() []byte {
-	bytes := nameToBytes(res.Name)
+func (res *resourceRecord) Bytes() []byte {
+	bytes := nameToBytes(res.name)
 
 	typeBytes := make([]byte, 2)
-	bytes = append(bytes, encoding.IntegerToBytes(uint(res.Type), typeBytes)...)
+	bytes = append(bytes, encoding.IntegerToBytes(uint(res.typ), typeBytes)...)
 
 	classBytes := make([]byte, 2)
-	class := res.Class
-	if res.CacheFlush {
+	class := res.class
+	if res.cacheFlush {
 		class |= cacheFlushMask
 	}
 	bytes = append(bytes, encoding.IntegerToBytes(uint(class), classBytes)...)
 
 	ttlBytes := make([]byte, 4)
-	bytes = append(bytes, encoding.IntegerToBytes(res.TTL, ttlBytes)...)
+	bytes = append(bytes, encoding.IntegerToBytes(res.ttl, ttlBytes)...)
 
 	dataLenBytes := make([]byte, 2)
-	bytes = append(bytes, encoding.IntegerToBytes(uint(len(res.Data)), dataLenBytes)...)
-	bytes = append(bytes, res.Data...)
+	bytes = append(bytes, encoding.IntegerToBytes(uint(len(res.data)), dataLenBytes)...)
+	bytes = append(bytes, res.data...)
 
 	return bytes
 }
