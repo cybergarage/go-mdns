@@ -27,6 +27,7 @@ const (
 	PTR   Type = 0x000C
 	HINFO Type = 0x000D
 	MX    Type = 0x000F
+	AAAA  Type = 0x001C
 	AXFR  Type = 0x00FC
 	ANY   Type = 0x00FF
 )
