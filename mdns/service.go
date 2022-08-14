@@ -55,6 +55,8 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 			srv.Port = rr.Port()
 		case *protocol.ARecord:
 			srv.AddrV4 = rr.IP()
+		case *protocol.AAAARecord:
+			srv.AddrV6 = rr.IP()
 		}
 	}
 	return srv, nil
