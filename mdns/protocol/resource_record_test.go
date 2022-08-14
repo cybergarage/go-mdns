@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"net"
 	"testing"
 )
 
@@ -110,6 +111,39 @@ func TestResourceRecord(t *testing.T) {
 		}
 	})
 
+	t.Run("A", func(t *testing.T) {
+		tests := []struct {
+			query       []byte
+			expectedTTL uint
+			expectedIP  net.IP
+		}{
+			{
+				query:       []byte{0xc1, 0x3a, 0x00, 0x01, 0x80, 0x01, 0x00, 0x00, 0x00, 0x78, 0x00, 0x04, 0xc0, 0x01, 0x02, 0x0b},
+				expectedTTL: 120,
+				expectedIP:  net.IPv4(192, 168, 1, 2),
+			},
+		}
+		for _, test := range tests {
+			t.Run(test.expectedIP.String(), func(t *testing.T) {
+				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				if err != nil {
+					t.Error(err)
+				}
+				a, ok := q.(*ARecord)
+				if !ok {
+					t.Errorf("%v", a)
+					return
+				}
+				// Checks each field
+				if a.TTL() != test.expectedTTL {
+					t.Errorf("TTL: %d != %d", a.TTL(), test.expectedTTL)
+				}
+				if test.expectedIP.Equal(a.IP()) {
+					t.Skipf("IP: %s != %s", a.IP(), test.expectedIP)
+				}
+			})
+		}
+	})
 	t.Run("OPT", func(t *testing.T) {
 		tests := []struct {
 			query         []byte

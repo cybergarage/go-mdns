@@ -53,6 +53,8 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 		case *protocol.SRVRecord:
 			srv.Host = rr.Target()
 			srv.Port = rr.Port()
+		case *protocol.ARecord:
+			srv.AddrV4 = rr.IP()
 		}
 	}
 	return srv, nil
