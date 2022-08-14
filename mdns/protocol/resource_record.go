@@ -48,9 +48,9 @@ type resourceRecord struct {
 	data       []byte
 }
 
-// newResourceRecord returns a new resource record innstance.
-func newResourceRecord() *resourceRecord {
-	return &resourceRecord{
+// newResourceRecordWithReader returns a new question innstance with the specified reader.
+func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+	res := &resourceRecord{
 		name:       "",
 		typ:        0,
 		cacheFlush: false,
@@ -58,11 +58,7 @@ func newResourceRecord() *resourceRecord {
 		ttl:        0,
 		data:       nil,
 	}
-}
 
-// newResourceRecordWithReader returns a new question innstance with the specified reader.
-func newResourceRecordWithReader(reader io.Reader) (*resourceRecord, error) {
-	res := newResourceRecord()
 	if err := res.parse(reader); err != nil {
 		return nil, err
 	}
