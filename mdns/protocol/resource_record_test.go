@@ -21,7 +21,46 @@ import (
 )
 
 func TestResourceRecord(t *testing.T) {
-	t.Run("ParseAuthoritative", func(t *testing.T) {
+	t.Run("PTR", func(t *testing.T) {
+		tests := []struct {
+			query              []byte
+			expectedName       string
+			expectedTTL        uint
+			expectedDomainName string
+		}{
+			{
+				query:              []byte{0x09, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x07, 0x5f, 0x64, 0x6e, 0x73, 0x2d, 0x73, 0x64, 0x04, 0x5f, 0x75, 0x64, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0x0c, 0x00, 0x01, 0x00, 0x00, 0x11, 0x94, 0x00, 0x13, 0x0b, 0x5f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x63, 0x61, 0x73, 0x74, 0x04, 0x5f, 0x74, 0x63, 0x70, 0xc0, 0x23},
+				expectedName:       "_services._dns-sd._udp.local",
+				expectedTTL:        4500,
+				expectedDomainName: "googlecast._tcp.local",
+			},
+		}
+		for _, test := range tests {
+			t.Run(test.expectedName, func(t *testing.T) {
+				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				if err != nil {
+					t.Error(err)
+				}
+				ptr, ok := q.(*PTRRecord)
+				if !ok {
+					t.Errorf("%v", q)
+					return
+				}
+				// Checks each field
+				if ptr.Name() != test.expectedName {
+					t.Errorf("Name: %s != %s", q.Name(), test.expectedName)
+				}
+				if ptr.TTL() != test.expectedTTL {
+					t.Errorf("TTL: %d != %d", q.TTL(), test.expectedTTL)
+				}
+				if ptr.DomainName() != test.expectedDomainName {
+					t.Skipf("Domain: %s != %s", ptr.DomainName(), test.expectedDomainName)
+				}
+			})
+		}
+	})
+
+	t.Run("OPT", func(t *testing.T) {
 		tests := []struct {
 			query         []byte
 			expectedName  string
