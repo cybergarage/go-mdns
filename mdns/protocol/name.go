@@ -21,7 +21,11 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
-const nameSep = "."
+const (
+	nameSep               = "."
+	nameIsCompressionMask = 0xC0
+	nameLenMask           = 0x3F
+)
 
 func parseName(reader io.Reader) (string, error) {
 	name := ""
@@ -29,6 +33,17 @@ func parseName(reader io.Reader) (string, error) {
 	_, err := reader.Read(nextNameLenBuf)
 	for err == nil {
 		nextNameLen := encoding.BytesToInteger(nextNameLenBuf)
+		// Note: Compression names are not supported, and so
+		// the alias name are indistinguishable from root names yet.
+		if (nextNameLen & nameIsCompressionMask) == nameIsCompressionMask {
+			// Skips a remain compression offset bit
+			_, err := reader.Read(nextNameLenBuf)
+			if err != nil {
+				return "", err
+			}
+			return "", nil
+		}
+		nextNameLen &= nameLenMask
 		if nextNameLen == 0 {
 			break
 		}
