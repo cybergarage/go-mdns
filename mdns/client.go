@@ -74,8 +74,13 @@ func (client *Client) MessageReceived(msg *protocol.Message) (*protocol.Message,
 		client.userListener.MessageReceived(msg)
 	}
 
-	if msg.IsQuery() {
+	if !msg.IsResponse() {
 		return nil, nil
+	}
+
+	srv, err := NewServiceWithMessage(msg)
+	if err == nil {
+		client.AddService(srv)
 	}
 
 	return nil, nil
