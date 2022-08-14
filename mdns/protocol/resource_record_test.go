@@ -20,7 +20,7 @@ import (
 	"testing"
 )
 
-func TestResource(t *testing.T) {
+func TestResourceRecord(t *testing.T) {
 	t.Run("ParseAuthoritative", func(t *testing.T) {
 		tests := []struct {
 			query         []byte
