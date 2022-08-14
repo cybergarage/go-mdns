@@ -19,6 +19,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net"
+	"strings"
 	"testing"
 )
 
@@ -107,6 +108,51 @@ func TestResourceRecord(t *testing.T) {
 				}
 				if srv.Target() != test.expectedTarget {
 					t.Skipf("Target: %s != %s", srv.Target(), test.expectedTarget)
+				}
+			})
+		}
+	})
+
+	t.Run("TXT", func(t *testing.T) {
+		tests := []struct {
+			query         []byte
+			expectedTTL   uint
+			expectedAttrs []string
+		}{
+			{
+				query:         []byte{0xc1, 0x3a, 0x00, 0x10, 0x80, 0x01, 0x00, 0x00, 0x00, 0x78, 0x00, 0x49, 0x23, 0x69, 0x64, 0x3d, 0x31, 0x66, 0x61, 0x30, 0x35, 0x63, 0x31, 0x35, 0x63, 0x65, 0x37, 0x65, 0x66, 0x65, 0x63, 0x62, 0x37, 0x34, 0x30, 0x38, 0x37, 0x38, 0x64, 0x31, 0x63, 0x30, 0x32, 0x34, 0x32, 0x31, 0x38, 0x33, 0x23, 0x63, 0x64, 0x3d, 0x44, 0x45, 0x39, 0x39, 0x42, 0x44, 0x31, 0x39, 0x34, 0x42, 0x32, 0x42, 0x46, 0x33, 0x42, 0x42, 0x46, 0x35, 0x42, 0x30, 0x39, 0x43, 0x36, 0x46, 0x42, 0x42, 0x34, 0x41, 0x30, 0x31, 0x35, 0x46, 0x00},
+				expectedTTL:   120,
+				expectedAttrs: []string{"id=1fa05c15ce7efecb740878d1c0242183", "cd=DE99BD194B2BF3BBF5B09C6FBB4A015F"},
+			},
+		}
+		for _, test := range tests {
+			t.Run(strings.Join(test.expectedAttrs, ","), func(t *testing.T) {
+				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				if err != nil {
+					t.Error(err)
+				}
+				txt, ok := q.(*TXTRecord)
+				if !ok {
+					t.Errorf("%v", txt)
+					return
+				}
+				// Checks each field
+				if txt.TTL() != test.expectedTTL {
+					t.Errorf("TTL: %d != %d", txt.TTL(), test.expectedTTL)
+				}
+				attrs, err := txt.Attributes()
+				if err != nil {
+					t.Error(err)
+					return
+				}
+				if len(attrs) != len(test.expectedAttrs) {
+					t.Errorf("Attrs: %d != %d", len(attrs), len(test.expectedAttrs))
+					return
+				}
+				for n, attr := range attrs {
+					if attr != test.expectedAttrs[n] {
+						t.Errorf("Attr[%d]: %s != %s", n, attrs, test.expectedAttrs[n])
+					}
 				}
 			})
 		}

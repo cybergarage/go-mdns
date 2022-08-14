@@ -56,7 +56,10 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 			srv.Host = rr.Target()
 			srv.Port = rr.Port()
 		case *protocol.TXTRecord:
-			srv.Attributes = rr.Attributes()
+			attr, err := rr.Attributes()
+			if err == nil {
+				srv.Attributes = attr
+			}
 		case *protocol.ARecord:
 			srv.AddrV4 = rr.IP()
 		case *protocol.AAAARecord:

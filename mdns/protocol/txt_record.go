@@ -14,6 +14,8 @@
 
 package protocol
 
+import "bytes"
+
 // TXTRecord represents a TXT record.
 type TXTRecord struct {
 	*resourceRecord
@@ -26,7 +28,7 @@ func NewTXTRecord(res *resourceRecord) *TXTRecord {
 	}
 }
 
-// IP returns the resource ip address.
-func (a *TXTRecord) Attributes() []string {
-	return []string{}
+// Attributes returns the resource attribute strings.
+func (txt *TXTRecord) Attributes() ([]string, error) {
+	return parseTxt(bytes.NewReader(txt.data))
 }
