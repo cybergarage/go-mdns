@@ -27,11 +27,11 @@ type Service struct {
 	Domain string
 	AddrV4 net.IP
 	AddrV6 net.IP
-	Port   int
+	Port   uint
 }
 
 // NewService returns a new service instance.
-func NewService(name, domain string, port int) *Service {
+func NewService(name, domain string, port uint) *Service {
 	return &Service{
 		Name:   name,
 		Domain: domain,
@@ -41,7 +41,6 @@ func NewService(name, domain string, port int) *Service {
 	}
 }
 
-// nolint: gocritic
 // NewServiceWithMessage returns a new service instance.
 func NewServiceWithMessage(msg *Message) (*Service, error) {
 	srv := &Service{
@@ -56,6 +55,8 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 		switch rr := res.(type) {
 		case *protocol.PTRRecord:
 			srv.Name = rr.DomainName()
+		case *protocol.SRVRecord:
+			srv.Port = rr.Port()
 		}
 	}
 
