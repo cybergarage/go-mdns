@@ -22,7 +22,7 @@ import (
 // Client represents a client node instance.
 type Client struct {
 	*transport.MessageManager
-	*Services
+	*services
 	userListener MessageListener
 }
 
@@ -30,7 +30,7 @@ type Client struct {
 func NewClient() *Client {
 	client := &Client{
 		MessageManager: transport.NewMessageManager(),
-		Services:       NewServices(),
+		services:       newServices(),
 		userListener:   nil,
 	}
 	client.SetMessageHandler(client)
