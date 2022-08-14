@@ -23,23 +23,25 @@ import (
 
 // Service represents a SRV record.
 type Service struct {
-	Name   string
-	Domain string
-	Host   string
-	AddrV4 net.IP
-	AddrV6 net.IP
-	Port   uint
+	Name       string
+	Domain     string
+	Host       string
+	AddrV4     net.IP
+	AddrV6     net.IP
+	Port       uint
+	Attributes []string
 }
 
 // NewService returns a new service instance.
 func NewService(name, domain string, port uint) *Service {
 	return &Service{
-		Name:   name,
-		Domain: domain,
-		Host:   "",
-		AddrV4: nil,
-		AddrV6: nil,
-		Port:   port,
+		Name:       name,
+		Domain:     domain,
+		Host:       "",
+		AddrV4:     nil,
+		AddrV6:     nil,
+		Port:       port,
+		Attributes: []string{},
 	}
 }
 
@@ -53,6 +55,8 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 		case *protocol.SRVRecord:
 			srv.Host = rr.Target()
 			srv.Port = rr.Port()
+		case *protocol.TXTRecord:
+			srv.Attributes = rr.Attributes()
 		case *protocol.ARecord:
 			srv.AddrV4 = rr.IP()
 		case *protocol.AAAARecord:
