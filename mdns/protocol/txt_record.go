@@ -29,6 +29,10 @@ func NewTXTRecord(res *resourceRecord) *TXTRecord {
 }
 
 // Attributes returns the resource attribute strings.
-func (txt *TXTRecord) Attributes() ([]string, error) {
-	return parseTxt(bytes.NewReader(txt.data))
+func (txt *TXTRecord) Attributes() []string {
+	attrs, err := parseTxt(bytes.NewReader(txt.data))
+	if err != nil {
+		return []string{}
+	}
+	return attrs
 }
