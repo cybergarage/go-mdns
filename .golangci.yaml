@@ -31,3 +31,4 @@ linters:
     - dupl
     - exhaustive
     - forbidigo
+    - maligned
