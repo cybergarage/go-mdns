@@ -19,8 +19,8 @@ type PTRRecord struct {
 	*resourceRecord
 }
 
-// NewPTRRecord returns a new PTR record innstance.
-func NewPTRRecord(res *resourceRecord) *PTRRecord {
+// newPTRRecordWithResourceRecord returns a new PTR record innstance.
+func newPTRRecordWithResourceRecord(res *resourceRecord) *PTRRecord {
 	return &PTRRecord{
 		resourceRecord: res,
 	}

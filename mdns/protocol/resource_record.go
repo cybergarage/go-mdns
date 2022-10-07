@@ -65,15 +65,15 @@ func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 
 	switch res.Type() {
 	case PTR:
-		return NewPTRRecord(res), nil
+		return newPTRRecordWithResourceRecord(res), nil
 	case SRV:
-		return NewSRVRecord(res), nil
+		return newSRVRecordWithResourceRecord(res), nil
 	case TXT:
-		return NewTXTRecord(res), nil
+		return newTXTRecordWithResourceRecord(res), nil
 	case A:
-		return NewARecord(res), nil
+		return newARecordWithResourceRecord(res), nil
 	case AAAA:
-		return NewAAAARecord(res), nil
+		return newAAAARecordWithResourceRecord(res), nil
 	}
 
 	return res, nil

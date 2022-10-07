@@ -21,8 +21,8 @@ type TXTRecord struct {
 	*resourceRecord
 }
 
-// NewTXTRecord returns a new TXT record innstance.
-func NewTXTRecord(res *resourceRecord) *TXTRecord {
+// newTXTRecordWithResourceRecord returns a new TXT record innstance.
+func newTXTRecordWithResourceRecord(res *resourceRecord) *TXTRecord {
 	return &TXTRecord{
 		resourceRecord: res,
 	}
