@@ -102,7 +102,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	for n := 0; n < int(msg.QD()); n++ {
 		q, err := NewQuestionWithReader(reader)
 		if err != nil {
-			return nil
+			return err
 		}
 		msg.Questions = append(msg.Questions, q)
 	}
