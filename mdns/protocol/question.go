@@ -50,8 +50,3 @@ func (q *Question) SetType(t Type) *Question {
 	q.Record.SetType(t)
 	return q
 }
-
-// Parse parses the specified reader.
-func (q *Question) Parse(reader io.Reader) error {
-	return q.Record.Parse(reader)
-}
