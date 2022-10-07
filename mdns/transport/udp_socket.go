@@ -15,7 +15,8 @@
 package transport
 
 import (
-	"errors"
+	"fmt"
+	"io"
 	"net"
 	"strconv"
 	"time"
@@ -92,7 +93,7 @@ func (sock *UDPSocket) SendMessage(addr string, port int, msg *protocol.Message)
 // ReadMessage reads a message from the current opened socket.
 func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 	if sock.Conn == nil {
-		return nil, errors.New(errorSocketClosed)
+		return nil, fmt.Errorf("%w: %s", io.EOF, errorSocketClosed)
 	}
 
 	n, _, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)
