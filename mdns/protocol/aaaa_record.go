@@ -24,7 +24,14 @@ type AAAARecord struct {
 	*resourceRecord
 }
 
-// newAAAARecordWithResourceRecord returns a new A record innstance.
+// NewAAAARecord returns a new AAAA record innstance.
+func NewAAAARecord() *AAAARecord {
+	return &AAAARecord{
+		resourceRecord: newResourceRecord(),
+	}
+}
+
+// newAAAARecordWithResourceRecord returns a new AAAA record innstance.
 func newAAAARecordWithResourceRecord(res *resourceRecord) *AAAARecord {
 	return &AAAARecord{
 		resourceRecord: res,
