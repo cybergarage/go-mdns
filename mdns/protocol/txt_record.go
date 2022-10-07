@@ -21,6 +21,13 @@ type TXTRecord struct {
 	*resourceRecord
 }
 
+// NewTXTRecord returns a new TXT record innstance.
+func NewTXTRecord() *TXTRecord {
+	return &TXTRecord{
+		resourceRecord: newResourceRecord(),
+	}
+}
+
 // newTXTRecordWithResourceRecord returns a new TXT record innstance.
 func newTXTRecordWithResourceRecord(res *resourceRecord) *TXTRecord {
 	return &TXTRecord{
