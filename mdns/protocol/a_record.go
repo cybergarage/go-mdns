@@ -18,20 +18,20 @@ import "net"
 
 // ARecord represents a A record.
 type ARecord struct {
-	*resourceRecord
+	*Record
 }
 
 // NewARecord returns a new A record innstance.
-func NewARecord(res *resourceRecord) *ARecord {
+func NewARecord(res *Record) *ARecord {
 	return &ARecord{
-		resourceRecord: newResourceRecord(),
+		Record: newResourceRecord(),
 	}
 }
 
 // newARecordWithResourceRecord returns a new A record innstance.
-func newARecordWithResourceRecord(res *resourceRecord) *ARecord {
+func newARecordWithResourceRecord(res *Record) *ARecord {
 	return &ARecord{
-		resourceRecord: res,
+		Record: res,
 	}
 }
 

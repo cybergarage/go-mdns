@@ -16,20 +16,20 @@ package protocol
 
 // PTRRecord represents a PTR record.
 type PTRRecord struct {
-	*resourceRecord
+	*Record
 }
 
 // NewPTRRecord returns a new PTR record innstance.
 func NewPTRRecord() *PTRRecord {
 	return &PTRRecord{
-		resourceRecord: newResourceRecord(),
+		Record: newResourceRecord(),
 	}
 }
 
 // newPTRRecordWithResourceRecord returns a new PTR record innstance.
-func newPTRRecordWithResourceRecord(res *resourceRecord) *PTRRecord {
+func newPTRRecordWithResourceRecord(res *Record) *PTRRecord {
 	return &PTRRecord{
-		resourceRecord: res,
+		Record: res,
 	}
 }
 

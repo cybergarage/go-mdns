@@ -21,20 +21,20 @@ import (
 
 // AAAARecord represents a AAAA record.
 type AAAARecord struct {
-	*resourceRecord
+	*Record
 }
 
 // NewAAAARecord returns a new AAAA record innstance.
 func NewAAAARecord() *AAAARecord {
 	return &AAAARecord{
-		resourceRecord: newResourceRecord(),
+		Record: newResourceRecord(),
 	}
 }
 
 // newAAAARecordWithResourceRecord returns a new AAAA record innstance.
-func newAAAARecordWithResourceRecord(res *resourceRecord) *AAAARecord {
+func newAAAARecordWithResourceRecord(res *Record) *AAAARecord {
 	return &AAAARecord{
-		resourceRecord: res,
+		Record: res,
 	}
 }
 

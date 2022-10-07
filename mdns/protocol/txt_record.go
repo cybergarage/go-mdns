@@ -18,20 +18,20 @@ import "bytes"
 
 // TXTRecord represents a TXT record.
 type TXTRecord struct {
-	*resourceRecord
+	*Record
 }
 
 // NewTXTRecord returns a new TXT record innstance.
 func NewTXTRecord() *TXTRecord {
 	return &TXTRecord{
-		resourceRecord: newResourceRecord(),
+		Record: newResourceRecord(),
 	}
 }
 
 // newTXTRecordWithResourceRecord returns a new TXT record innstance.
-func newTXTRecordWithResourceRecord(res *resourceRecord) *TXTRecord {
+func newTXTRecordWithResourceRecord(res *Record) *TXTRecord {
 	return &TXTRecord{
-		resourceRecord: res,
+		Record: res,
 	}
 }
 

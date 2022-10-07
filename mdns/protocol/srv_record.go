@@ -22,20 +22,20 @@ import (
 // RFC 2782: A DNS RR for specifying the location of services (DNS SRV).
 // https://www.rfc-editor.org/rfc/rfc2782
 type SRVRecord struct {
-	*resourceRecord
+	*Record
 }
 
 // NewSRVRecord returns a new SRV record innstance.
 func NewSRVRecord() *SRVRecord {
 	return &SRVRecord{
-		resourceRecord: newResourceRecord(),
+		Record: newResourceRecord(),
 	}
 }
 
 // newSRVRecordWithResourceRecord returns a new SRV record innstance.
-func newSRVRecordWithResourceRecord(res *resourceRecord) *SRVRecord {
+func newSRVRecordWithResourceRecord(res *Record) *SRVRecord {
 	return &SRVRecord{
-		resourceRecord: res,
+		Record: res,
 	}
 }
 
