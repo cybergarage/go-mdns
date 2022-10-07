@@ -16,16 +16,11 @@ package protocol
 
 import (
 	"io"
-
-	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
 // Question represents a question.
 type Question struct {
-	Name            string
-	Type            Type
-	UnicastResponse bool
-	Class           Class
+	*Record
 }
 
 // Questions represents a question array.
@@ -34,10 +29,7 @@ type Questions []*Question
 // NewQuestion returns a new question innstance.
 func NewQuestion() *Question {
 	return &Question{
-		Name:            "",
-		Type:            0,
-		UnicastResponse: false,
-		Class:           IN,
+		Record: newResourceRecord(),
 	}
 }
 
@@ -49,63 +41,17 @@ func NewQuestionWithReader(reader io.Reader) (*Question, error) {
 
 // SetName sets the specified name to the question instance.
 func (q *Question) SetName(name string) *Question {
-	q.Name = name
+	q.Record.SetName(name)
 	return q
 }
 
 // SetType sets the specified type to the question instance.
 func (q *Question) SetType(t Type) *Question {
-	q.Type = t
+	q.Record.SetType(t)
 	return q
 }
 
 // Parse parses the specified reader.
 func (q *Question) Parse(reader io.Reader) error {
-	var err error
-
-	// Parses domain names
-	q.Name, err = parseName(reader)
-	if err != nil {
-		return err
-	}
-
-	// Parses query type
-	typeBytes := make([]byte, 2)
-	_, err = reader.Read(typeBytes)
-	if err != nil {
-		return err
-	}
-	q.Type = Type(encoding.BytesToInteger(typeBytes))
-
-	// Parses class type
-	classBytes := make([]byte, 2)
-	_, err = reader.Read(classBytes)
-	if err != nil {
-		return err
-	}
-	class := encoding.BytesToInteger(classBytes)
-	q.UnicastResponse = false
-	if (class & unicastResponseMask) != 0 {
-		q.UnicastResponse = true
-	}
-	q.Class = Class(class & classMask)
-
-	return nil
-}
-
-// Bytes returns the binary representation.
-func (q *Question) Bytes() []byte {
-	bytes := nameToBytes(q.Name)
-
-	typeBytes := make([]byte, 2)
-	bytes = append(bytes, encoding.IntegerToBytes(uint(q.Type), typeBytes)...)
-
-	classBytes := make([]byte, 2)
-	class := q.Class
-	if q.UnicastResponse {
-		class |= unicastResponseMask
-	}
-	bytes = append(bytes, encoding.IntegerToBytes(uint(class), classBytes)...)
-
-	return bytes
+	return q.Record.Parse(reader)
 }

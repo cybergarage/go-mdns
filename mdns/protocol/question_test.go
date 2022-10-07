@@ -43,17 +43,17 @@ func TestQuestion(t *testing.T) {
 				t.Error(err)
 			}
 			// Checks each field
-			if q.Name != test.expectedName {
-				t.Errorf("%s != %s", q.Name, test.expectedName)
+			if q.Name() != test.expectedName {
+				t.Errorf("%s != %s", q.Name(), test.expectedName)
 			}
-			if q.Type != test.expectedType {
-				t.Errorf("%2X != %2X", q.Type, test.expectedType)
+			if q.Type() != test.expectedType {
+				t.Errorf("%2X != %2X", q.Type(), test.expectedType)
 			}
-			if q.UnicastResponse != test.expectedUnicast {
-				t.Errorf("%t != %t", q.UnicastResponse, test.expectedUnicast)
+			if q.UnicastResponse() != test.expectedUnicast {
+				t.Errorf("%t != %t", q.UnicastResponse(), test.expectedUnicast)
 			}
-			if q.Class != test.expectedClass {
-				t.Errorf("%2X != %2X", q.Class, test.expectedClass)
+			if q.Class() != test.expectedClass {
+				t.Errorf("%2X != %2X", q.Class(), test.expectedClass)
 			}
 			// Checks all bytes
 			if !bytes.Equal(q.Bytes(), test.query) {

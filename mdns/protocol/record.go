@@ -23,30 +23,32 @@ import (
 
 // Record represents a resource record.
 type Record struct {
-	name       string
-	typ        Type
-	cacheFlush bool
-	class      Class
-	ttl        uint
-	data       []byte
+	name            string
+	unicastResponse bool
+	typ             Type
+	cacheFlush      bool
+	class           Class
+	ttl             uint
+	data            []byte
 }
 
 // newResourceRecord returns a new resource record innstance.
 func newResourceRecord() *Record {
 	return &Record{
-		name:       "",
-		typ:        0,
-		cacheFlush: false,
-		class:      0,
-		ttl:        0,
-		data:       nil,
+		name:            "",
+		unicastResponse: false,
+		typ:             0,
+		cacheFlush:      false,
+		class:           0,
+		ttl:             0,
+		data:            nil,
 	}
 }
 
 // newResourceRecordWithReader returns a new resource record innstance with the specified reader.
 func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 	res := newResourceRecord()
-	if err := res.parse(reader); err != nil {
+	if err := res.Parse(reader); err != nil {
 		return nil, err
 	}
 
@@ -69,6 +71,12 @@ func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 // SetName sets the specified name.
 func (res *Record) SetName(name string) *Record {
 	res.name = name
+	return res
+}
+
+// SetUnicastResponse sets the specified unicast response flag.
+func (res *Record) SetUnicastResponse(enabled bool) *Record {
+	res.unicastResponse = enabled
 	return res
 }
 
@@ -112,6 +120,11 @@ func (res *Record) Type() Type {
 	return res.typ
 }
 
+// UnicastResponse returns the unicast response flag.
+func (res *Record) UnicastResponse() bool {
+	return res.cacheFlush
+}
+
 // Class returns the resource record class.
 func (res *Record) Class() Class {
 	return res.class
@@ -132,8 +145,8 @@ func (res *Record) Data() []byte {
 	return res.data
 }
 
-// parse parses the specified reader.
-func (res *Record) parse(reader io.Reader) error {
+// Parse parses the specified reader.
+func (res *Record) Parse(reader io.Reader) error {
 	var err error
 
 	// Parses domain names
@@ -148,7 +161,12 @@ func (res *Record) parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
-	res.typ = Type(encoding.BytesToInteger(typeBytes))
+	typ := Type(encoding.BytesToInteger(typeBytes))
+	res.unicastResponse = false
+	if (typ & unicastResponseMask) != 0 {
+		res.unicastResponse = true
+	}
+	res.typ = typ & unicastResponseMask
 
 	// Parses class type
 	classBytes := make([]byte, 2)
@@ -192,7 +210,11 @@ func (res *Record) Bytes() []byte {
 	bytes := nameToBytes(res.name)
 
 	typeBytes := make([]byte, 2)
-	bytes = append(bytes, encoding.IntegerToBytes(uint(res.typ), typeBytes)...)
+	typ := res.typ
+	if res.unicastResponse {
+		typ |= unicastResponseMask
+	}
+	bytes = append(bytes, encoding.IntegerToBytes(uint(typ), typeBytes)...)
 
 	classBytes := make([]byte, 2)
 	class := res.class
