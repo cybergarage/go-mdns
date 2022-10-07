@@ -15,6 +15,7 @@
 package protocol
 
 import (
+	"bytes"
 	"io"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
@@ -36,6 +37,8 @@ type ResourceRecord interface {
 	Data() []byte
 	// Bytes returns the binary representation.
 	Bytes() []byte
+	// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+	Equal(res ResourceRecord) bool
 }
 
 // resourceRecord represents a resource record.
@@ -186,4 +189,9 @@ func (res *resourceRecord) Bytes() []byte {
 	bytes = append(bytes, res.data...)
 
 	return bytes
+}
+
+// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+func (res *resourceRecord) Equal(other ResourceRecord) bool {
+	return bytes.Equal(res.Bytes(), other.Bytes())
 }
