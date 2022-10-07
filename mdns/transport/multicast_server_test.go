@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
@@ -99,6 +100,9 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr s
 }
 
 func TestMulticastServerWithInterface(t *testing.T) {
+	log.SetStdoutDebugEnbled(true)
+	defer log.SetStdoutDebugEnbled(false)
+
 	ifis, err := GetAvailableInterfaces()
 	if err != nil {
 		t.Error(err)
