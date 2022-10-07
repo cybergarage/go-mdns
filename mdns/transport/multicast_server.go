@@ -87,7 +87,7 @@ func handleMulticastConnection(server *MulticastServer, cancel chan interface{})
 			msg, err := server.MulticastSocket.ReadMessage()
 			if err != nil {
 				if !errors.Is(err, io.EOF) {
-					log.Error(err.Error())
+					log.Error(err)
 				}
 				break
 			}
