@@ -86,6 +86,36 @@ func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 	return res, nil
 }
 
+// SetName sets the specified name.
+func (res *resourceRecord) SetName(name string) {
+	res.name = name
+}
+
+// SetType sets the specified resource record type.
+func (res *resourceRecord) SetType(typ Type) {
+	res.typ = typ
+}
+
+// SetClass sets the specified resource record class.
+func (res *resourceRecord) SetClass(cls Class) {
+	res.class = cls
+}
+
+// SetCacheFlush sets the specified cache flush flag.
+func (res *resourceRecord) SetCacheFlush(enabled bool) {
+	res.cacheFlush = enabled
+}
+
+// SetTTL returns the specified TTL second.
+func (res *resourceRecord) SetTTL(ttl uint) {
+	res.ttl = ttl
+}
+
+// SetData returns the specified resource record data.
+func (res *resourceRecord) SetData(b []byte) {
+	res.data = b
+}
+
 // Name returns the resource record name.
 func (res *resourceRecord) Name() string {
 	return res.name
@@ -101,7 +131,7 @@ func (res *resourceRecord) Class() Class {
 	return res.class
 }
 
-// Type returns the cache flush flag.
+// CacheFlush returns the cache flush flag.
 func (res *resourceRecord) CacheFlush() bool {
 	return res.cacheFlush
 }
