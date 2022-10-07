@@ -21,6 +21,13 @@ type ARecord struct {
 	*resourceRecord
 }
 
+// NewARecord returns a new A record innstance.
+func NewARecord(res *resourceRecord) *ARecord {
+	return &ARecord{
+		resourceRecord: newResourceRecord(),
+	}
+}
+
 // newARecordWithResourceRecord returns a new A record innstance.
 func newARecordWithResourceRecord(res *resourceRecord) *ARecord {
 	return &ARecord{
