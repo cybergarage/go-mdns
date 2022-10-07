@@ -84,7 +84,7 @@ func (sock *UDPSocket) SendMessage(addr string, port int, msg *protocol.Message)
 	}
 	n, err := sock.Conn.WriteToUDP(msg.Bytes(), toAddr)
 	if err != nil {
-		log.Error(err.Error())
+		log.Error(err)
 	}
 	return n, err
 }
