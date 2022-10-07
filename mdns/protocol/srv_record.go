@@ -25,6 +25,13 @@ type SRVRecord struct {
 	*resourceRecord
 }
 
+// NewSRVRecord returns a new SRV record innstance.
+func NewSRVRecord() *SRVRecord {
+	return &SRVRecord{
+		resourceRecord: newResourceRecord(),
+	}
+}
+
 // newSRVRecordWithResourceRecord returns a new SRV record innstance.
 func newSRVRecordWithResourceRecord(res *resourceRecord) *SRVRecord {
 	return &SRVRecord{
