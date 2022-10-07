@@ -24,8 +24,8 @@ type testMessageManager struct {
 }
 
 func newTestMessage(tid uint) (*protocol.Message, error) {
-	testMessageBytes := []byte{0x00, 0x02, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01}
-	return protocol.NewMessageWithBytes(testMessageBytes)
+	msg := protocol.NewRequestMessage()
+	return msg, nil
 }
 
 func isTestMessage(msg *protocol.Message) bool {
