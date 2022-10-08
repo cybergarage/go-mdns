@@ -21,8 +21,8 @@ import (
 // Message represents a protocol message.
 type Message = protocol.Message
 
-func newRequestWithQuery(q *Query) *Message {
+func NewRequestWithQuery(q *Query) *Message {
 	msg := protocol.NewRequestMessage()
-	msg.AddQuestion(protocol.NewQuestion().SetName(q.String()).SetType(protocol.PTR))
+	msg.AddQuestion(protocol.NewQuestion().SetName(q.String()).SetType(protocol.PTR).SetClass(protocol.IN))
 	return msg
 }
