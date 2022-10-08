@@ -16,7 +16,6 @@ package protocol
 
 import (
 	"bytes"
-	"encoding/hex"
 	"testing"
 )
 
@@ -54,10 +53,6 @@ func TestQuestion(t *testing.T) {
 			}
 			if q.Class() != test.expectedClass {
 				t.Errorf("%2X != %2X", q.Class(), test.expectedClass)
-			}
-			// Checks all bytes
-			if !bytes.Equal(q.Bytes(), test.query) {
-				t.Errorf("%s != %s", hex.EncodeToString(q.Bytes()), hex.EncodeToString(test.query))
 			}
 		}
 	})
