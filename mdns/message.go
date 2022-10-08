@@ -23,6 +23,6 @@ type Message = protocol.Message
 
 func NewRequestWithQuery(q *Query) *Message {
 	msg := protocol.NewRequestMessage()
-	msg.AddQuestion(protocol.NewQuestion().SetName(q.String()).SetType(protocol.PTR).SetClass(protocol.IN))
+	msg.AddQuestion(protocol.NewQuestion().SetName(q.String()).SetType(protocol.PTR).SetClass(protocol.IN).SetUnicastResponse(true))
 	return msg
 }
