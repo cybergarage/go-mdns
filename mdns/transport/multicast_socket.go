@@ -85,10 +85,10 @@ func (sock *MulticastSocket) AnnounceMessage(msg *protocol.Message) error {
 	if err != nil {
 		return err
 	}
-	port, err := sock.GetBoundPort()
-	if err != nil {
-		return err
+	toAddr := MulticastIPv4Address
+	if IsIPv6Address(addr) {
+		toAddr = MulticastIPv6Address
 	}
-	_, err = sock.SendMessage(addr, port, msg)
+	_, err = sock.SendMessage(toAddr, Port, msg)
 	return err
 }
