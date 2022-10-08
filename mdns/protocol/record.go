@@ -201,9 +201,11 @@ func (r *Record) Parse(reader io.Reader) error {
 	}
 	dataLen := encoding.BytesToInteger(dataLenBytes)
 	r.data = make([]byte, dataLen)
-	_, err = reader.Read(r.data)
-	if err != nil {
-		return err
+	if 0 < dataLen {
+		_, err = reader.Read(r.data)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
