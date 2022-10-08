@@ -86,7 +86,7 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg *protocol.Mess
 
 	fromAddr, _ := sock.GetBoundAddr()
 	fromPort, _ := sock.GetBoundPort()
-	log.Debugf("%s -> %s", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
+	log.Debugf("SEND %s -> %s", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 
 	n, err := sock.Conn.WriteToUDP(msg.Bytes(), toUDPAddr)
 	if err != nil {
@@ -109,7 +109,7 @@ func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 	toAddr, _ := sock.GetBoundAddr()
 	toPort, _ := sock.GetBoundPort()
 
-	log.Debugf("%s -> %s", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
+	log.Debugf("RECV %s -> %s", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 
 	msg, err := protocol.NewMessageWithBytes(sock.ReadBuffer[:n])
 	if err != nil {
