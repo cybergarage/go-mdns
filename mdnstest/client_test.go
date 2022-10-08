@@ -17,10 +17,14 @@ package mdnstest
 import (
 	"testing"
 
+	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns"
 )
 
 func TestClient(t *testing.T) {
+	log.SetStdoutDebugEnbled(true)
+	defer log.SetStdoutDebugEnbled(false)
+
 	client := mdns.NewClient()
 
 	err := client.Start()
