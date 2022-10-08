@@ -21,7 +21,8 @@ const (
 )
 
 const (
-	classMask           = 0x7FFF
 	unicastResponseMask = 0x8000
+	typeMask            = 0x7FFF
 	cacheFlushMask      = 0x8000
+	classMask           = 0x7FFF
 )
