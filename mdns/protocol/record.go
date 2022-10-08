@@ -45,8 +45,8 @@ func newResourceRecord() *Record {
 	}
 }
 
-// newResourceRecordWithReader returns a new resource record innstance with the specified reader.
-func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+// newRecordWithReader returns a new resource record innstance with the specified reader.
+func newRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 	res := newResourceRecord()
 	if err := res.Parse(reader); err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (res *Record) Parse(reader io.Reader) error {
 	if (typ & unicastResponseMask) != 0 {
 		res.unicastResponse = true
 	}
-	res.typ = typ & unicastResponseMask
+	res.typ = typ & (^unicastResponseMask & 0xFFFF)
 
 	// Parses class type
 	classBytes := make([]byte, 2)
@@ -179,7 +179,7 @@ func (res *Record) Parse(reader io.Reader) error {
 	if (class & cacheFlushMask) != 0 {
 		res.cacheFlush = true
 	}
-	res.class = Class(class & classMask)
+	res.class = Class(class & (^classMask & 0xFFFF))
 
 	// Parses TTL
 	ttlBytes := make([]byte, 4)
