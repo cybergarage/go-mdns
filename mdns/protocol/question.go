@@ -56,3 +56,9 @@ func (q *Question) SetClass(cls Class) *Question {
 	q.Record.SetClass(cls)
 	return q
 }
+
+// SetUnicastResponse sets the specified unicast response flag.
+func (q *Question) SetUnicastResponse(enabled bool) *Question {
+	q.Record.SetUnicastResponse(enabled)
+	return q
+}
