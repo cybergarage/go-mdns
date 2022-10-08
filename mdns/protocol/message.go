@@ -108,7 +108,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses answers.
 	for n := 0; n < int(msg.AN()); n++ {
-		a, err := newResourceRecordWithReader(reader)
+		a, err := newRecordWithReader(reader)
 		if err != nil {
 			return err
 		}
@@ -116,7 +116,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses name servers.
 	for n := 0; n < int(msg.AN()); n++ {
-		a, err := newResourceRecordWithReader(reader)
+		a, err := newRecordWithReader(reader)
 		if err != nil {
 			return err
 		}
@@ -124,7 +124,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses name servers.
 	for n := 0; n < int(msg.NS()); n++ {
-		ns, err := newResourceRecordWithReader(reader)
+		ns, err := newRecordWithReader(reader)
 		if err != nil {
 			return err
 		}
@@ -132,7 +132,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses additional records.
 	for n := 0; n < int(msg.AR()); n++ {
-		a, err := newResourceRecordWithReader(reader)
+		a, err := newRecordWithReader(reader)
 		if err != nil {
 			return err
 		}

@@ -41,7 +41,7 @@ func TestResourceRecord(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(test.expectedName, func(t *testing.T) {
-				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				q, err := newRecordWithReader(bytes.NewReader(test.query))
 				if err != nil {
 					t.Error(err)
 				}
@@ -84,7 +84,7 @@ func TestResourceRecord(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(fmt.Sprintf("%d:%d:%d", test.expectedPriority, test.expectedWeight, test.expectedPort), func(t *testing.T) {
-				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				q, err := newRecordWithReader(bytes.NewReader(test.query))
 				if err != nil {
 					t.Error(err)
 				}
@@ -127,7 +127,7 @@ func TestResourceRecord(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(strings.Join(test.expectedAttrs, ","), func(t *testing.T) {
-				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				q, err := newRecordWithReader(bytes.NewReader(test.query))
 				if err != nil {
 					t.Error(err)
 				}
@@ -168,7 +168,7 @@ func TestResourceRecord(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(test.expectedIP.String(), func(t *testing.T) {
-				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				q, err := newRecordWithReader(bytes.NewReader(test.query))
 				if err != nil {
 					t.Error(err)
 				}
@@ -202,7 +202,7 @@ func TestResourceRecord(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(test.expectedIP.String(), func(t *testing.T) {
-				q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+				q, err := newRecordWithReader(bytes.NewReader(test.query))
 				if err != nil {
 					t.Error(err)
 				}
@@ -238,7 +238,7 @@ func TestResourceRecord(t *testing.T) {
 			},
 		}
 		for _, test := range tests {
-			q, err := newResourceRecordWithReader(bytes.NewReader(test.query))
+			q, err := newRecordWithReader(bytes.NewReader(test.query))
 			if err != nil {
 				t.Error(err)
 			}
