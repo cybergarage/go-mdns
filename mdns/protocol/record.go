@@ -16,6 +16,7 @@ package protocol
 
 import (
 	"bytes"
+	"errors"
 	"io"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
@@ -185,6 +186,9 @@ func (r *Record) Parse(reader io.Reader) error {
 	ttlBytes := make([]byte, 4)
 	_, err = reader.Read(ttlBytes)
 	if err != nil {
+		if errors.Is(err, io.EOF) { // QR == 0
+			return nil
+		}
 		return err
 	}
 	r.ttl = encoding.BytesToInteger(ttlBytes)
