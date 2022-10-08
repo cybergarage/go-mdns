@@ -78,12 +78,17 @@ func (sock *UDPSocket) Close() error {
 }
 
 // SendMessage sends the message to the destination address.
-func (sock *UDPSocket) SendMessage(addr string, port int, msg *protocol.Message) (int, error) {
-	toAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(addr, strconv.Itoa(port)))
+func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg *protocol.Message) (int, error) {
+	toUDPAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 	if err != nil {
 		return 0, err
 	}
-	n, err := sock.Conn.WriteToUDP(msg.Bytes(), toAddr)
+
+	fromAddr, _ := sock.GetBoundAddr()
+	fromPort, _ := sock.GetBoundPort()
+	log.Debugf("%s -> %s", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
+
+	n, err := sock.Conn.WriteToUDP(msg.Bytes(), toUDPAddr)
 	if err != nil {
 		log.Error(err)
 	}
@@ -96,10 +101,15 @@ func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 		return nil, fmt.Errorf("%w: %s", io.EOF, errorSocketClosed)
 	}
 
-	n, _, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)
+	n, fromAddr, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)
 	if err != nil {
 		return nil, err
 	}
+
+	toAddr, _ := sock.GetBoundAddr()
+	toPort, _ := sock.GetBoundPort()
+
+	log.Debugf("%s -> %s", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 
 	msg, err := protocol.NewMessageWithBytes(sock.ReadBuffer[:n])
 	if err != nil {
