@@ -217,11 +217,11 @@ func (res *Record) Bytes() []byte {
 	bytes = append(bytes, encoding.IntegerToBytes(uint(typ), typeBytes)...)
 
 	classBytes := make([]byte, 2)
-	class := res.class
+	cls := res.class
 	if res.cacheFlush {
-		class |= cacheFlushMask
+		cls |= cacheFlushMask
 	}
-	bytes = append(bytes, encoding.IntegerToBytes(uint(class), classBytes)...)
+	bytes = append(bytes, encoding.IntegerToBytes(uint(cls), classBytes)...)
 
 	ttlBytes := make([]byte, 4)
 	bytes = append(bytes, encoding.IntegerToBytes(res.ttl, ttlBytes)...)
