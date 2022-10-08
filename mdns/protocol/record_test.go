@@ -224,17 +224,17 @@ func TestResourceRecord(t *testing.T) {
 
 	t.Run("OPT", func(t *testing.T) {
 		tests := []struct {
-			query         []byte
-			expectedName  string
-			expectedType  Type
-			expectedCache bool
-			expectedClass Class
+			query            []byte
+			expectedName     string
+			expectedType     Type
+			expectedResponse bool
+			expectedClass    Class
 		}{
 			{
-				query:         []byte{0x00, 0x00, 0x29, 0x05, 0xa0, 0x00, 0x00, 0x11, 0x94, 0x00, 0x12, 0x00, 0x04, 0x00, 0x0e, 0x00, 0x74, 0x52, 0x06, 0x8d, 0xcf, 0x54, 0x27, 0x86, 0xfd, 0xcd, 0x88, 0xe1, 0x43},
-				expectedName:  "",
-				expectedType:  OPT,
-				expectedCache: false,
+				query:            []byte{0x00, 0x00, 0x29, 0x05, 0xa0, 0x00, 0x00, 0x11, 0x94, 0x00, 0x12, 0x00, 0x04, 0x00, 0x0e, 0x00, 0x74, 0x52, 0x06, 0x8d, 0xcf, 0x54, 0x27, 0x86, 0xfd, 0xcd, 0x88, 0xe1, 0x43},
+				expectedName:     "",
+				expectedType:     OPT,
+				expectedResponse: false,
 			},
 		}
 		for _, test := range tests {
@@ -249,8 +249,8 @@ func TestResourceRecord(t *testing.T) {
 			if q.Type() != test.expectedType {
 				t.Errorf("%2X != %2X", q.Type(), test.expectedType)
 			}
-			if q.CacheFlush() != test.expectedCache {
-				t.Errorf("%t != %t", q.CacheFlush(), test.expectedCache)
+			if q.UnicastResponse() != test.expectedResponse {
+				t.Errorf("%t != %t", q.UnicastResponse(), test.expectedResponse)
 			}
 			// Checks all bytes
 			if !bytes.Equal(q.Bytes(), test.query) {

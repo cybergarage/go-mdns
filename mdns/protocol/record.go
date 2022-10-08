@@ -27,7 +27,6 @@ type Record struct {
 	name            string
 	unicastResponse bool
 	typ             Type
-	cacheFlush      bool
 	class           Class
 	ttl             uint
 	data            []byte
@@ -39,7 +38,6 @@ func newResourceRecord() *Record {
 		name:            "",
 		unicastResponse: false,
 		typ:             0,
-		cacheFlush:      false,
 		class:           0,
 		ttl:             0,
 		data:            nil,
@@ -93,12 +91,6 @@ func (r *Record) SetClass(cls Class) *Record {
 	return r
 }
 
-// SetCacheFlush sets the specified cache flush flag.
-func (r *Record) SetCacheFlush(enabled bool) *Record {
-	r.cacheFlush = enabled
-	return r
-}
-
 // SetTTL returns the specified TTL second.
 func (r *Record) SetTTL(ttl uint) *Record {
 	r.ttl = ttl
@@ -123,17 +115,12 @@ func (r *Record) Type() Type {
 
 // UnicastResponse returns the unicast response flag.
 func (r *Record) UnicastResponse() bool {
-	return r.cacheFlush
+	return r.unicastResponse
 }
 
 // Class returns the resource record class.
 func (r *Record) Class() Class {
 	return r.class
-}
-
-// CacheFlush returns the cache flush flag.
-func (r *Record) CacheFlush() bool {
-	return r.cacheFlush
 }
 
 // TTL returns the TTL second.
@@ -162,12 +149,7 @@ func (r *Record) Parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
-	typ := Type(encoding.BytesToInteger(typeBytes))
-	r.unicastResponse = false
-	if (typ & unicastResponseMask) != 0 {
-		r.unicastResponse = true
-	}
-	r.typ = typ & typeMask
+	r.typ = Type(encoding.BytesToInteger(typeBytes))
 
 	// Parses class type
 	classBytes := make([]byte, 2)
@@ -176,9 +158,9 @@ func (r *Record) Parse(reader io.Reader) error {
 		return err
 	}
 	cls := encoding.BytesToInteger(classBytes)
-	r.cacheFlush = false
-	if (cls & cacheFlushMask) != 0 {
-		r.cacheFlush = true
+	r.unicastResponse = false
+	if (cls & unicastResponseMask) != 0 {
+		r.unicastResponse = true
 	}
 	r.class = Class(cls & classMask)
 
@@ -217,14 +199,11 @@ func (r *Record) Bytes() []byte {
 
 	typeBytes := make([]byte, 2)
 	typ := r.typ
-	if r.unicastResponse {
-		typ |= unicastResponseMask
-	}
 	bytes = append(bytes, encoding.IntegerToBytes(uint(typ), typeBytes)...)
 
 	classBytes := make([]byte, 2)
 	cls := r.class
-	if r.cacheFlush {
+	if r.unicastResponse {
 		cls |= cacheFlushMask
 	}
 	bytes = append(bytes, encoding.IntegerToBytes(uint(cls), classBytes)...)
