@@ -50,3 +50,9 @@ func (q *Question) SetType(t Type) *Question {
 	q.Record.SetType(t)
 	return q
 }
+
+// SetClass sets the specified class to the question instance.
+func (q *Question) SetClass(cls Class) *Question {
+	q.Record.SetClass(cls)
+	return q
+}

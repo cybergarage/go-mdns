@@ -39,13 +39,17 @@ import (
 )
 
 func main() {
-	verbose := flag.Bool("v", false, "Enable verbose output")
+	verbose := flag.Bool("v", false, "Enable verbose messages")
+	debug := flag.Bool("d", false, "Enable debug messages")
 	flag.Parse()
 
 	// Setup logger
 
 	if *verbose {
 		log.SetSharedLogger(log.NewStdoutLogger(log.LevelTrace))
+	}
+	if *debug {
+		log.SetSharedLogger(log.NewStdoutLogger(log.LevelDebug))
 	}
 
 	// Start a controller for Echonet Lite node
