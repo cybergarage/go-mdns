@@ -21,8 +21,16 @@ import (
 // Message represents a protocol message.
 type Message = protocol.Message
 
-func NewRequestWithQuery(q *Query) *Message {
+func NewRequestWithQuery(query *Query) *Message {
 	msg := protocol.NewRequestMessage()
-	msg.AddQuestion(protocol.NewQuestion().SetName(q.String()).SetType(protocol.PTR).SetClass(protocol.IN).SetUnicastResponse(true))
+	msg.AddQuestion(protocol.NewQuestion().SetName(query.String()).SetType(protocol.PTR).SetClass(protocol.IN).SetUnicastResponse(true))
+	return msg
+}
+
+func NewRequestWithQueries(queries []*Query) *Message {
+	msg := protocol.NewRequestMessage()
+	for _, query := range queries {
+		msg.AddQuestion(protocol.NewQuestion().SetName(query.String()).SetType(protocol.PTR).SetClass(protocol.IN).SetUnicastResponse(true))
+	}
 	return msg
 }
