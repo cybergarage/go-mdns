@@ -47,110 +47,110 @@ func newResourceRecord() *Record {
 
 // newRecordWithReader returns a new resource record innstance with the specified reader.
 func newRecordWithReader(reader io.Reader) (ResourceRecord, error) {
-	res := newResourceRecord()
-	if err := res.Parse(reader); err != nil {
+	r := newResourceRecord()
+	if err := r.Parse(reader); err != nil {
 		return nil, err
 	}
 
-	switch res.Type() {
+	switch r.Type() {
 	case PTR:
-		return newPTRRecordWithResourceRecord(res), nil
+		return newPTRRecordWithResourceRecord(r), nil
 	case SRV:
-		return newSRVRecordWithResourceRecord(res), nil
+		return newSRVRecordWithResourceRecord(r), nil
 	case TXT:
-		return newTXTRecordWithResourceRecord(res), nil
+		return newTXTRecordWithResourceRecord(r), nil
 	case A:
-		return newARecordWithResourceRecord(res), nil
+		return newARecordWithResourceRecord(r), nil
 	case AAAA:
-		return newAAAARecordWithResourceRecord(res), nil
+		return newAAAARecordWithResourceRecord(r), nil
 	}
 
-	return res, nil
+	return r, nil
 }
 
 // SetName sets the specified name.
-func (res *Record) SetName(name string) *Record {
-	res.name = name
-	return res
+func (r *Record) SetName(name string) *Record {
+	r.name = name
+	return r
 }
 
 // SetUnicastResponse sets the specified unicast response flag.
-func (res *Record) SetUnicastResponse(enabled bool) *Record {
-	res.unicastResponse = enabled
-	return res
+func (r *Record) SetUnicastResponse(enabled bool) *Record {
+	r.unicastResponse = enabled
+	return r
 }
 
 // SetType sets the specified resource record type.
-func (res *Record) SetType(typ Type) *Record {
-	res.typ = typ
-	return res
+func (r *Record) SetType(typ Type) *Record {
+	r.typ = typ
+	return r
 }
 
 // SetClass sets the specified resource record class.
-func (res *Record) SetClass(cls Class) *Record {
-	res.class = cls
-	return res
+func (r *Record) SetClass(cls Class) *Record {
+	r.class = cls
+	return r
 }
 
 // SetCacheFlush sets the specified cache flush flag.
-func (res *Record) SetCacheFlush(enabled bool) *Record {
-	res.cacheFlush = enabled
-	return res
+func (r *Record) SetCacheFlush(enabled bool) *Record {
+	r.cacheFlush = enabled
+	return r
 }
 
 // SetTTL returns the specified TTL second.
-func (res *Record) SetTTL(ttl uint) *Record {
-	res.ttl = ttl
-	return res
+func (r *Record) SetTTL(ttl uint) *Record {
+	r.ttl = ttl
+	return r
 }
 
 // SetData returns the specified resource record data.
-func (res *Record) SetData(b []byte) *Record {
-	res.data = b
-	return res
+func (r *Record) SetData(b []byte) *Record {
+	r.data = b
+	return r
 }
 
 // Name returns the resource record name.
-func (res *Record) Name() string {
-	return res.name
+func (r *Record) Name() string {
+	return r.name
 }
 
 // Type returns the resource record type.
-func (res *Record) Type() Type {
-	return res.typ
+func (r *Record) Type() Type {
+	return r.typ
 }
 
 // UnicastResponse returns the unicast response flag.
-func (res *Record) UnicastResponse() bool {
-	return res.cacheFlush
+func (r *Record) UnicastResponse() bool {
+	return r.cacheFlush
 }
 
 // Class returns the resource record class.
-func (res *Record) Class() Class {
-	return res.class
+func (r *Record) Class() Class {
+	return r.class
 }
 
 // CacheFlush returns the cache flush flag.
-func (res *Record) CacheFlush() bool {
-	return res.cacheFlush
+func (r *Record) CacheFlush() bool {
+	return r.cacheFlush
 }
 
 // TTL returns the TTL second.
-func (res *Record) TTL() uint {
-	return res.ttl
+func (r *Record) TTL() uint {
+	return r.ttl
 }
 
 // Data returns the resource record data.
-func (res *Record) Data() []byte {
-	return res.data
+func (r *Record) Data() []byte {
+	return r.data
 }
 
 // Parse parses the specified reader.
-func (res *Record) Parse(reader io.Reader) error {
+func (r *Record) Parse(reader io.Reader) error {
 	var err error
 
 	// Parses domain names
-	res.name, err = parseName(reader)
+	r.name, err = parseName(reader)
 	if err != nil {
 		return err
 	}
@@ -162,11 +162,11 @@ func (res *Record) Parse(reader io.Reader) error {
 		return err
 	}
 	typ := Type(encoding.BytesToInteger(typeBytes))
-	res.unicastResponse = false
+	r.unicastResponse = false
 	if (typ & unicastResponseMask) != 0 {
-		res.unicastResponse = true
+		r.unicastResponse = true
 	}
-	res.typ = typ & (^unicastResponseMask & 0xFFFF)
+	r.typ = typ & typeMask
 
 	// Parses class type
 	classBytes := make([]byte, 2)
@@ -174,12 +174,12 @@ func (res *Record) Parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
-	class := encoding.BytesToInteger(classBytes)
-	res.cacheFlush = false
-	if (class & cacheFlushMask) != 0 {
-		res.cacheFlush = true
+	cls := encoding.BytesToInteger(classBytes)
+	r.cacheFlush = false
+	if (cls & cacheFlushMask) != 0 {
+		r.cacheFlush = true
 	}
-	res.class = Class(class & (^classMask & 0xFFFF))
+	r.class = Class(cls & classMask)
 
 	// Parses TTL
 	ttlBytes := make([]byte, 4)
@@ -187,7 +187,7 @@ func (res *Record) Parse(reader io.Reader) error {
 	if err != nil {
 		return err
 	}
-	res.ttl = encoding.BytesToInteger(ttlBytes)
+	r.ttl = encoding.BytesToInteger(ttlBytes)
 
 	// Parses data
 	dataLenBytes := make([]byte, 2)
@@ -196,8 +196,8 @@ func (res *Record) Parse(reader io.Reader) error {
 		return err
 	}
 	dataLen := encoding.BytesToInteger(dataLenBytes)
-	res.data = make([]byte, dataLen)
-	_, err = reader.Read(res.data)
+	r.data = make([]byte, dataLen)
+	_, err = reader.Read(r.data)
 	if err != nil {
 		return err
 	}
@@ -206,34 +206,34 @@ func (res *Record) Parse(reader io.Reader) error {
 }
 
 // Bytes returns the binary representation.
-func (res *Record) Bytes() []byte {
-	bytes := nameToBytes(res.name)
+func (r *Record) Bytes() []byte {
+	bytes := nameToBytes(r.name)
 
 	typeBytes := make([]byte, 2)
-	typ := res.typ
-	if res.unicastResponse {
+	typ := r.typ
+	if r.unicastResponse {
 		typ |= unicastResponseMask
 	}
 	bytes = append(bytes, encoding.IntegerToBytes(uint(typ), typeBytes)...)
 
 	classBytes := make([]byte, 2)
-	cls := res.class
-	if res.cacheFlush {
+	cls := r.class
+	if r.cacheFlush {
 		cls |= cacheFlushMask
 	}
 	bytes = append(bytes, encoding.IntegerToBytes(uint(cls), classBytes)...)
 
 	ttlBytes := make([]byte, 4)
-	bytes = append(bytes, encoding.IntegerToBytes(res.ttl, ttlBytes)...)
+	bytes = append(bytes, encoding.IntegerToBytes(r.ttl, ttlBytes)...)
 
 	dataLenBytes := make([]byte, 2)
-	bytes = append(bytes, encoding.IntegerToBytes(uint(len(res.data)), dataLenBytes)...)
-	bytes = append(bytes, res.data...)
+	bytes = append(bytes, encoding.IntegerToBytes(uint(len(r.data)), dataLenBytes)...)
+	bytes = append(bytes, r.data...)
 
 	return bytes
 }
 
 // Equal returns true if this record is equal to  the specified resource record. otherwise false.
-func (res *Record) Equal(other ResourceRecord) bool {
-	return bytes.Equal(res.Bytes(), other.Bytes())
+func (r *Record) Equal(other ResourceRecord) bool {
+	return bytes.Equal(r.Bytes(), other.Bytes())
 }
