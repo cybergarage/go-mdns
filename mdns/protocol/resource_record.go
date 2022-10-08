@@ -22,8 +22,8 @@ type ResourceRecord interface {
 	Type() Type
 	// Class returns the resource record class.
 	Class() Class
-	// Type returns the cache flush flag.
-	CacheFlush() bool
+	// UnicastResponse returns the unicast response flag.
+	UnicastResponse() bool
 	// TTL returns the TTL second.
 	TTL() uint
 	// Data returns the resource record data.
