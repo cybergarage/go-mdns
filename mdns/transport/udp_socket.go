@@ -115,6 +115,7 @@ func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 	msg, err := protocol.NewMessageWithBytes(sock.ReadBuffer[:n])
 	if err != nil {
 		log.Error(err)
+		log.HexError(sock.ReadBuffer[:n])
 		return nil, err
 	}
 
