@@ -28,6 +28,10 @@ type ResourceRecord interface {
 	TTL() uint
 	// Data returns the resource record data.
 	Data() []byte
+	// RequestBytes returns only the binary representation of the request fields.
+	RequestBytes() []byte
+	// ResponseBytes returns only the binary representation of the all fields.
+	ResponseBytes() []byte
 	// Bytes returns the binary representation.
 	Bytes() []byte
 	// Equal returns true if this record is equal to  the specified resource record. otherwise false.

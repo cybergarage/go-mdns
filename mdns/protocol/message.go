@@ -163,17 +163,32 @@ func (msg *Message) Copy() *Message {
 // Bytes returns the binary representation.
 func (msg *Message) Bytes() []byte {
 	bytes := msg.Header.Bytes()
-	for _, q := range msg.Questions {
-		bytes = append(bytes, q.Bytes()...)
-	}
-	for _, an := range msg.Answers {
-		bytes = append(bytes, an.Bytes()...)
-	}
-	for _, ns := range msg.NameServers {
-		bytes = append(bytes, ns.Bytes()...)
-	}
-	for _, a := range msg.Additions {
-		bytes = append(bytes, a.Bytes()...)
+	if msg.IsQuery() {
+		for _, q := range msg.Questions {
+			bytes = append(bytes, q.RequestBytes()...)
+		}
+		for _, an := range msg.Answers {
+			bytes = append(bytes, an.RequestBytes()...)
+		}
+		for _, ns := range msg.NameServers {
+			bytes = append(bytes, ns.RequestBytes()...)
+		}
+		for _, a := range msg.Additions {
+			bytes = append(bytes, a.RequestBytes()...)
+		}
+	} else {
+		for _, q := range msg.Questions {
+			bytes = append(bytes, q.ResponseBytes()...)
+		}
+		for _, an := range msg.Answers {
+			bytes = append(bytes, an.ResponseBytes()...)
+		}
+		for _, ns := range msg.NameServers {
+			bytes = append(bytes, ns.ResponseBytes()...)
+		}
+		for _, a := range msg.Additions {
+			bytes = append(bytes, a.ResponseBytes()...)
+		}
 	}
 	return bytes
 }

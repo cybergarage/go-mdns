@@ -193,8 +193,8 @@ func (r *Record) Parse(reader io.Reader) error {
 	return nil
 }
 
-// Bytes returns the binary representation.
-func (r *Record) Bytes() []byte {
+// RequestBytes returns only the binary representation of the request fields.
+func (r *Record) RequestBytes() []byte {
 	bytes := nameToBytes(r.name)
 
 	typeBytes := make([]byte, 2)
@@ -208,6 +208,13 @@ func (r *Record) Bytes() []byte {
 	}
 	bytes = append(bytes, encoding.IntegerToBytes(uint(cls), classBytes)...)
 
+	return bytes
+}
+
+// ResponseBytes returns only the binary representation of the all fields.
+func (r *Record) ResponseBytes() []byte {
+	bytes := r.RequestBytes()
+
 	ttlBytes := make([]byte, 4)
 	bytes = append(bytes, encoding.IntegerToBytes(r.ttl, ttlBytes)...)
 
@@ -216,6 +223,11 @@ func (r *Record) Bytes() []byte {
 	bytes = append(bytes, r.data...)
 
 	return bytes
+}
+
+// Bytes returns the binary representation.
+func (r *Record) Bytes() []byte {
+	return r.ResponseBytes()
 }
 
 // Equal returns true if this record is equal to  the specified resource record. otherwise false.
