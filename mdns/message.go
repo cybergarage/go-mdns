@@ -23,14 +23,14 @@ type Message = protocol.Message
 
 func NewRequestWithQuery(query *Query) *Message {
 	msg := protocol.NewRequestMessage()
-	msg.AddQuestion(protocol.NewQuestion().SetName(query.String()).SetType(protocol.PTR).SetClass(protocol.IN).SetUnicastResponse(true))
+	msg.AddQuestion(protocol.NewQuestion().SetName(query.String()).SetType(protocol.PTR).SetClass(protocol.IN))
 	return msg
 }
 
 func NewRequestWithQueries(queries []*Query) *Message {
 	msg := protocol.NewRequestMessage()
 	for _, query := range queries {
-		msg.AddQuestion(protocol.NewQuestion().SetName(query.String()).SetType(protocol.PTR).SetClass(protocol.IN).SetUnicastResponse(true))
+		msg.AddQuestion(protocol.NewQuestion().SetName(query.String()).SetType(protocol.PTR).SetClass(protocol.IN))
 	}
 	return msg
 }
