@@ -67,7 +67,18 @@ func main() {
 
 	defer client.Stop()
 
-	err = client.Query(mdns.NewQueryWithService(mdns.AutomaticBrowsingService))
+	// err = client.Query(mdns.NewQueryWithService(mdns.AutomaticBrowsingService))
+	// if err != nil {
+	// 	return
+	// }
+
+	services := []string{
+		"_services._dns-sd._udp",
+		"_rdlink._tcp",
+		"_companion - link._tcp",
+	}
+
+	err = client.Query(mdns.NewQueryWithServices(services))
 	if err != nil {
 		return
 	}
