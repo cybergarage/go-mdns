@@ -64,8 +64,8 @@ func (client *Client) Restart() error {
 }
 
 // Query sends a question message to the multicast address.
-func (client *Client) Query(q *Query) error {
-	msg := NewRequestWithQuery(q)
+func (client *Client) Query(q []*Query) error {
+	msg := NewRequestWithQueries(q)
 	return client.AnnounceMessage(msg)
 }
 
