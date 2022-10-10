@@ -17,6 +17,7 @@ package protocol
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"io"
 )
 
@@ -96,13 +97,13 @@ func (msg *Message) AddAddition(a Addition) {
 // Parse parses the specified reader.
 func (msg *Message) Parse(reader io.Reader) error {
 	if err := msg.Header.Parse(reader); err != nil {
-		return err
+		return fmt.Errorf("header : %w", err)
 	}
 	// Parses questions.
 	for n := 0; n < int(msg.QD()); n++ {
 		q, err := NewQuestionWithReader(reader)
 		if err != nil {
-			return err
+			return fmt.Errorf("question[%d] : %w", n, err)
 		}
 		msg.Questions = append(msg.Questions, q)
 	}
@@ -110,23 +111,15 @@ func (msg *Message) Parse(reader io.Reader) error {
 	for n := 0; n < int(msg.AN()); n++ {
 		a, err := newRecordWithReader(reader)
 		if err != nil {
-			return err
+			return fmt.Errorf("answer[%d] : %w", n, err)
 		}
 		msg.Answers = append(msg.Answers, a)
 	}
-	// Parses name servers.
-	for n := 0; n < int(msg.AN()); n++ {
-		a, err := newRecordWithReader(reader)
-		if err != nil {
-			return err
-		}
-		msg.Answers = append(msg.Answers, a)
-	}
-	// Parses name servers.
+	// Parses authorities.
 	for n := 0; n < int(msg.NS()); n++ {
 		ns, err := newRecordWithReader(reader)
 		if err != nil {
-			return err
+			return fmt.Errorf("authority[%d] : %w", n, err)
 		}
 		msg.NameServers = append(msg.NameServers, ns)
 	}
@@ -134,7 +127,7 @@ func (msg *Message) Parse(reader io.Reader) error {
 	for n := 0; n < int(msg.AR()); n++ {
 		a, err := newRecordWithReader(reader)
 		if err != nil {
-			return err
+			return fmt.Errorf("additional[%d] : %w", n, err)
 		}
 		msg.Additions = append(msg.Additions, a)
 	}
