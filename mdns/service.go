@@ -63,14 +63,26 @@ func (srv *Service) Update(msg *Message) {
 		case *protocol.PTRRecord:
 			srv.Name = rr.DomainName()
 		case *protocol.SRVRecord:
-			srv.Host = rr.Target()
-			srv.Port = rr.Port()
+			host := rr.Target()
+			if 0 < len(host) {
+				srv.Host = host
+			}
+			port := rr.Port()
+			if 0 < port {
+				srv.Port = port
+			}
 		case *protocol.TXTRecord:
-			srv.Attributes = rr.Attributes()
+			srv.Attributes = append(srv.Attributes, rr.Attributes()...)
 		case *protocol.ARecord:
-			srv.AddrV4 = rr.IP()
+			ip := rr.IP()
+			if ip != nil {
+				srv.AddrV4 = ip
+			}
 		case *protocol.AAAARecord:
-			srv.AddrV6 = rr.IP()
+			ip := rr.IP()
+			if ip != nil {
+				srv.AddrV6 = ip
+			}
 		}
 	}
 }
