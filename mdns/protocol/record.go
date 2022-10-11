@@ -51,7 +51,7 @@ func newRecordWithReader(reader io.Reader) (*Record, error) {
 
 // newResourceRecordWithReader returns a new resource record innstance with the specified reader.
 func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
-	return newRequestResourceRecordWithReader(reader)
+	return newResponseResourceRecordWithReader(reader)
 }
 
 // newRequestRecordWithReader returns a new request resource record innstance with the specified reader.
