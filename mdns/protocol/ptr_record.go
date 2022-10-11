@@ -14,6 +14,8 @@
 
 package protocol
 
+import "bytes"
+
 // PTRRecord represents a PTR record.
 type PTRRecord struct {
 	*Record
@@ -35,8 +37,9 @@ func newPTRRecordWithResourceRecord(res *Record) *PTRRecord {
 
 // DomainName returns the resource domain name.
 func (ptr *PTRRecord) DomainName() string {
-	if len(ptr.data) < 1 {
+	name, err := parseName(bytes.NewReader(ptr.data))
+	if err != nil {
 		return ""
 	}
-	return string(ptr.data[1:])
+	return name
 }
