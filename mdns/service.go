@@ -49,8 +49,11 @@ func NewService(name, domain string, port uint) *Service {
 // NewServiceWithMessage returns a new service instance.
 func NewServiceWithMessage(msg *Message) (*Service, error) {
 	srv := NewService("", "", 0)
-	for _, res := range append(msg.Answers, msg.Additions...) {
-		switch rr := res.(type) {
+	records := msg.Answers
+	records = append(records, msg.NameServers...)
+	records = append(records, msg.Additions...)
+	for _, record := range records {
+		switch rr := record.(type) {
 		case *protocol.PTRRecord:
 			srv.Name = rr.DomainName()
 		case *protocol.SRVRecord:
