@@ -83,7 +83,7 @@ func (client *Client) MessageReceived(msg *protocol.Message) (*protocol.Message,
 		return nil, err
 	}
 
-	addedService := client.FindService(newService.Domain)
+	addedService := client.FindService(newService)
 	if addedService != nil {
 		addedService.Update(msg)
 		return nil, nil
