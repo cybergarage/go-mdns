@@ -37,6 +37,10 @@ func (services *services) HasService(service *Service) bool {
 }
 
 // AddService adds the specified service into th service array.
-func (services *services) AddService(service *Service) {
+func (services *services) AddService(service *Service) bool {
+	if services.HasService(service) {
+		return false
+	}
 	services.services = append(services.services, service)
+	return true
 }
