@@ -44,10 +44,26 @@ func newResourceRecord() *Record {
 	}
 }
 
+// newRecordWithReader returns a new record innstance with the specified reader.
+func newRecordWithReader(reader io.Reader) (*Record, error) {
+	return newRequestRecordWithReader(reader)
+}
+
+// newResourceRecordWithReader returns a new resource record innstance with the specified reader.
+func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+	return newRequestResourceRecordWithReader(reader)
+}
+
 // newRequestRecordWithReader returns a new request resource record innstance with the specified reader.
-func newRequestRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+func newRequestRecordWithReader(reader io.Reader) (*Record, error) {
 	r := newResourceRecord()
-	if err := r.ParseRequest(reader); err != nil {
+	return r, r.ParseRequest(reader)
+}
+
+// newRequestResourceRecordWithReader returns a new request resource record innstance with the specified reader.
+func newRequestResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+	r, err := newRequestRecordWithReader(reader)
+	if err != nil {
 		return nil, err
 	}
 
@@ -68,9 +84,15 @@ func newRequestRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 }
 
 // newResponseRecordWithReader returns a new response resource record innstance with the specified reader.
-func newResponseRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+func newResponseRecordWithReader(reader io.Reader) (*Record, error) {
 	r := newResourceRecord()
-	if err := r.ParseResponse(reader); err != nil {
+	return r, r.ParseResponse(reader)
+}
+
+// newResponseResourceRecordWithReader returns a new response resource record innstance with the specified reader.
+func newResponseResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+	r, err := newResponseRecordWithReader(reader)
+	if err != nil {
 		return nil, err
 	}
 
