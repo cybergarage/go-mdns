@@ -86,6 +86,9 @@ func (srv *Service) Equal(other *Service) bool {
 	if srv.Host != other.Host {
 		return false
 	}
+	if srv.Domain != other.Domain {
+		return false
+	}
 	return true
 }
 
