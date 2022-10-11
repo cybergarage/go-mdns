@@ -133,8 +133,8 @@ func (r *Record) Data() []byte {
 	return r.data
 }
 
-// Parse parses the specified reader.
-func (r *Record) Parse(reader io.Reader) error {
+// ParseRequest parses a request record from the specified reader.
+func (r *Record) ParseRequest(reader io.Reader) error {
 	var err error
 
 	// Parses domain names
@@ -163,6 +163,18 @@ func (r *Record) Parse(reader io.Reader) error {
 		r.unicastResponse = true
 	}
 	r.class = Class(cls & classMask)
+
+	return nil
+}
+
+// ParseResponse parses a response record from the specified reader.
+func (r *Record) ParseResponse(reader io.Reader) error {
+	var err error
+
+	err = r.ParseRequest(reader)
+	if err != nil {
+		return err
+	}
 
 	// Parses TTL
 	ttlBytes := make([]byte, 4)
