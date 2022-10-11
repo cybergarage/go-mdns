@@ -78,10 +78,18 @@ func (client *Client) MessageReceived(msg *protocol.Message) (*protocol.Message,
 		return nil, nil
 	}
 
-	srv, err := NewServiceWithMessage(msg)
-	if err == nil {
-		client.AddService(srv)
+	newService, err := NewServiceWithMessage(msg)
+	if err != nil {
+		return nil, err
 	}
+
+	addedService := client.FindService(newService.Domain)
+	if addedService != nil {
+		addedService.Update(msg)
+		return nil, nil
+	}
+
+	client.AddService(newService)
 
 	return nil, nil
 }
