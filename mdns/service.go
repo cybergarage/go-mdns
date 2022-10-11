@@ -66,6 +66,20 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 	return srv, nil
 }
 
+// Equal returns true if the header is same as the specified header, otherwise false.
+func (srv *Service) Equal(other *Service) bool {
+	if other == nil {
+		return false
+	}
+	if srv.Name != other.Name {
+		return false
+	}
+	if srv.Host != other.Host {
+		return false
+	}
+	return true
+}
+
 // String returns the string representation.
 func (srv *Service) String() string {
 	return strings.Join([]string{srv.Name, srv.Domain}, nameSep)
