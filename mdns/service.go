@@ -49,6 +49,12 @@ func NewService(name, domain string, port uint) *Service {
 // NewServiceWithMessage returns a new service instance.
 func NewServiceWithMessage(msg *Message) (*Service, error) {
 	srv := NewService("", "", 0)
+	srv.Update(msg)
+	return srv, nil
+}
+
+// Update updates the service data by the specified message.
+func (srv *Service) Update(msg *Message) {
 	records := msg.Answers
 	records = append(records, msg.NameServers...)
 	records = append(records, msg.Additions...)
@@ -67,7 +73,6 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 			srv.AddrV6 = rr.IP()
 		}
 	}
-	return srv, nil
 }
 
 // Equal returns true if the header is same as the specified header, otherwise false.
