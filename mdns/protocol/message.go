@@ -96,20 +96,31 @@ func (msg *Message) AddAddition(a Addition) {
 
 // Parse parses the specified reader.
 func (msg *Message) Parse(reader io.Reader) error {
+	var err error
 	if err := msg.Header.Parse(reader); err != nil {
 		return fmt.Errorf("header : %w", err)
 	}
 	// Parses questions.
 	for n := 0; n < int(msg.QD()); n++ {
-		q, err := NewQuestionWithReader(reader)
+		var r *Record
+		if msg.IsQuery() {
+			r, err = newRequestRecordWithReader(reader)
+		} else {
+			r, err = newResponseRecordWithReader(reader)
+		}
 		if err != nil {
 			return fmt.Errorf("question[%d] : %w", n, err)
 		}
-		msg.Questions = append(msg.Questions, q)
+		msg.Questions = append(msg.Questions, NewQuestionWithRecord(r))
 	}
 	// Parses answers.
 	for n := 0; n < int(msg.AN()); n++ {
-		a, err := newRecordWithReader(reader)
+		var a ResourceRecord
+		if msg.IsQuery() {
+			a, err = newRequestResourceRecordWithReader(reader)
+		} else {
+			a, err = newResponseResourceRecordWithReader(reader)
+		}
 		if err != nil {
 			return fmt.Errorf("answer[%d] : %w", n, err)
 		}
@@ -117,7 +128,12 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses authorities.
 	for n := 0; n < int(msg.NS()); n++ {
-		ns, err := newRecordWithReader(reader)
+		var ns ResourceRecord
+		if msg.IsQuery() {
+			ns, err = newRequestResourceRecordWithReader(reader)
+		} else {
+			ns, err = newResponseResourceRecordWithReader(reader)
+		}
 		if err != nil {
 			return fmt.Errorf("authority[%d] : %w", n, err)
 		}
@@ -125,7 +141,12 @@ func (msg *Message) Parse(reader io.Reader) error {
 	}
 	// Parses additional records.
 	for n := 0; n < int(msg.AR()); n++ {
-		a, err := newRecordWithReader(reader)
+		var a ResourceRecord
+		if msg.IsQuery() {
+			a, err = newRequestResourceRecordWithReader(reader)
+		} else {
+			a, err = newResponseResourceRecordWithReader(reader)
+		}
 		if err != nil {
 			return fmt.Errorf("additional[%d] : %w", n, err)
 		}
