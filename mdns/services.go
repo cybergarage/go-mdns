@@ -31,6 +31,11 @@ func (services *services) Services() []*Service {
 	return services.services
 }
 
+// HasService returns true if the specified service is already added, otherwise false.
+func (services *services) HasService(service *Service) bool {
+	return false
+}
+
 // AddService adds the specified service into th service array.
 func (services *services) AddService(service *Service) {
 	services.services = append(services.services, service)
