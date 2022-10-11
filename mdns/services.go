@@ -31,19 +31,19 @@ func (services *services) Services() []*Service {
 	return services.services
 }
 
-// HasService returns true if the specified service is already added, otherwise false.
-func (services *services) HasService(service *Service) bool {
-	for _, srv := range services.services {
-		if srv.Equal(service) {
-			return true
+// FindService returns the added service by the specified domain name.
+func (services *services) FindService(domain string) *Service {
+	for _, service := range services.services {
+		if service.Domain == domain {
+			return service
 		}
 	}
-	return false
+	return nil
 }
 
 // AddService adds the specified service into th service array.
 func (services *services) AddService(service *Service) bool {
-	if services.HasService(service) {
+	if services.FindService(service.Domain) != nil {
 		return false
 	}
 	services.services = append(services.services, service)
