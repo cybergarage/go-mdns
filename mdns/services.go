@@ -33,6 +33,11 @@ func (services *services) Services() []*Service {
 
 // HasService returns true if the specified service is already added, otherwise false.
 func (services *services) HasService(service *Service) bool {
+	for _, srv := range services.services {
+		if srv.Equal(service) {
+			return true
+		}
+	}
 	return false
 }
 
