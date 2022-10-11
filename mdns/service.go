@@ -15,6 +15,7 @@
 package mdns
 
 import (
+	"fmt"
 	"net"
 	"strings"
 
@@ -82,5 +83,12 @@ func (srv *Service) Equal(other *Service) bool {
 
 // String returns the string representation.
 func (srv *Service) String() string {
-	return strings.Join([]string{srv.Name, srv.Domain}, nameSep)
+	return fmt.Sprintf(
+		"%s (%s:%d, %s:%d)",
+		strings.Join([]string{srv.Name, srv.Host, srv.Domain}, nameSep),
+		srv.AddrV4,
+		srv.Port,
+		srv.AddrV6,
+		srv.Port,
+	)
 }
