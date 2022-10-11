@@ -155,8 +155,8 @@ func (msg *Message) Parse(reader io.Reader) error {
 	return nil
 }
 
-// Equals returns true if the message is same as the specified message, otherwise false.
-func (msg *Message) Equals(other *Message) bool {
+// Equal returns true if the message is same as the specified message, otherwise false.
+func (msg *Message) Equal(other *Message) bool {
 	if other == nil {
 		return false
 	}

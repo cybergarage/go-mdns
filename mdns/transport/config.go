@@ -32,7 +32,7 @@ func (conf *Config) SetConfig(newConfig *Config) {
 	conf.MulticastConfig.SetConfig(newConfig.MulticastConfig)
 }
 
-// Equals returns true whether the specified other class is same, otherwise false.
-func (conf *Config) Equals(other *Config) bool {
-	return conf.MulticastConfig.Equals(other.MulticastConfig)
+// Equal returns true whether the specified other class is same, otherwise false.
+func (conf *Config) Equal(other *Config) bool {
+	return conf.MulticastConfig.Equal(other.MulticastConfig)
 }
