@@ -15,12 +15,15 @@
 package mdns
 
 import (
+	"sync"
+
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 	"github.com/cybergarage/go-mdns/mdns/transport"
 )
 
 // Client represents a client node instance.
 type Client struct {
+	sync.Mutex
 	*transport.MessageManager
 	*services
 	userListener MessageListener
@@ -29,6 +32,7 @@ type Client struct {
 // NewClient returns a new client instance.
 func NewClient() *Client {
 	client := &Client{
+		Mutex:          sync.Mutex{},
 		MessageManager: transport.NewMessageManager(),
 		services:       newServices(),
 		userListener:   nil,
@@ -70,6 +74,9 @@ func (client *Client) Query(q []*Query) error {
 }
 
 func (client *Client) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+	client.Lock()
+	defer client.Unlock()
+
 	if client.userListener != nil {
 		client.userListener.MessageReceived(msg)
 	}
