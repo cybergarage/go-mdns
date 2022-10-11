@@ -16,7 +16,6 @@ package protocol
 
 import (
 	"bytes"
-	"encoding/hex"
 	"fmt"
 	"net"
 	"strings"
@@ -251,10 +250,6 @@ func TestResourceRecord(t *testing.T) {
 			}
 			if q.UnicastResponse() != test.expectedResponse {
 				t.Errorf("%t != %t", q.UnicastResponse(), test.expectedResponse)
-			}
-			// Checks all bytes
-			if !bytes.Equal(q.Bytes(), test.query) {
-				t.Errorf("%s != %s", hex.EncodeToString(q.Bytes()), hex.EncodeToString(test.query))
 			}
 		}
 	})
