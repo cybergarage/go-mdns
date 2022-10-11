@@ -36,12 +36,12 @@ func parseName(reader io.Reader) (string, error) {
 		// Note: Compression names are not supported, and so
 		// the alias name are indistinguishable from root names yet.
 		if (nextNameLen & nameIsCompressionMask) == nameIsCompressionMask {
-			// Skips a remain compression offset bit
+			// FIXME: Skips a remain compression offset bit
 			_, err := reader.Read(nextNameLenBuf)
 			if err != nil {
 				return "", err
 			}
-			return "", nil
+			return name, nil
 		}
 		nextNameLen &= nameLenMask
 		if nextNameLen == 0 {
