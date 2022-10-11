@@ -90,6 +90,6 @@ func main() {
 	// Output all found nodes
 
 	for n, srv := range client.Services() {
-		fmt.Printf("[%d] %s", n, srv.String())
+		fmt.Printf("[%d] %s\n", n, srv.String())
 	}
 }
