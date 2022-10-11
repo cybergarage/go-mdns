@@ -44,10 +44,33 @@ func newResourceRecord() *Record {
 	}
 }
 
-// newRecordWithReader returns a new resource record innstance with the specified reader.
-func newRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+// newRequestRecordWithReader returns a new request resource record innstance with the specified reader.
+func newRequestRecordWithReader(reader io.Reader) (ResourceRecord, error) {
 	r := newResourceRecord()
-	if err := r.Parse(reader); err != nil {
+	if err := r.ParseRequest(reader); err != nil {
+		return nil, err
+	}
+
+	switch r.Type() {
+	case PTR:
+		return newPTRRecordWithResourceRecord(r), nil
+	case SRV:
+		return newSRVRecordWithResourceRecord(r), nil
+	case TXT:
+		return newTXTRecordWithResourceRecord(r), nil
+	case A:
+		return newARecordWithResourceRecord(r), nil
+	case AAAA:
+		return newAAAARecordWithResourceRecord(r), nil
+	}
+
+	return r, nil
+}
+
+// newResponseRecordWithReader returns a new response resource record innstance with the specified reader.
+func newResponseRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+	r := newResourceRecord()
+	if err := r.ParseResponse(reader); err != nil {
 		return nil, err
 	}
 
