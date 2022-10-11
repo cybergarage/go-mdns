@@ -87,7 +87,7 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr s
 
 	// time.Sleep(time.Second)
 
-	// if !msg.Equals(server.lastMessage) {
+	// if !msg.Equal(server.lastMessage) {
 	// t.Errorf("%s != %s", msg.String(), server.lastMessage.String())
 	// }
 

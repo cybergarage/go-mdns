@@ -42,7 +42,7 @@ func (conf *MulticastConfig) IsEachInterfaceBindingEnabled() bool {
 	return conf.EachInterfaceBindingEnabled
 }
 
-// Equals returns true whether the specified other class is same, otherwise false.
-func (conf *MulticastConfig) Equals(otherConf *MulticastConfig) bool {
+// Equal returns true whether the specified other class is same, otherwise false.
+func (conf *MulticastConfig) Equal(otherConf *MulticastConfig) bool {
 	return conf.EachInterfaceBindingEnabled == otherConf.EachInterfaceBindingEnabled
 }
