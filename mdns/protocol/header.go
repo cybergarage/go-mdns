@@ -211,7 +211,7 @@ func (header *Header) setQD(n uint) {
 	header.setNumberOfEntries(n, 4)
 }
 
-// QD returns the the number of entries in the question section.
+// QD returns the number of entries in the question section.
 func (header *Header) QD() uint {
 	return encoding.BytesToInteger(header.bytes[4:6])
 }
@@ -221,7 +221,7 @@ func (header *Header) setAN(n uint) {
 	header.setNumberOfEntries(n, 6)
 }
 
-// AN returns the the number of entries in in the answer section.
+// AN returns the number of entries in the answer section.
 func (header *Header) AN() uint {
 	return encoding.BytesToInteger(header.bytes[6:8])
 }
