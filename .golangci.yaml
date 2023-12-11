@@ -34,3 +34,4 @@ linters:
     - maligned
     - revive
     - depguard
+    - inamedparam
