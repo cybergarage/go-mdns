@@ -32,3 +32,5 @@ linters:
     - exhaustive
     - forbidigo
     - maligned
+    - revive
+    - depguard
