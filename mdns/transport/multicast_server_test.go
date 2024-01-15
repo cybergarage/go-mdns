@@ -58,6 +58,15 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr s
 		return
 	}
 
+	// Stop server
+
+	defer func() {
+		err := server.Stop()
+		if err != nil {
+			t.Error(err)
+		}
+	}()
+
 	time.Sleep(time.Second)
 
 	// Send a test message
@@ -76,6 +85,7 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr s
 	nSent, err := server.SendMessage(toAddr, Port, msg)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if msgBytes := msg.Bytes(); nSent != len(msgBytes) {
@@ -90,13 +100,6 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr s
 	// if !msg.Equal(server.lastMessage) {
 	// t.Errorf("%s != %s", msg.String(), server.lastMessage.String())
 	// }
-
-	// Stop server
-
-	err = server.Stop()
-	if err != nil {
-		t.Error(err)
-	}
 }
 
 func TestMulticastServerWithInterface(t *testing.T) {
