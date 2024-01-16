@@ -1,8 +1,2 @@
-github.com/cybergarage/go-logger v1.2.0 h1:pHfFFxVvaNE3pWmiEGGlguborEzwCH7DAJtkjeYQSUE=
-github.com/cybergarage/go-logger v1.2.0/go.mod h1:m6rxERUs6audClnM1+FI2+8kIIaSWrBfH/ZV3wc/dYo=
-github.com/cybergarage/go-logger v1.3.0 h1:5NYcPLBpmKfkC+oH0GPZXoOggHO/tBZCE9RW3kKwLyQ=
-github.com/cybergarage/go-logger v1.3.0/go.mod h1:4N4xo4/FUVjvc0mILUwFItBGhVglCPN4hSLK38zRLTk=
-github.com/cybergarage/go-logger v1.3.1 h1:A/Q5TzZokWqdZRzA0W/0uca4wMSpxfqG5HqxaN+K+nQ=
-github.com/cybergarage/go-logger v1.3.1/go.mod h1:4N4xo4/FUVjvc0mILUwFItBGhVglCPN4hSLK38zRLTk=
-github.com/cybergarage/go-logger v1.3.2 h1:eFLeIsBS5/bRpyQoh8QoGX8sTUfdGww1P/dT41Qa9BY=
-github.com/cybergarage/go-logger v1.3.2/go.mod h1:4N4xo4/FUVjvc0mILUwFItBGhVglCPN4hSLK38zRLTk=
+github.com/cybergarage/go-logger v1.3.4 h1:UTgYZr/LwQtYVOncS3NJ64We5kCe7ce6L85y/MOYfrM=
+github.com/cybergarage/go-logger v1.3.4/go.mod h1:2iMjinHam5oqyKEGsKIzeQQmmOPxpCgro95LOlEC2ks=
