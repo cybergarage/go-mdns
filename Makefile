@@ -17,32 +17,23 @@ SHELL := bash
 MODULE_ROOT=github.com/cybergarage/go-mdns
 
 PKG_NAME=mdns
+PKG_VER=$(shell git describe --abbrev=0 --tags)
+PKG_COVER=${PKG_NAME}-cover
+
 PKG_ID=${MODULE_ROOT}/${PKG_NAME}
 PKG_SRC_DIR=${PKG_NAME}
-PKG_SRCS=\
-	${PKG_SRC_DIR} \
-	${PKG_SRC_DIR}/encoding \
-	${PKG_SRC_DIR}/protocol \
-	${PKG_SRC_DIR}/transport
-PKGS=\
-	${PKG_ID} \
-	${PKG_ID}/encoding \
-	${PKG_ID}/protocol \
-	${PKG_ID}/transport
+PKG=${MODULE_ROOT}/${PKG_SRC_DIR}
 
 TEST_PKG_NAME=${PKG_NAME}test
 TEST_PKG_ID=${MODULE_ROOT}/${TEST_PKG_NAME}
 TEST_PKG_DIR=${TEST_PKG_NAME}
-TEST_PKG_SRCS=\
-	${TEST_PKG_DIR}
-TEST_PKGS=\
-	${TEST_PKG_ID}
+TEST_PKG=${MODULE_ROOT}/${TEST_PKG_DIR}
 
-BIN_ROOT=examples
-BIN_ID=${MODULE_ROOT}/${BIN_ROOT}
+BIN_ROOT_DIR=examples
+BIN_ID=${MODULE_ROOT}/${BIN_ROOT_DIR}
 BIN_SRCS=\
-	${BIN_ROOT}/mdnssearch \
-	${BIN_ROOT}/mdnsserver
+	${BIN_ROOT_DIR}/mdnssearch \
+	${BIN_ROOT_DIR}/mdnsserver
 BINS=\
 	${BIN_ID}/mdnssearch \
 	${BIN_ID}/mdnsserver
@@ -52,19 +43,20 @@ BINS=\
 all: test
 
 format:
-	gofmt -s -w ${PKG_SRC_DIR} ${TEST_PKG_DIR} ${BIN_ROOT}
+	gofmt -s -w ${PKG_SRC_DIR} ${TEST_PKG_DIR} ${BIN_ROOT_DIR}
 
 vet: format
 	go vet ${PKG_ID} ${TEST_PKG_ID} ${BINS}
 
 lint: format
-	golangci-lint run ${PKG_SRCS} ${TEST_PKG_SRCS} ${BIN_SRCS}
+	golangci-lint run ${PKG_SRC_DIR}/... ${TEST_PKG_DIR}/...
 
 test: lint
-	go test -v -cover -timeout 60s ${PKGS} ${TEST_PKGS}
+	go test -v -p 1 -timeout 10m -cover -coverpkg=${PKG}/... -coverprofile=${PKG_COVER}.out ${PKG}/... ${TEST_PKG}/...
+	go tool cover -html=${PKG_COVER}.out -o ${PKG_COVER}.html
 
 install: test
 	go install ${BINS}
 
 clean:
-	go clean -i ${PKGS}  ${TEST_PKGS} ${BINS}
+	go clean -i ${PKG}  ${TEST_PKG} ${BINS}
