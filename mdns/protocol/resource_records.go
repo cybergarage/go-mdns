@@ -26,3 +26,9 @@ func (records ResourceRecords) GetResourceRecord(name string) (ResourceRecord, b
 	}
 	return nil, false
 }
+
+// HasResourceRecord returns true if the resource record of the specified name is included in the list. otherwise false.
+func (records ResourceRecords) HasResourceRecord(name string) bool {
+	_, ok := records.GetResourceRecord(name)
+	return ok
+}
