@@ -26,12 +26,22 @@ import (
 //go:embed log/matter01.log
 var matter01 string
 
-func TestMessage(t *testing.T) {
+func TestResponseMessage(t *testing.T) {
+	type answer struct {
+		name string
+	}
 	tests := []struct {
 		name    string
 		msgLogs string
+		answers []answer
 	}{
-		{"matter01", matter01},
+		{
+			"matter01",
+			matter01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -42,11 +52,18 @@ func TestMessage(t *testing.T) {
 				return
 			}
 
-			_, err = protocol.NewMessageWithBytes(msgBytes)
+			msg, err := protocol.NewMessageWithBytes(msgBytes)
 			if err != nil {
 				t.Error(err)
 				return
 			}
+
+			for _, answer := range test.answers {
+				if !msg.Answers.HasResourceRecord(answer.name) {
+					t.Errorf("answer (%s) not found", answer.name)
+				}
+			}
+			t.Log(msg.String())
 		})
 	}
 }
