@@ -26,6 +26,9 @@ import (
 //go:embed log/matter01.log
 var matter01 string
 
+//go:embed log/googlecast01.log
+var googlecast01 string
+
 func TestResponseMessage(t *testing.T) {
 	type answer struct {
 		name string
@@ -38,6 +41,13 @@ func TestResponseMessage(t *testing.T) {
 		{
 			"matter01",
 			matter01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
+			},
+		},
+		{
+			"googlecast01",
+			googlecast01,
 			[]answer{
 				{"_services._dns-sd._udp.local"},
 			},
