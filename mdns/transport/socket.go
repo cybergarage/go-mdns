@@ -15,7 +15,7 @@
 package transport
 
 import (
-	"fmt"
+	"errors"
 	"net"
 	"os"
 	"strconv"
@@ -62,7 +62,7 @@ func (sock *Socket) IsBound() bool {
 // GetBoundPort returns the bound port.
 func (sock *Socket) GetBoundPort() (int, error) {
 	if !sock.IsBound() {
-		return 0, fmt.Errorf(errorSocketClosed)
+		return 0, errors.New(errorSocketClosed)
 	}
 	return sock.BoundPort, nil
 }
@@ -70,7 +70,7 @@ func (sock *Socket) GetBoundPort() (int, error) {
 // GetBoundInterface returns the bound interface.
 func (sock *Socket) GetBoundInterface() (*net.Interface, error) {
 	if !sock.IsBound() {
-		return nil, fmt.Errorf(errorSocketClosed)
+		return nil, errors.New(errorSocketClosed)
 	}
 	return sock.BoundInterface, nil
 }
@@ -78,7 +78,7 @@ func (sock *Socket) GetBoundInterface() (*net.Interface, error) {
 // GetBoundAddr returns the bound address.
 func (sock *Socket) GetBoundAddr() (string, error) {
 	if !sock.IsBound() {
-		return "", fmt.Errorf(errorSocketClosed)
+		return "", errors.New(errorSocketClosed)
 	}
 
 	return sock.BoundAddress, nil
