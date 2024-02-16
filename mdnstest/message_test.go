@@ -26,6 +26,9 @@ import (
 //go:embed log/matter01.log
 var matter01 string
 
+//go:embed log/matter02.log
+var matter02 string
+
 //go:embed log/googlecast01.log
 var googlecast01 string
 
@@ -40,6 +43,13 @@ func TestResponseMessage(t *testing.T) {
 	}{
 		{
 			"matter01",
+			matter01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
+			},
+		},
+		{
+			"matter02",
 			matter01,
 			[]answer{
 				{"_services._dns-sd._udp.local"},
