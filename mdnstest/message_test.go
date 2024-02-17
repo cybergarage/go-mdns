@@ -50,7 +50,7 @@ func TestResponseMessage(t *testing.T) {
 		},
 		{
 			"matter02",
-			matter01,
+			matter02,
 			[]answer{
 				{"_services._dns-sd._udp.local"},
 			},
