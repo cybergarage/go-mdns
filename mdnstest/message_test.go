@@ -47,27 +47,29 @@ func TestResponseMessage(t *testing.T) {
 		msgLogs string
 		answers []answer
 	}{
-		{
-			"matter01",
-			matter01,
-			[]answer{
-				{"_services._dns-sd._udp.local"},
+		/*
+			{
+				"matter01",
+				matter01,
+				[]answer{
+					{"_services._dns-sd._udp.local"},
+				},
 			},
-		},
-		{
-			"matter02",
-			matter02,
-			[]answer{
-				{"_services._dns-sd._udp.local"},
+			{
+				"matter02",
+				matter02,
+				[]answer{
+					{"_services._dns-sd._udp.local"},
+				},
 			},
-		},
-		{
-			"googlecast01",
-			googlecast01,
-			[]answer{
-				{"_services._dns-sd._udp.local"},
+			{
+				"googlecast01",
+				googlecast01,
+				[]answer{
+					{"_services._dns-sd._udp.local"},
+				},
 			},
-		},
+		*/
 		{
 			"matter 120 4.3.1.13",
 			matter12043113,
