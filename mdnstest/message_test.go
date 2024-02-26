@@ -35,8 +35,8 @@ var googlecast01 string
 // 4.3.1.13. Examples
 // dns-sd -R DD200C20D25AE5F7 _matterc._udp,_S3,_L840,_CM . 11111 D=840 CM=2
 //
-//go:embed log/matter-120-4.3.1.13.log
-var matter12043113 string
+//go:embed log/matter-spec-120-4.3.1.13.log
+var matterSpec12043113 string
 
 func TestResponseMessage(t *testing.T) {
 	type answer struct {
@@ -72,7 +72,7 @@ func TestResponseMessage(t *testing.T) {
 		*/
 		{
 			"matter 120 4.3.1.13",
-			matter12043113,
+			matterSpec12043113,
 			[]answer{
 				{"_services._dns-sd"},
 			},
