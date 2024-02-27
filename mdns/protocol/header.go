@@ -22,7 +22,6 @@ package protocol
 import (
 	"bytes"
 	"encoding/hex"
-	"fmt"
 	"io"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
@@ -105,14 +104,8 @@ func NewHeaderWithReader(reader io.Reader) (*Header, error) {
 // Parse parses the specified reader.
 func (header *Header) Parse(reader io.Reader) error {
 	header.bytes = make([]byte, headerSize)
-	n, err := reader.Read(header.bytes)
-	if err != nil {
-		return err
-	}
-	if n != headerSize {
-		return fmt.Errorf(errorHeaderShortLength, n)
-	}
-	return nil
+	_, err := reader.Read(header.bytes)
+	return err
 }
 
 // ID returns the query identifier.
