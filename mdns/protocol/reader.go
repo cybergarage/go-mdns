@@ -70,34 +70,27 @@ func (reader *Reader) ReadString() (string, error) {
 }
 
 // ReadNameWith returns a name from the reader with the read reader.
-func (reader *Reader) ReadNameWith(readReader *CompressionReader) (string, error) {
-	nameLenIsCompressed := func(l uint) bool {
+func (reader *Reader) ReadNameWith(compReader *CompressionReader) (string, error) {
+	nameLenIsCompressed := func(l uint8) bool {
 		return (l & nameIsCompressionMask) == nameIsCompressionMask
 	}
 
 	name := ""
-	nextNameLenBuf := make([]byte, 1)
-	_, err := reader.Read(nextNameLenBuf)
+	nextNameLen, err := reader.ReadUint8()
 	for err == nil {
-		nextNameField := encoding.BytesToInteger(nextNameLenBuf)
-		if nameLenIsCompressed(nextNameField) {
-			if readReader == nil {
+		if nameLenIsCompressed(nextNameLen) {
+			if compReader == nil {
 				return "", ErrNilReader
 			}
-			remainNameOffsetBuf := make([]byte, 1)
-			_, err := reader.Read(remainNameOffsetBuf)
+			nameOffset, err := reader.ReadUint8()
 			if err != nil {
 				return "", err
 			}
-			remainNameOffset := encoding.BytesToInteger(remainNameOffsetBuf)
-			nameOffset := int(((nextNameField & nameLenMask) << 8) + remainNameOffset)
-			if err := readReader.Skip(nameOffset); err != nil {
+			if err := compReader.Skip(int(nameOffset)); err != nil {
 				return "", err
 			}
-			return NewReaderWithReader(readReader).ReadNameWith(nil)
+			return NewReaderWithReader(compReader).ReadNameWith(nil)
 		}
-
-		nextNameLen := int(nextNameField & nameLenMask)
 		if nextNameLen == 0 {
 			break
 		}
@@ -110,7 +103,7 @@ func (reader *Reader) ReadNameWith(readReader *CompressionReader) (string, error
 			name += nameSep
 		}
 		name += string(nextName)
-		_, err = reader.Read(nextNameLenBuf)
+		nextNameLen, err = reader.ReadUint8()
 	}
 	if err != nil {
 		return "", err
