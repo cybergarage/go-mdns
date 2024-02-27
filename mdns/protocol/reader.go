@@ -48,6 +48,21 @@ func (reader *Reader) Read(p []byte) (int, error) {
 	return n, nil
 }
 
+// ReadString returns a string from the reader.
+func (reader *Reader) ReadString() (string, error) {
+	lenByte := make([]byte, 1)
+	_, err := reader.Read(lenByte)
+	if err != nil {
+		return "", err
+	}
+	strBytes := make([]byte, int(lenByte[0]))
+	_, err = reader.Read(strBytes)
+	if err != nil {
+		return "", err
+	}
+	return string(strBytes), nil
+}
+
 // ReadReader returns a read reader instance.
 func (reader *Reader) ReadReader() *ReadReader {
 	return NewReadReaderWithBytes(reader.Bytes)
