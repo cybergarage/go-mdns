@@ -15,10 +15,7 @@
 package protocol
 
 import (
-	"io"
 	"strings"
-
-	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
 const (
@@ -26,53 +23,6 @@ const (
 	nameIsCompressionMask = uint(0xC0)
 	nameLenMask           = uint(0x3F)
 )
-
-func nameLenIsCompressed(l uint) bool {
-	return (l & nameIsCompressionMask) == nameIsCompressionMask
-}
-
-func parseName(reader io.Reader, readReader *ReadReader) (string, error) {
-	name := ""
-	nextNameLenBuf := make([]byte, 1)
-	_, err := reader.Read(nextNameLenBuf)
-	for err == nil {
-		nextNameField := encoding.BytesToInteger(nextNameLenBuf)
-		if nameLenIsCompressed(nextNameField) {
-			if readReader == nil {
-				return "", ErrNilReader
-			}
-			remainNameOffsetBuf := make([]byte, 1)
-			_, err := reader.Read(remainNameOffsetBuf)
-			if err != nil {
-				return "", err
-			}
-			remainNameOffset := encoding.BytesToInteger(remainNameOffsetBuf)
-			nameOffset := int(((nextNameField & nameLenMask) << 8) + remainNameOffset)
-			if err := readReader.Skip(nameOffset); err != nil {
-				return "", err
-			}
-			return parseName(readReader, nil)
-		}
-		nextNameLen := int(nextNameField & nameLenMask)
-		if nextNameLen == 0 {
-			break
-		}
-		nextName := make([]byte, nextNameLen)
-		_, err = reader.Read(nextName)
-		if err != nil {
-			return "", err
-		}
-		if 0 < len(name) {
-			name += nameSep
-		}
-		name += string(nextName)
-		_, err = reader.Read(nextNameLenBuf)
-	}
-	if err != nil {
-		return "", err
-	}
-	return name, nil
-}
 
 func nameToBytes(name string) []byte {
 	bytes := []byte{}

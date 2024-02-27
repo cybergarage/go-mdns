@@ -23,25 +23,77 @@ import (
 // https://www.rfc-editor.org/rfc/rfc2782
 type SRVRecord struct {
 	*Record
+	service  string
+	proto    string
+	name     string
+	ttl      uint
+	class    Class
+	priority uint
+	weight   uint
+	port     uint
+	target   string
 }
 
 // NewSRVRecord returns a new SRV record innstance.
 func NewSRVRecord() *SRVRecord {
 	return &SRVRecord{
-		Record: newResourceRecord(),
+		Record:   newResourceRecord(),
+		service:  "",
+		proto:    "",
+		name:     "",
+		ttl:      0,
+		class:    0,
+		priority: 0,
+		weight:   0,
+		port:     0,
+		target:   "",
 	}
 }
 
 // newSRVRecordWithResourceRecord returns a new SRV record innstance.
 func newSRVRecordWithResourceRecord(res *Record) (*SRVRecord, error) {
 	srv := &SRVRecord{
-		Record: res,
+		Record:   res,
+		service:  "",
+		proto:    "",
+		name:     "",
+		ttl:      0,
+		class:    0,
+		priority: 0,
+		weight:   0,
+		port:     0,
+		target:   "",
 	}
 	return srv, srv.parseResourceRecord()
 }
 
 func (srv *SRVRecord) parseResourceRecord() error {
 	return nil
+}
+
+// Service returns the service name.
+func (srv *SRVRecord) Service() string {
+	return srv.service
+}
+
+// Proto returns the protocol name.
+func (srv *SRVRecord) Proto() string {
+	return srv.proto
+}
+
+// Name returns the resource name.
+func (srv *SRVRecord) Name() string {
+	return srv.name
+}
+
+// TTL returns the resource TTL.
+func (srv *SRVRecord) TTL() uint {
+	return srv.ttl
+}
+
+// Class returns the resource class.
+func (srv *SRVRecord) Class() Class {
+	return srv.class
 }
 
 // Priority returns the resource priority.
@@ -54,24 +106,15 @@ func (srv *SRVRecord) Priority() uint {
 
 // Weight returns the resource weight.
 func (srv *SRVRecord) Weight() uint {
-	if len(srv.data) < 4 {
-		return 0
-	}
-	return encoding.BytesToInteger(srv.data[2:4])
+	return srv.weight
 }
 
 // Port returns the resource port.
 func (srv *SRVRecord) Port() uint {
-	if len(srv.data) < 6 {
-		return 0
-	}
-	return encoding.BytesToInteger(srv.data[4:6])
+	return srv.port
 }
 
-// Target returns the resource domain name of the target host.
+// Target returns the resource target.
 func (srv *SRVRecord) Target() string {
-	if len(srv.data) < 7 {
-		return ""
-	}
-	return string(srv.data[7:])
+	return srv.target
 }
