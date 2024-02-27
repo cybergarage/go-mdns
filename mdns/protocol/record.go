@@ -45,23 +45,23 @@ func newResourceRecord() *Record {
 }
 
 // newRecordWithReader returns a new record innstance with the specified reader.
-func newRecordWithReader(reader io.Reader) (*Record, error) {
+func newRecordWithReader(reader *Reader) (*Record, error) {
 	return newRequestRecordWithReader(reader)
 }
 
 // newResourceRecordWithReader returns a new resource record innstance with the specified reader.
-func newResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+func newResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
 	return newResponseResourceRecordWithReader(reader)
 }
 
 // newRequestRecordWithReader returns a new request resource record innstance with the specified reader.
-func newRequestRecordWithReader(reader io.Reader) (*Record, error) {
+func newRequestRecordWithReader(reader *Reader) (*Record, error) {
 	r := newResourceRecord()
 	return r, r.ParseRequest(reader)
 }
 
 // newRequestResourceRecordWithReader returns a new request resource record innstance with the specified reader.
-func newRequestResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
 	r, err := newRequestRecordWithReader(reader)
 	if err != nil {
 		return nil, err
@@ -84,13 +84,13 @@ func newRequestResourceRecordWithReader(reader io.Reader) (ResourceRecord, error
 }
 
 // newResponseRecordWithReader returns a new response resource record innstance with the specified reader.
-func newResponseRecordWithReader(reader io.Reader) (*Record, error) {
+func newResponseRecordWithReader(reader *Reader) (*Record, error) {
 	r := newResourceRecord()
 	return r, r.ParseResponse(reader)
 }
 
 // newResponseResourceRecordWithReader returns a new response resource record innstance with the specified reader.
-func newResponseResourceRecordWithReader(reader io.Reader) (ResourceRecord, error) {
+func newResponseResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
 	r, err := newResponseRecordWithReader(reader)
 	if err != nil {
 		return nil, err
@@ -178,8 +178,7 @@ func (r *Record) Data() []byte {
 	return r.data
 }
 
-// ParseRequest parses a request record from the specified reader.
-func (r *Record) ParseRequest(reader io.Reader) error {
+func (r *Record) parseResouce(reader *Reader) error {
 	var err error
 
 	// Parses domain names
@@ -212,11 +211,16 @@ func (r *Record) ParseRequest(reader io.Reader) error {
 	return nil
 }
 
+// ParseRequest parses a request record from the specified reader.
+func (r *Record) ParseRequest(reader *Reader) error {
+	return r.parseResouce(reader)
+}
+
 // ParseResponse parses a response record from the specified reader.
-func (r *Record) ParseResponse(reader io.Reader) error {
+func (r *Record) ParseResponse(reader *Reader) error {
 	var err error
 
-	err = r.ParseRequest(reader)
+	err = r.parseResouce(reader)
 	if err != nil {
 		return err
 	}
