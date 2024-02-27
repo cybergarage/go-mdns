@@ -174,6 +174,29 @@ func (msg *Message) Copy() *Message {
 	}
 }
 
+// GetResourceRecord returns the resource record of the specified name.
+func (msg *Message) GetResourceRecord(name string) (ResourceRecord, bool) {
+	res, ok := msg.Answers.GetResourceRecord(name)
+	if ok {
+		return res, true
+	}
+	res, ok = msg.NameServers.GetResourceRecord(name)
+	if ok {
+		return res, true
+	}
+	res, ok = msg.Additions.GetResourceRecord(name)
+	if ok {
+		return res, true
+	}
+	return nil, false
+}
+
+// HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
+func (msg *Message) HasResourceRecord(name string) bool {
+	_, ok := msg.GetResourceRecord(name)
+	return ok
+}
+
 // Bytes returns the binary representation.
 func (msg *Message) Bytes() []byte {
 	bytes := msg.Header.Bytes()
