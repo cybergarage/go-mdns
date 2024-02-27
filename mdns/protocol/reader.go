@@ -21,11 +21,23 @@ import (
 // Reader represents a record reader.
 type Reader struct {
 	Reader io.Reader
+	Bytes  []byte
 }
 
 // NewReaderWithReader returns a new reader instance with the specified reader.
 func NewReaderWithReader(reader io.Reader) *Reader {
 	return &Reader{
 		Reader: reader,
+		Bytes:  []byte{},
 	}
+}
+
+// Read overwrites the io.Reader interface.
+func (reader *Reader) Read(p []byte) (int, error) {
+	n, err := reader.Reader.Read(p)
+	if err != nil {
+		return n, err
+	}
+	reader.Bytes = append(reader.Bytes, p[:n]...)
+	return n, nil
 }
