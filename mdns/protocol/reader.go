@@ -118,6 +118,16 @@ func (reader *Reader) ReadNameWith(readReader *CompressionReader) (string, error
 	return name, nil
 }
 
+// ReadUint16 returns a uint16 from the reader.
+func (reader *Reader) ReadUint16() (uint16, error) {
+	buf := make([]byte, 2)
+	_, err := reader.Read(buf)
+	if err != nil {
+		return 0, err
+	}
+	return uint16(encoding.BytesToInteger(buf)), nil
+}
+
 // CompressionReader returns a read reader instance.
 func (reader *Reader) CompressionReader() *CompressionReader {
 	return NewCompressionReaderWithBytes(reader.Bytes)
