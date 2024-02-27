@@ -20,8 +20,8 @@ import (
 
 const (
 	nameSep               = "."
-	nameIsCompressionMask = uint(0xC0)
-	nameLenMask           = uint(0x3F)
+	nameIsCompressionMask = uint8(0xC0)
+	nameLenMask           = uint8(0x3F)
 )
 
 func nameToBytes(name string) []byte {
