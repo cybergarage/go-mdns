@@ -194,7 +194,7 @@ func (r *Record) parseResouce(reader *Reader) error {
 	var err error
 
 	// Parses domain names
-	r.name, err = reader.ReadNameWith(r.reader.ReadReader())
+	r.name, err = reader.ReadNameWith(r.reader.CompressionReader())
 	if err != nil {
 		return err
 	}

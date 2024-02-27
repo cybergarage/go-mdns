@@ -66,7 +66,7 @@ func (reader *Reader) ReadString() (string, error) {
 }
 
 // ReadNameWith returns a name from the reader with the read reader.
-func (reader *Reader) ReadNameWith(readReader *ReadReader) (string, error) {
+func (reader *Reader) ReadNameWith(readReader *CompressionReader) (string, error) {
 	nameLenIsCompressed := func(l uint) bool {
 		return (l & nameIsCompressionMask) == nameIsCompressionMask
 	}
@@ -114,7 +114,7 @@ func (reader *Reader) ReadNameWith(readReader *ReadReader) (string, error) {
 	return name, nil
 }
 
-// ReadReader returns a read reader instance.
-func (reader *Reader) ReadReader() *ReadReader {
-	return NewReadReaderWithBytes(reader.Bytes)
+// CompressionReader returns a read reader instance.
+func (reader *Reader) CompressionReader() *CompressionReader {
+	return NewCompressionReaderWithBytes(reader.Bytes)
 }
