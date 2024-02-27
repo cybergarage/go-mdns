@@ -59,7 +59,7 @@ func NewResponseMessage() *Message {
 // NewMessageWithReader returns a message instance with the specified reader.
 func NewMessageWithReader(reader io.Reader) (*Message, error) {
 	msg := NewMessage()
-	if err := msg.Parse(reader); err != nil {
+	if err := msg.Parse(NewReaderWithReader(reader)); err != nil {
 		return nil, err
 	}
 	return msg, nil
@@ -95,7 +95,7 @@ func (msg *Message) AddAddition(a Addition) {
 }
 
 // Parse parses the specified reader.
-func (msg *Message) Parse(reader io.Reader) error {
+func (msg *Message) Parse(reader *Reader) error {
 	var err error
 	if err := msg.Header.Parse(reader); err != nil {
 		return fmt.Errorf("header : %w", err)
