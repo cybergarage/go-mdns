@@ -179,8 +179,8 @@ func TestResourceRecord(t *testing.T) {
 				if a.TTL() != test.expectedTTL {
 					t.Errorf("TTL: %d != %d", a.TTL(), test.expectedTTL)
 				}
-				if !test.expectedIP.Equal(a.IP()) {
-					t.Errorf("IP: %s != %s", a.IP(), test.expectedIP)
+				if !test.expectedIP.Equal(a.Address()) {
+					t.Errorf("IP: %s != %s", a.Address(), test.expectedIP)
 				}
 			})
 		}
@@ -213,8 +213,8 @@ func TestResourceRecord(t *testing.T) {
 				if a.TTL() != test.expectedTTL {
 					t.Errorf("TTL: %d != %d", a.TTL(), test.expectedTTL)
 				}
-				if !test.expectedIP.Equal(a.IP()) {
-					t.Errorf("IP: %s != %s", a.IP(), test.expectedIP)
+				if !test.expectedIP.Equal(a.Address()) {
+					t.Errorf("IP: %s != %s", a.Address(), test.expectedIP)
 				}
 			})
 		}

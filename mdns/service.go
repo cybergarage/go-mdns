@@ -74,12 +74,12 @@ func (srv *Service) Update(msg *Message) {
 		case *protocol.TXTRecord:
 			srv.Attributes = append(srv.Attributes, rr.Attributes()...)
 		case *protocol.ARecord:
-			ip := rr.IP()
+			ip := rr.Address()
 			if ip != nil {
 				srv.AddrV4 = ip
 			}
 		case *protocol.AAAARecord:
-			ip := rr.IP()
+			ip := rr.Address()
 			if ip != nil {
 				srv.AddrV6 = ip
 			}
