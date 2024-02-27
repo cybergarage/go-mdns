@@ -68,6 +68,25 @@ func newSRVRecordWithResourceRecord(res *Record) (*SRVRecord, error) {
 }
 
 func (srv *SRVRecord) parseResourceRecord() error {
+	var err error
+
+	reader := NewReaderWithBytes(srv.data)
+
+	srv.service, err = reader.ReadString()
+	if err != nil {
+		return err
+	}
+
+	srv.proto, err = reader.ReadString()
+	if err != nil {
+		return err
+	}
+
+	srv.name, err = reader.ReadNameWith(srv.reader.CompressionReader())
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
