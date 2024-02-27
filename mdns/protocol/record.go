@@ -24,6 +24,7 @@ import (
 
 // Record represents a resource record.
 type Record struct {
+	reader          *Reader
 	name            string
 	unicastResponse bool
 	typ             Type
@@ -35,6 +36,7 @@ type Record struct {
 // newResourceRecord returns a new resource record innstance.
 func newResourceRecord() *Record {
 	return &Record{
+		reader:          nil,
 		name:            "",
 		unicastResponse: false,
 		typ:             0,
@@ -45,8 +47,10 @@ func newResourceRecord() *Record {
 }
 
 // newRecordWithReader returns a new record innstance with the specified reader.
-func newRecordWithReader(reader *Reader) (*Record, error) {
-	return newRequestRecordWithReader(reader)
+func newRecordWithReader(reader *Reader) *Record {
+	r := newResourceRecord()
+	r.reader = reader
+	return r
 }
 
 // newResourceRecordWithReader returns a new resource record innstance with the specified reader.
@@ -56,7 +60,7 @@ func newResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
 
 // newRequestRecordWithReader returns a new request resource record innstance with the specified reader.
 func newRequestRecordWithReader(reader *Reader) (*Record, error) {
-	r := newResourceRecord()
+	r := newRecordWithReader(reader)
 	return r, r.ParseRequest(reader)
 }
 
@@ -85,7 +89,7 @@ func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) 
 
 // newResponseRecordWithReader returns a new response resource record innstance with the specified reader.
 func newResponseRecordWithReader(reader *Reader) (*Record, error) {
-	r := newResourceRecord()
+	r := newRecordWithReader(reader)
 	return r, r.ParseResponse(reader)
 }
 
@@ -110,6 +114,14 @@ func newResponseResourceRecordWithReader(reader *Reader) (ResourceRecord, error)
 	}
 
 	return r, nil
+}
+
+// Reader returns a record reader.
+func (r *Record) Reader() (*Reader, error) {
+	if r.reader == nil {
+		return nil, ErrNilReader
+	}
+	return r.reader, nil
 }
 
 // SetName sets the specified name.
@@ -182,7 +194,7 @@ func (r *Record) parseResouce(reader *Reader) error {
 	var err error
 
 	// Parses domain names
-	r.name, err = parseName(reader)
+	r.name, err = parseName(reader, r.reader.ReadReader())
 	if err != nil {
 		return err
 	}

@@ -37,7 +37,7 @@ func newPTRRecordWithResourceRecord(res *Record) *PTRRecord {
 
 // DomainName returns the resource domain name.
 func (ptr *PTRRecord) DomainName() string {
-	name, err := parseName(bytes.NewReader(ptr.data))
+	name, err := parseName(bytes.NewReader(ptr.data), ptr.reader.ReadReader())
 	if err != nil {
 		return ""
 	}
