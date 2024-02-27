@@ -14,10 +14,6 @@
 
 package protocol
 
-import (
-	"github.com/cybergarage/go-mdns/mdns/encoding"
-)
-
 // SRVRecord represents a SRV record.
 // RFC 2782: A DNS RR for specifying the location of services (DNS SRV).
 // https://www.rfc-editor.org/rfc/rfc2782
@@ -26,11 +22,9 @@ type SRVRecord struct {
 	service  string
 	proto    string
 	name     string
-	ttl      uint
-	class    Class
-	priority uint
-	weight   uint
-	port     uint
+	priority uint16
+	weight   uint16
+	port     uint16
 	target   string
 }
 
@@ -41,8 +35,6 @@ func NewSRVRecord() *SRVRecord {
 		service:  "",
 		proto:    "",
 		name:     "",
-		ttl:      0,
-		class:    0,
 		priority: 0,
 		weight:   0,
 		port:     0,
@@ -57,8 +49,6 @@ func newSRVRecordWithResourceRecord(res *Record) (*SRVRecord, error) {
 		service:  "",
 		proto:    "",
 		name:     "",
-		ttl:      0,
-		class:    0,
 		priority: 0,
 		weight:   0,
 		port:     0,
@@ -72,17 +62,22 @@ func (srv *SRVRecord) parseResourceRecord() error {
 
 	reader := NewReaderWithBytes(srv.data)
 
-	srv.service, err = reader.ReadString()
+	srv.priority, err = reader.ReadUint16()
 	if err != nil {
 		return err
 	}
 
-	srv.proto, err = reader.ReadString()
+	srv.weight, err = reader.ReadUint16()
 	if err != nil {
 		return err
 	}
 
-	srv.name, err = reader.ReadNameWith(srv.reader.CompressionReader())
+	srv.port, err = reader.ReadUint16()
+	if err != nil {
+		return err
+	}
+
+	srv.target, err = reader.ReadString()
 	if err != nil {
 		return err
 	}
@@ -105,32 +100,19 @@ func (srv *SRVRecord) Name() string {
 	return srv.name
 }
 
-// TTL returns the resource TTL.
-func (srv *SRVRecord) TTL() uint {
-	return srv.ttl
-}
-
-// Class returns the resource class.
-func (srv *SRVRecord) Class() Class {
-	return srv.class
-}
-
 // Priority returns the resource priority.
 func (srv *SRVRecord) Priority() uint {
-	if len(srv.data) < 2 {
-		return 0
-	}
-	return encoding.BytesToInteger(srv.data[0:2])
+	return uint(srv.priority)
 }
 
 // Weight returns the resource weight.
 func (srv *SRVRecord) Weight() uint {
-	return srv.weight
+	return uint(srv.weight)
 }
 
 // Port returns the resource port.
 func (srv *SRVRecord) Port() uint {
-	return srv.port
+	return uint(srv.port)
 }
 
 // Target returns the resource target.
