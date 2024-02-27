@@ -15,7 +15,6 @@
 package protocol
 
 import (
-	"io"
 	"strings"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
@@ -27,7 +26,7 @@ const (
 	nameLenMask           = 0x3F
 )
 
-func parseName(reader io.Reader) (string, error) {
+func parseName(reader *Reader) (string, error) {
 	name := ""
 	nextNameLenBuf := make([]byte, 1)
 	_, err := reader.Read(nextNameLenBuf)

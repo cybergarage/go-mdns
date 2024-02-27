@@ -14,8 +14,6 @@
 
 package protocol
 
-import "io"
-
 // Question represents a question.
 type Question struct {
 	*Record
@@ -39,7 +37,7 @@ func NewQuestionWithRecord(record *Record) *Question {
 }
 
 // NewQuestionWithRecord returns a new question innstance with the specified record.
-func NewQuestionWithReader(reader io.Reader) (*Question, error) {
+func NewQuestionWithReader(reader *Reader) (*Question, error) {
 	r, err := newRecordWithReader(reader)
 	if err != nil {
 		return nil, err
