@@ -35,3 +35,4 @@ linters:
     - revive
     - depguard
     - inamedparam
+    - interfacer
