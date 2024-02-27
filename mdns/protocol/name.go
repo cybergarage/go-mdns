@@ -15,6 +15,7 @@
 package protocol
 
 import (
+	"io"
 	"strings"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
@@ -22,27 +23,37 @@ import (
 
 const (
 	nameSep               = "."
-	nameIsCompressionMask = 0xC0
-	nameLenMask           = 0x3F
+	nameIsCompressionMask = uint(0xC0)
+	nameLenMask           = uint(0x3F)
 )
 
-func parseName(reader *Reader) (string, error) {
+func nameLenIsCompressed(l uint) bool {
+	return (l & nameIsCompressionMask) == nameIsCompressionMask
+}
+
+func parseName(reader io.Reader, readReader *ReadReader) (string, error) {
 	name := ""
 	nextNameLenBuf := make([]byte, 1)
 	_, err := reader.Read(nextNameLenBuf)
 	for err == nil {
-		nextNameLen := encoding.BytesToInteger(nextNameLenBuf)
-		// Note: Compression names are not supported, and so
-		// the alias name are indistinguishable from root names yet.
-		if (nextNameLen & nameIsCompressionMask) == nameIsCompressionMask {
-			// FIXME: Skips a remain compression offset bit
-			_, err := reader.Read(nextNameLenBuf)
+		nextNameField := encoding.BytesToInteger(nextNameLenBuf)
+		if nameLenIsCompressed(nextNameField) {
+			if readReader == nil {
+				return "", ErrNilReader
+			}
+			remainNameOffsetBuf := make([]byte, 1)
+			_, err := reader.Read(remainNameOffsetBuf)
 			if err != nil {
 				return "", err
 			}
-			return name, nil
+			remainNameOffset := encoding.BytesToInteger(remainNameOffsetBuf)
+			nameOffset := int(((nextNameField & nameLenMask) << 8) + remainNameOffset)
+			if err := readReader.Skip(nameOffset); err != nil {
+				return "", err
+			}
+			return parseName(readReader, nil)
 		}
-		nextNameLen &= nameLenMask
+		nextNameLen := int(nextNameField & nameLenMask)
 		if nextNameLen == 0 {
 			break
 		}
