@@ -21,7 +21,3 @@ import (
 
 var ErrNil = errors.New("nil")
 var ErrNilReader = fmt.Errorf("reader is %w", ErrNil)
-
-const (
-	errorHeaderShortLength = "header is short length (%d)"
-)
