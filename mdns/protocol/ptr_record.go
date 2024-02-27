@@ -19,27 +19,36 @@ import "bytes"
 // PTRRecord represents a PTR record.
 type PTRRecord struct {
 	*Record
+	domainName string
 }
 
 // NewPTRRecord returns a new PTR record innstance.
 func NewPTRRecord() *PTRRecord {
 	return &PTRRecord{
-		Record: newResourceRecord(),
+		Record:     newResourceRecord(),
+		domainName: "",
 	}
 }
 
 // newPTRRecordWithResourceRecord returns a new PTR record innstance.
-func newPTRRecordWithResourceRecord(res *Record) *PTRRecord {
-	return &PTRRecord{
-		Record: res,
+func newPTRRecordWithResourceRecord(res *Record) (*PTRRecord, error) {
+	ptr := &PTRRecord{
+		Record:     res,
+		domainName: "",
 	}
+	return ptr, ptr.parseResourceRecord()
+}
+
+func (ptr *PTRRecord) parseResourceRecord() error {
+	name, err := parseName(bytes.NewReader(ptr.data), ptr.reader.ReadReader())
+	if err != nil {
+		return err
+	}
+	ptr.domainName = name
+	return nil
 }
 
 // DomainName returns the resource domain name.
 func (ptr *PTRRecord) DomainName() string {
-	name, err := parseName(bytes.NewReader(ptr.data), ptr.reader.ReadReader())
-	if err != nil {
-		return ""
-	}
-	return name
+	return ptr.domainName
 }

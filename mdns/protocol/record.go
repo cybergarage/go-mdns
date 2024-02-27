@@ -73,7 +73,7 @@ func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) 
 
 	switch r.Type() {
 	case PTR:
-		return newPTRRecordWithResourceRecord(r), nil
+		return newPTRRecordWithResourceRecord(r)
 	case SRV:
 		return newSRVRecordWithResourceRecord(r), nil
 	case TXT:
@@ -102,7 +102,7 @@ func newResponseResourceRecordWithReader(reader *Reader) (ResourceRecord, error)
 
 	switch r.Type() {
 	case PTR:
-		return newPTRRecordWithResourceRecord(r), nil
+		return newPTRRecordWithResourceRecord(r)
 	case SRV:
 		return newSRVRecordWithResourceRecord(r), nil
 	case TXT:
