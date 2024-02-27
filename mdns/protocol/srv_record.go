@@ -33,10 +33,15 @@ func NewSRVRecord() *SRVRecord {
 }
 
 // newSRVRecordWithResourceRecord returns a new SRV record innstance.
-func newSRVRecordWithResourceRecord(res *Record) *SRVRecord {
-	return &SRVRecord{
+func newSRVRecordWithResourceRecord(res *Record) (*SRVRecord, error) {
+	srv := &SRVRecord{
 		Record: res,
 	}
+	return srv, srv.parseResourceRecord()
+}
+
+func (srv *SRVRecord) parseResourceRecord() error {
+	return nil
 }
 
 // Priority returns the resource priority.
