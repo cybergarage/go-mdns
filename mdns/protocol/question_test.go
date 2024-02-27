@@ -15,7 +15,6 @@
 package protocol
 
 import (
-	"bytes"
 	"testing"
 )
 
@@ -37,7 +36,7 @@ func TestQuestion(t *testing.T) {
 			},
 		}
 		for _, test := range tests {
-			q, err := NewQuestionWithReader(bytes.NewReader(test.query))
+			q, err := NewQuestionWithReader(NewReaderWithBytes(test.query))
 			if err != nil {
 				t.Error(err)
 			}

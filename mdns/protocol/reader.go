@@ -15,6 +15,7 @@
 package protocol
 
 import (
+	"bytes"
 	"io"
 )
 
@@ -32,6 +33,11 @@ func NewReaderWithReader(reader io.Reader) *Reader {
 	}
 }
 
+// NewReaderWithBytes returns a new reader instance with the specified bytes.
+func NewReaderWithBytes(b []byte) *Reader {
+	return NewReaderWithReader(bytes.NewReader(b))
+}
+
 // Read overwrites the io.Reader interface.
 func (reader *Reader) Read(p []byte) (int, error) {
 	n, err := reader.Reader.Read(p)
@@ -40,4 +46,9 @@ func (reader *Reader) Read(p []byte) (int, error) {
 	}
 	reader.Bytes = append(reader.Bytes, p[:n]...)
 	return n, nil
+}
+
+// ReadReader returns a read reader instance.
+func (reader *Reader) ReadReader() *ReadReader {
+	return NewReadReaderWithBytes(reader.Bytes)
 }
