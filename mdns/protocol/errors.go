@@ -14,6 +14,14 @@
 
 package protocol
 
+import (
+	"errors"
+	"fmt"
+)
+
+var ErrNil = errors.New("nil")
+var ErrNilReader = fmt.Errorf("reader is %w", ErrNil)
+
 const (
-	errorHeaderShortLength = "hader is short length (%d)"
+	errorHeaderShortLength = "header is short length (%d)"
 )
