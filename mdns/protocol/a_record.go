@@ -35,8 +35,8 @@ func newARecordWithResourceRecord(res *Record) *ARecord {
 	}
 }
 
-// IP returns the resource ip address.
-func (a *ARecord) IP() net.IP {
+// Address returns the resource ip address.
+func (a *ARecord) Address() net.IP {
 	if len(a.data) < 4 {
 		return nil
 	}

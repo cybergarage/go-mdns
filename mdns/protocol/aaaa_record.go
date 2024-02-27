@@ -38,8 +38,8 @@ func newAAAARecordWithResourceRecord(res *Record) *AAAARecord {
 	}
 }
 
-// IP returns the resource ip address.
-func (a *AAAARecord) IP() net.IP {
+// Address returns the resource ip address.
+func (a *AAAARecord) Address() net.IP {
 	if len(a.data) != 16 {
 		return nil
 	}
