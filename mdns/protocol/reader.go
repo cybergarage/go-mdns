@@ -70,7 +70,7 @@ func (reader *Reader) ReadString() (string, error) {
 // ReadNameWith returns a name from the reader with the read reader.
 func (reader *Reader) ReadNameWith(compReader *CompressionReader) (string, error) {
 	nameLenIsCompressed := func(l uint8) bool {
-		return (l & nameIsCompressionMask) == nameIsCompressionMask
+		return (l & nameIsCompressionMask) != 0
 	}
 
 	name := ""
@@ -80,11 +80,12 @@ func (reader *Reader) ReadNameWith(compReader *CompressionReader) (string, error
 			if compReader == nil {
 				return "", ErrNilReader
 			}
-			nameOffset, err := reader.ReadUint8()
+			remainNameOffset, err := reader.ReadUint8()
 			if err != nil {
 				return "", err
 			}
-			if err := compReader.Skip(int(nameOffset)); err != nil {
+			nameOffset := (int(nextNameLen & ^nameIsCompressionMask) << 8) + int(remainNameOffset)
+			if err := compReader.Skip(nameOffset); err != nil {
 				return "", err
 			}
 			return NewReaderWithReader(compReader).ReadNameWith(nil)

@@ -42,6 +42,7 @@ func TestResourceRecord(t *testing.T) {
 				q, err := newResourceRecordWithReader(NewReaderWithBytes(test.query))
 				if err != nil {
 					t.Error(err)
+					return
 				}
 				ptr, ok := q.(*PTRRecord)
 				if !ok {
