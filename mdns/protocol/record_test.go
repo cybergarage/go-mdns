@@ -105,7 +105,7 @@ func TestResourceRecord(t *testing.T) {
 					t.Errorf("Port: %d != %d", srv.Port(), test.expectedPort)
 				}
 				if srv.Target() != test.expectedTarget {
-					t.Skipf("Target: %s != %s", srv.Target(), test.expectedTarget)
+					t.Errorf("Target: %s != %s", srv.Target(), test.expectedTarget)
 				}
 			})
 		}
