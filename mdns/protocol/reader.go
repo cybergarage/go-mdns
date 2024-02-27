@@ -57,7 +57,11 @@ func (reader *Reader) ReadString() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	strBytes := make([]byte, int(lenByte[0]))
+	len := encoding.BytesToInteger(lenByte)
+	if len == 0 {
+		return "", nil
+	}
+	strBytes := make([]byte, len)
 	_, err = reader.Read(strBytes)
 	if err != nil {
 		return "", err
