@@ -17,6 +17,8 @@ package protocol
 import (
 	"bytes"
 	"io"
+
+	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
 // Reader represents a record reader.
@@ -61,6 +63,55 @@ func (reader *Reader) ReadString() (string, error) {
 		return "", err
 	}
 	return string(strBytes), nil
+}
+
+// ReadNameWith returns a name from the reader with the read reader.
+func (reader *Reader) ReadNameWith(readReader *ReadReader) (string, error) {
+	nameLenIsCompressed := func(l uint) bool {
+		return (l & nameIsCompressionMask) == nameIsCompressionMask
+	}
+
+	name := ""
+	nextNameLenBuf := make([]byte, 1)
+	_, err := reader.Read(nextNameLenBuf)
+	for err == nil {
+		nextNameField := encoding.BytesToInteger(nextNameLenBuf)
+		if nameLenIsCompressed(nextNameField) {
+			if readReader == nil {
+				return "", ErrNilReader
+			}
+			remainNameOffsetBuf := make([]byte, 1)
+			_, err := reader.Read(remainNameOffsetBuf)
+			if err != nil {
+				return "", err
+			}
+			remainNameOffset := encoding.BytesToInteger(remainNameOffsetBuf)
+			nameOffset := int(((nextNameField & nameLenMask) << 8) + remainNameOffset)
+			if err := readReader.Skip(nameOffset); err != nil {
+				return "", err
+			}
+			return NewReaderWithReader(readReader).ReadNameWith(nil)
+		}
+
+		nextNameLen := int(nextNameField & nameLenMask)
+		if nextNameLen == 0 {
+			break
+		}
+		nextName := make([]byte, nextNameLen)
+		_, err = reader.Read(nextName)
+		if err != nil {
+			return "", err
+		}
+		if 0 < len(name) {
+			name += nameSep
+		}
+		name += string(nextName)
+		_, err = reader.Read(nextNameLenBuf)
+	}
+	if err != nil {
+		return "", err
+	}
+	return name, nil
 }
 
 // ReadReader returns a read reader instance.
