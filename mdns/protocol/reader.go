@@ -52,16 +52,14 @@ func (reader *Reader) Read(p []byte) (int, error) {
 
 // ReadString returns a string from the reader.
 func (reader *Reader) ReadString() (string, error) {
-	lenByte := make([]byte, 1)
-	_, err := reader.Read(lenByte)
+	l, err := reader.ReadUint8()
 	if err != nil {
 		return "", err
 	}
-	len := encoding.BytesToInteger(lenByte)
-	if len == 0 {
+	if l == 0 {
 		return "", nil
 	}
-	strBytes := make([]byte, len)
+	strBytes := make([]byte, l)
 	_, err = reader.Read(strBytes)
 	if err != nil {
 		return "", err
