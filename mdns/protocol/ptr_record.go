@@ -40,12 +40,9 @@ func newPTRRecordWithResourceRecord(res *Record) (*PTRRecord, error) {
 }
 
 func (ptr *PTRRecord) parseResourceRecord() error {
-	name, err := NewReaderWithReader(bytes.NewReader(ptr.data)).ReadNameWith(ptr.reader.CompressionReader())
-	if err != nil {
-		return err
-	}
-	ptr.domainName = name
-	return nil
+	var err error
+	ptr.domainName, err = NewReaderWithReader(bytes.NewReader(ptr.data)).ReadNameWith(ptr.reader.CompressionReader())
+	return err
 }
 
 // DomainName returns the resource domain name.
