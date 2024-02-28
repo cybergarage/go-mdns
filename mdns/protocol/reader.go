@@ -50,6 +50,24 @@ func (reader *Reader) Read(p []byte) (int, error) {
 	return n, nil
 }
 
+// ReadUint8 returns a uint8 from the reader.
+func (reader *Reader) ReadUint8() (uint8, error) {
+	buf := make([]byte, 1)
+	if _, err := reader.Read(buf); err != nil {
+		return 0, err
+	}
+	return uint8(encoding.BytesToInteger(buf)), nil
+}
+
+// ReadUint16 returns a uint16 from the reader.
+func (reader *Reader) ReadUint16() (uint16, error) {
+	buf := make([]byte, 2)
+	if _, err := reader.Read(buf); err != nil {
+		return 0, err
+	}
+	return uint16(encoding.BytesToInteger(buf)), nil
+}
+
 // ReadString returns a string from the reader.
 func (reader *Reader) ReadString() (string, error) {
 	l, err := reader.ReadUint8()
@@ -110,22 +128,20 @@ func (reader *Reader) ReadNameWith(compReader *CompressionReader) (string, error
 	return name, nil
 }
 
-// ReadUint8 returns a uint8 from the reader.
-func (reader *Reader) ReadUint8() (uint8, error) {
-	buf := make([]byte, 1)
-	if _, err := reader.Read(buf); err != nil {
-		return 0, err
+// ReadAttributes returns attributes from the reader.
+func (reader *Reader) ReadAttributes() ([]*Attribute, error) {
+	attrs := make([]*Attribute, 0)
+	str, err := reader.ReadString()
+	for err == nil {
+		var attr *Attribute
+		attr, err = NewAttributeWithString(str)
+		if err != nil {
+			return nil, err
+		}
+		attrs = append(attrs, attr)
+		str, err = reader.ReadString()
 	}
-	return uint8(encoding.BytesToInteger(buf)), nil
-}
-
-// ReadUint16 returns a uint16 from the reader.
-func (reader *Reader) ReadUint16() (uint16, error) {
-	buf := make([]byte, 2)
-	if _, err := reader.Read(buf); err != nil {
-		return 0, err
-	}
-	return uint16(encoding.BytesToInteger(buf)), nil
+	return attrs, nil
 }
 
 // CompressionReader returns a read reader instance.
