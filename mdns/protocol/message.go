@@ -183,9 +183,9 @@ func (msg *Message) ResourceRecords() ResourceRecords {
 	return records
 }
 
-// GetResourceRecord returns the resource record of the specified name.
-func (msg *Message) GetResourceRecord(name string) (ResourceRecord, bool) {
-	res, ok := msg.ResourceRecords().GetResourceRecord(name)
+// LookupResourceRecordForName returns the resource record of the specified name.
+func (msg *Message) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
+	res, ok := msg.ResourceRecords().LookupResourceRecordForName(name)
 	if ok {
 		return res, true
 	}
@@ -194,7 +194,7 @@ func (msg *Message) GetResourceRecord(name string) (ResourceRecord, bool) {
 
 // HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
 func (msg *Message) HasResourceRecord(name string) bool {
-	_, ok := msg.GetResourceRecord(name)
+	_, ok := msg.LookupResourceRecordForName(name)
 	return ok
 }
 

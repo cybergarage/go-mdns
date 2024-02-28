@@ -17,8 +17,8 @@ package protocol
 // ResourceRecords is a list of ResourceRecord.
 type ResourceRecords []ResourceRecord
 
-// GetResourceRecord returns the resource record of the specified name.
-func (records ResourceRecords) GetResourceRecord(name string) (ResourceRecord, bool) {
+// LookupResourceRecordForName returns the resource record of the specified name.
+func (records ResourceRecords) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
 	for _, record := range records {
 		if record.Name() == name {
 			return record, true
@@ -29,6 +29,6 @@ func (records ResourceRecords) GetResourceRecord(name string) (ResourceRecord, b
 
 // HasResourceRecord returns true if the resource record of the specified name is included in the list. otherwise false.
 func (records ResourceRecords) HasResourceRecord(name string) bool {
-	_, ok := records.GetResourceRecord(name)
+	_, ok := records.LookupResourceRecordForName(name)
 	return ok
 }
