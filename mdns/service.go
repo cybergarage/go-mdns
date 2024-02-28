@@ -22,15 +22,17 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
+type Attributes = protocol.Attributes
+
 // Service represents a SRV record.
 type Service struct {
-	Name       string
-	Domain     string
-	Host       string
-	AddrV4     net.IP
-	AddrV6     net.IP
-	Port       uint
-	Attributes []string
+	Name   string
+	Domain string
+	Host   string
+	AddrV4 net.IP
+	AddrV6 net.IP
+	Port   uint
+	Attributes
 }
 
 // NewService returns a new service instance.
@@ -42,7 +44,7 @@ func NewService(name, domain string, port uint) *Service {
 		AddrV4:     nil,
 		AddrV6:     nil,
 		Port:       port,
-		Attributes: []string{},
+		Attributes: Attributes{},
 	}
 }
 
