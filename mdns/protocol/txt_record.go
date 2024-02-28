@@ -56,9 +56,9 @@ func (txt *TXTRecord) Attributes() Attributes {
 	return txt.attrs
 }
 
-// GetAttribute returns the attribute with the specified name.
-func (txt *TXTRecord) GetAttribute(name string) *Attribute {
-	return txt.attrs.GetAttribute(name)
+// LookupAttribute returns the attribute with the specified name.
+func (txt *TXTRecord) LookupAttribute(name string) (*Attribute, bool) {
+	return txt.attrs.LookupAttribute(name)
 }
 
 // HasAttribute returns true if this instance has the specified attribute.
