@@ -175,7 +175,7 @@ func (msg *Message) Copy() *Message {
 }
 
 // ResourceRecords returns all resource records.
-func (msg *Message) ResourceRecords() []ResourceRecord {
+func (msg *Message) ResourceRecords() ResourceRecords {
 	records := []ResourceRecord{}
 	records = append(records, msg.Answers...)
 	records = append(records, msg.NameServers...)
@@ -185,15 +185,7 @@ func (msg *Message) ResourceRecords() []ResourceRecord {
 
 // GetResourceRecord returns the resource record of the specified name.
 func (msg *Message) GetResourceRecord(name string) (ResourceRecord, bool) {
-	res, ok := msg.Answers.GetResourceRecord(name)
-	if ok {
-		return res, true
-	}
-	res, ok = msg.NameServers.GetResourceRecord(name)
-	if ok {
-		return res, true
-	}
-	res, ok = msg.Additions.GetResourceRecord(name)
+	res, ok := msg.ResourceRecords().GetResourceRecord(name)
 	if ok {
 		return res, true
 	}

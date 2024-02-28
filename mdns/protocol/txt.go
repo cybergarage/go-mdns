@@ -14,35 +14,6 @@
 
 package protocol
 
-import (
-	"io"
-
-	"github.com/cybergarage/go-mdns/mdns/encoding"
-)
-
-func parseTxt(reader io.Reader) ([]string, error) {
-	attrs := []string{}
-	attrLenByte := make([]byte, 1)
-	_, err := reader.Read(attrLenByte)
-	for err == nil {
-		attrLen := encoding.BytesToInteger(attrLenByte)
-		if attrLen == 0 {
-			break
-		}
-		attrBytes := make([]byte, attrLen)
-		_, err = reader.Read(attrBytes)
-		if err != nil {
-			return nil, err
-		}
-		attrs = append(attrs, string(attrBytes))
-		_, err = reader.Read(attrLenByte)
-	}
-	if err != nil {
-		return nil, err
-	}
-	return attrs, nil
-}
-
 func txtToBytes(attrs []string) []byte {
 	bytes := []byte{}
 	for _, attr := range attrs {
