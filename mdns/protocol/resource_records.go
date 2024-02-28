@@ -27,6 +27,17 @@ func (records ResourceRecords) LookupResourceRecordForName(name string) (Resourc
 	return nil, false
 }
 
+// LookupResourceRecordsForName returns the resource records of the specified name.
+func (records ResourceRecords) LookupResourceRecordsForName(name string) ResourceRecords {
+	resRecords := ResourceRecords{}
+	for _, record := range records {
+		if record.Name() == name {
+			resRecords = append(resRecords, record)
+		}
+	}
+	return resRecords
+}
+
 // HasResourceRecord returns true if the resource record of the specified name is included in the list. otherwise false.
 func (records ResourceRecords) HasResourceRecord(name string) bool {
 	_, ok := records.LookupResourceRecordForName(name)
