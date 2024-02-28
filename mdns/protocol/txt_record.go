@@ -14,32 +14,34 @@
 
 package protocol
 
-import "bytes"
-
 // TXTRecord represents a TXT record.
 type TXTRecord struct {
 	*Record
+	attrs Attributes
 }
 
 // NewTXTRecord returns a new TXT record innstance.
 func NewTXTRecord() *TXTRecord {
 	return &TXTRecord{
 		Record: newResourceRecord(),
+		attrs:  Attributes{},
 	}
 }
 
 // newTXTRecordWithResourceRecord returns a new TXT record innstance.
-func newTXTRecordWithResourceRecord(res *Record) *TXTRecord {
-	return &TXTRecord{
+func newTXTRecordWithResourceRecord(res *Record) (*TXTRecord, error) {
+	txt := &TXTRecord{
 		Record: res,
+		attrs:  Attributes{},
 	}
+	return txt, txt.parseResourceRecord()
+}
+
+func (txt *TXTRecord) parseResourceRecord() error {
+	return nil
 }
 
 // Attributes returns the resource attribute strings.
-func (txt *TXTRecord) Attributes() []string {
-	attrs, err := parseTxt(bytes.NewReader(txt.data))
-	if err != nil {
-		return []string{}
-	}
-	return attrs
+func (txt *TXTRecord) Attributes() Attributes {
+	return txt.attrs
 }
