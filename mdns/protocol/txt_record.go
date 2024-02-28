@@ -14,6 +14,10 @@
 
 package protocol
 
+import (
+	"bytes"
+)
+
 // TXTRecord represents a TXT record.
 type TXTRecord struct {
 	*Record
@@ -38,10 +42,26 @@ func newTXTRecordWithResourceRecord(res *Record) (*TXTRecord, error) {
 }
 
 func (txt *TXTRecord) parseResourceRecord() error {
-	return nil
+	var err error
+	if len(txt.data) == 0 {
+		return nil
+	}
+	reader := NewReaderWithReader(bytes.NewReader(txt.data))
+	txt.attrs, err = reader.ReadAttributes()
+	return err
 }
 
 // Attributes returns the resource attribute strings.
 func (txt *TXTRecord) Attributes() Attributes {
 	return txt.attrs
+}
+
+// GetAttribute returns the attribute with the specified name.
+func (txt *TXTRecord) GetAttribute(name string) *Attribute {
+	return txt.attrs.GetAttribute(name)
+}
+
+// HasAttribute returns true if this instance has the specified attribute.
+func (txt *TXTRecord) HasAttribute(name string) bool {
+	return txt.attrs.HasAttribute(name)
 }
