@@ -20,4 +20,5 @@ import (
 )
 
 var ErrNil = errors.New("nil")
+var ErrInvalid = errors.New("invalid")
 var ErrNilReader = fmt.Errorf("reader is %w", ErrNil)
