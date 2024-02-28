@@ -57,10 +57,7 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 
 // Update updates the service data by the specified message.
 func (srv *Service) Update(msg *Message) {
-	records := msg.Answers
-	records = append(records, msg.NameServers...)
-	records = append(records, msg.Additions...)
-	for _, record := range records {
+	for _, record := range msg.ResourceRecords() {
 		switch rr := record.(type) {
 		case *protocol.PTRRecord:
 			srv.Name = rr.DomainName()
