@@ -14,6 +14,11 @@
 
 package protocol
 
+import (
+	"fmt"
+	"strings"
+)
+
 // RFC1464: Using the Domain Name System To Store Arbitrary String Attributes
 // https://datatracker.ietf.org/doc/html/rfc1464
 
@@ -31,6 +36,7 @@ func NewAttribute() *Attribute {
 	}
 }
 
+// NewAttributeWithString returns a new attribute innstance with the specified string.
 func NewAttributeWithString(str string) (*Attribute, error) {
 	attr := NewAttribute()
 	err := attr.parse(str)
@@ -39,7 +45,12 @@ func NewAttributeWithString(str string) (*Attribute, error) {
 
 // Parse parses the attribute string.
 func (attr *Attribute) parse(str string) error {
-	// TODO : Implement this
+	vars := strings.Split(str, "=")
+	if len(vars) != 2 {
+		return fmt.Errorf("attribute (%s) is %w", str, ErrInvalid)
+	}
+	attr.name = vars[0]
+	attr.value = vars[1]
 	return nil
 }
 
