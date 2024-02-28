@@ -77,7 +77,7 @@ func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) 
 	case SRV:
 		return newSRVRecordWithResourceRecord(r)
 	case TXT:
-		return newTXTRecordWithResourceRecord(r), nil
+		return newTXTRecordWithResourceRecord(r)
 	case A:
 		return newARecordWithResourceRecord(r), nil
 	case AAAA:
@@ -106,7 +106,7 @@ func newResponseResourceRecordWithReader(reader *Reader) (ResourceRecord, error)
 	case SRV:
 		return newSRVRecordWithResourceRecord(r)
 	case TXT:
-		return newTXTRecordWithResourceRecord(r), nil
+		return newTXTRecordWithResourceRecord(r)
 	case A:
 		return newARecordWithResourceRecord(r), nil
 	case AAAA:
