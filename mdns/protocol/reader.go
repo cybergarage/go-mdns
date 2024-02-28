@@ -133,6 +133,9 @@ func (reader *Reader) ReadAttributes() ([]*Attribute, error) {
 	attrs := make([]*Attribute, 0)
 	str, err := reader.ReadString()
 	for err == nil {
+		if len(str) == 0 {
+			break
+		}
 		var attr *Attribute
 		attr, err = NewAttributeWithString(str)
 		if err != nil {
