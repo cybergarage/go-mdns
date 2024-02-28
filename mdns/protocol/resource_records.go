@@ -17,6 +17,12 @@ package protocol
 // ResourceRecords is a list of ResourceRecord.
 type ResourceRecords []ResourceRecord
 
+// HasResourceRecord returns true if the resource record of the specified name is included in the list. otherwise false.
+func (records ResourceRecords) HasResourceRecord(name string) bool {
+	_, ok := records.LookupResourceRecordForName(name)
+	return ok
+}
+
 // LookupResourceRecordForName returns the resource record of the specified name.
 func (records ResourceRecords) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
 	for _, record := range records {
@@ -59,8 +65,57 @@ func (records ResourceRecords) LookupResourceRecordsForType(t Type) []ResourceRe
 	return resRecords
 }
 
-// HasResourceRecord returns true if the resource record of the specified name is included in the list. otherwise false.
-func (records ResourceRecords) HasResourceRecord(name string) bool {
-	_, ok := records.LookupResourceRecordForName(name)
-	return ok
+// LookupARecords returns the A records.
+func (records ResourceRecords) LookupARecords() []*ARecord {
+	resRecords := []*ARecord{}
+	for _, record := range records {
+		if aRecord, ok := record.(*ARecord); ok {
+			resRecords = append(resRecords, aRecord)
+		}
+	}
+	return resRecords
+}
+
+// LookupAAAARecords returns the AAAA records.
+func (records ResourceRecords) LookupAAAARecords() []*AAAARecord {
+	resRecords := []*AAAARecord{}
+	for _, record := range records {
+		if aaaaRecord, ok := record.(*AAAARecord); ok {
+			resRecords = append(resRecords, aaaaRecord)
+		}
+	}
+	return resRecords
+}
+
+// LookupPTRRecords returns the PTR records.
+func (records ResourceRecords) LookupPTRRecords() []*PTRRecord {
+	resRecords := []*PTRRecord{}
+	for _, record := range records {
+		if ptrRecord, ok := record.(*PTRRecord); ok {
+			resRecords = append(resRecords, ptrRecord)
+		}
+	}
+	return resRecords
+}
+
+// LookupSRVRecords returns the SRV records.
+func (records ResourceRecords) LookupSRVRecords() []*SRVRecord {
+	resRecords := []*SRVRecord{}
+	for _, record := range records {
+		if srvRecord, ok := record.(*SRVRecord); ok {
+			resRecords = append(resRecords, srvRecord)
+		}
+	}
+	return resRecords
+}
+
+// LookupTXTRecords returns the TXT records.
+func (records ResourceRecords) LookupTXTRecords() []*TXTRecord {
+	resRecords := []*TXTRecord{}
+	for _, record := range records {
+		if txtRecord, ok := record.(*TXTRecord); ok {
+			resRecords = append(resRecords, txtRecord)
+		}
+	}
+	return resRecords
 }
