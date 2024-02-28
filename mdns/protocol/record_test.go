@@ -145,7 +145,7 @@ func TestResourceRecord(t *testing.T) {
 					return
 				}
 				for n, attr := range attrs {
-					if attr != test.expectedAttrs[n] {
+					if attr.String() != test.expectedAttrs[n] {
 						t.Errorf("Attr[%d]: %s != %s", n, attrs, test.expectedAttrs[n])
 					}
 				}
