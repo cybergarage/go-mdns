@@ -15,3 +15,23 @@
 package protocol
 
 type Attributes []*Attribute
+
+// NewAttributes returns a new attributes instance.
+func NewAttributes() Attributes {
+	return Attributes{}
+}
+
+// GetAttribute returns the attribute with the specified name.
+func (attrs Attributes) GetAttribute(name string) *Attribute {
+	for _, attr := range attrs {
+		if attr.Name() == name {
+			return attr
+		}
+	}
+	return nil
+}
+
+// HasAttribute returns true if this instance has the specified attribute.
+func (attrs Attributes) HasAttribute(name string) bool {
+	return attrs.GetAttribute(name) != nil
+}
