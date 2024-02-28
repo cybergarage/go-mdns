@@ -39,8 +39,7 @@ func NewAttribute() *Attribute {
 // NewAttributeWithString returns a new attribute innstance with the specified string.
 func NewAttributeWithString(str string) (*Attribute, error) {
 	attr := NewAttribute()
-	err := attr.parse(str)
-	return attr, err
+	return attr, attr.parse(str)
 }
 
 // Parse parses the attribute string.
