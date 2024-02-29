@@ -22,8 +22,6 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
-type Attributes = protocol.Attributes
-
 // Service represents a SRV record.
 type Service struct {
 	Name   string
@@ -32,19 +30,19 @@ type Service struct {
 	AddrV4 net.IP
 	AddrV6 net.IP
 	Port   uint
-	attrs  Attributes
+	protocol.Attributes
 }
 
 // NewService returns a new service instance.
 func NewService(name, domain string, port uint) *Service {
 	return &Service{
-		Name:   name,
-		Domain: domain,
-		Host:   "",
-		AddrV4: nil,
-		AddrV6: nil,
-		Port:   port,
-		attrs:  Attributes{},
+		Name:       name,
+		Domain:     domain,
+		Host:       "",
+		AddrV4:     nil,
+		AddrV6:     nil,
+		Port:       port,
+		Attributes: protocol.Attributes{},
 	}
 }
 
@@ -71,7 +69,7 @@ func (srv *Service) Update(msg *Message) {
 				srv.Port = port
 			}
 		case *protocol.TXTRecord:
-			srv.attrs = append(srv.attrs, rr.Attributes()...)
+			srv.Attributes = append(srv.Attributes, rr.Attributes()...)
 		case *protocol.ARecord:
 			ip := rr.Address()
 			if ip != nil {
@@ -84,11 +82,6 @@ func (srv *Service) Update(msg *Message) {
 			}
 		}
 	}
-}
-
-// Attributes returns the resource attributes.
-func (srv *Service) Attributes() Attributes {
-	return srv.attrs
 }
 
 // Equal returns true if the header is same as the specified header, otherwise false.
