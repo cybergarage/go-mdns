@@ -32,19 +32,19 @@ type Service struct {
 	AddrV4 net.IP
 	AddrV6 net.IP
 	Port   uint
-	Attributes
+	attrs  Attributes
 }
 
 // NewService returns a new service instance.
 func NewService(name, domain string, port uint) *Service {
 	return &Service{
-		Name:       name,
-		Domain:     domain,
-		Host:       "",
-		AddrV4:     nil,
-		AddrV6:     nil,
-		Port:       port,
-		Attributes: Attributes{},
+		Name:   name,
+		Domain: domain,
+		Host:   "",
+		AddrV4: nil,
+		AddrV6: nil,
+		Port:   port,
+		attrs:  Attributes{},
 	}
 }
 
@@ -71,7 +71,7 @@ func (srv *Service) Update(msg *Message) {
 				srv.Port = port
 			}
 		case *protocol.TXTRecord:
-			srv.Attributes = append(srv.Attributes, rr.Attributes()...)
+			srv.attrs = append(srv.attrs, rr.Attributes()...)
 		case *protocol.ARecord:
 			ip := rr.Address()
 			if ip != nil {
@@ -84,6 +84,11 @@ func (srv *Service) Update(msg *Message) {
 			}
 		}
 	}
+}
+
+// Attributes returns the resource attributes.
+func (srv *Service) Attributes() Attributes {
+	return srv.attrs
 }
 
 // Equal returns true if the header is same as the specified header, otherwise false.
