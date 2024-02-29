@@ -110,8 +110,8 @@ func (records ResourceRecords) LookupSRVRecords() []*SRVRecord {
 }
 
 // LookupTXTRecords returns the TXT records.
-func (records ResourceRecords) LookupTXTRecords() TXTRecords {
-	resRecords := TXTRecords{}
+func (records ResourceRecords) LookupTXTRecords() []*TXTRecord {
+	resRecords := []*TXTRecord{}
 	for _, record := range records {
 		if txtRecord, ok := record.(*TXTRecord); ok {
 			resRecords = append(resRecords, txtRecord)
