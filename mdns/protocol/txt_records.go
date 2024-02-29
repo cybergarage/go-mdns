@@ -27,3 +27,9 @@ func (txts TXTRecords) LookupAttribute(name string) (*Attribute, bool) {
 	}
 	return nil, false
 }
+
+// HasAttribute returns true if this instance has the specified attribute.
+func (txts TXTRecords) HasAttribute(name string) bool {
+	_, ok := txts.LookupAttribute(name)
+	return ok
+}
