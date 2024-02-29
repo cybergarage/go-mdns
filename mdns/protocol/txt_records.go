@@ -16,3 +16,14 @@ package protocol
 
 // TXTRecords is a list of TXTRecord.
 type TXTRecords []*TXTRecord
+
+// LookupAttribute returns the attribute with the specified name.
+func (txts TXTRecords) LookupAttribute(name string) (*Attribute, bool) {
+	for _, txt := range txts {
+		attr, ok := txt.LookupAttribute(name)
+		if ok {
+			return attr, true
+		}
+	}
+	return nil, false
+}
