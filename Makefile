@@ -29,14 +29,14 @@ TEST_PKG_ID=${MODULE_ROOT}/${TEST_PKG_NAME}
 TEST_PKG_DIR=${TEST_PKG_NAME}
 TEST_PKG=${MODULE_ROOT}/${TEST_PKG_DIR}
 
-BIN_ROOT_DIR=examples
+BIN_ROOT_DIR=bin
 BIN_ID=${MODULE_ROOT}/${BIN_ROOT_DIR}
 BIN_SRCS=\
-	${BIN_ROOT_DIR}/mdnssearch \
-	${BIN_ROOT_DIR}/mdnsserver
+	${BIN_ROOT_DIR}/mdns-browse \
+	${BIN_ROOT_DIR}/mdns-server
 BINS=\
-	${BIN_ID}/mdnssearch \
-	${BIN_ID}/mdnsserver
+	${BIN_ID}/mdns-browse \
+	${BIN_ID}/mdns-server
 
 .PHONY: format vet lint clean
 
@@ -59,4 +59,4 @@ install: test
 	go install ${BINS}
 
 clean:
-	go clean -i ${PKG}  ${TEST_PKG} ${BINS}
+	go clean -i ${PKG} ${TEST_PKG} ${BINS}
