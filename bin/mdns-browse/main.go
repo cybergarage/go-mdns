@@ -13,16 +13,15 @@
 // limitations under the License.
 
 /*
-mdnsserver is a ggeneric server for mDNS protocol.
+mdns-browse is a browser utility for mDNS protocol.
 
 	NAME
-	mdnsserver
+	mdns-browse
 
 	SYNOPSIS
-	mdnsserver [OPTIONS]
+	mdns-browse [OPTIONS]
 
-	mdnsserver
-	uechosearch is a ggeneric server for mDNS protocol.
+	mdns-browse is a browser utility for mDNS protocol.
 
 	RETURN VALUE
 	  Return EXIT_SUCCESS or EXIT_FAILURE
@@ -31,13 +30,16 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"time"
 
 	"github.com/cybergarage/go-logger/log"
+	"github.com/cybergarage/go-mdns/mdns"
 )
 
 func main() {
-	verbose := flag.Bool("v", false, "Enable verbose output")
+	verbose := flag.Bool("v", false, "Enable verbose messages")
+	debug := flag.Bool("d", false, "Enable debug messages")
 	flag.Parse()
 
 	// Setup logger
@@ -45,30 +47,48 @@ func main() {
 	if *verbose {
 		log.SetSharedLogger(log.NewStdoutLogger(log.LevelTrace))
 	}
+	if *debug {
+		log.SetSharedLogger(log.NewStdoutLogger(log.LevelDebug))
+	}
 
 	// Start a controller for Echonet Lite node
 
-	server := NewServer()
+	client := NewClient()
 
 	if *verbose {
-		server.SetListener(server)
+		client.SetListener(client)
 	}
 
-	err := server.Start()
+	err := client.Start()
+	if err != nil {
+		return
+	}
+
+	defer client.Stop()
+
+	// err = client.Query(mdns.NewQueryWithService(mdns.AutomaticBrowsingService))
+	// if err != nil {
+	// 	return
+	// }
+
+	services := []string{
+		"_services._dns-sd._udp",
+		"_rdlink._tcp",
+		"_companion - link._tcp",
+	}
+
+	err = client.Query(mdns.NewQueryWithServices(services))
 	if err != nil {
 		return
 	}
 
 	// Wait node responses in the local network
 
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Second * 10)
 
 	// Output all found nodes
 
-	// Stop the controller
-
-	err = server.Stop()
-	if err != nil {
-		return
+	for n, srv := range client.Services() {
+		fmt.Printf("[%d] %s\n", n, srv.String())
 	}
 }
