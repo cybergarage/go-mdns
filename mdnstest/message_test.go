@@ -24,6 +24,9 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
+//go:embed log/service01.log
+var service01 string
+
 //go:embed log/matter01.log
 var matter01 string
 
@@ -49,6 +52,14 @@ func TestResponseMessage(t *testing.T) {
 		answers    []answer
 		attributes map[string]string
 	}{
+		{
+			"service01",
+			service01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
+			},
+			map[string]string{},
+		},
 		/*
 			{
 				"matter01",
@@ -56,6 +67,7 @@ func TestResponseMessage(t *testing.T) {
 				[]answer{
 					{"_services._dns-sd._udp.local"},
 				},
+				map[string]string{},
 			},
 			{
 				"matter02",
@@ -63,6 +75,7 @@ func TestResponseMessage(t *testing.T) {
 				[]answer{
 					{"_services._dns-sd._udp.local"},
 				},
+				map[string]string{},
 			},
 			{
 				"googlecast01",
@@ -70,6 +83,7 @@ func TestResponseMessage(t *testing.T) {
 				[]answer{
 					{"_services._dns-sd._udp.local"},
 				},
+				map[string]string{},
 			},
 		*/
 		{
