@@ -17,7 +17,9 @@ package protocol
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
+	"unicode"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
@@ -188,6 +190,20 @@ func (r *Record) TTL() uint {
 // Data returns the resource record data.
 func (r *Record) Data() []byte {
 	return r.data
+}
+
+// Data returns the resource record data.
+func (r *Record) Content() string {
+	c := ""
+	for n := 0; n < len(r.data); n++ {
+		rb := rune(r.data[n])
+		if unicode.IsPrint(rb) {
+			c += fmt.Sprintf("%c", rb)
+		} else {
+			c += "."
+		}
+	}
+	return c
 }
 
 func (r *Record) parseResouce(reader *Reader) error {
