@@ -106,7 +106,7 @@ func (reader *Reader) ReadNameWith(compReader *CompressionReader) (string, error
 			if err := compReader.Skip(nameOffset); err != nil {
 				return "", err
 			}
-			return NewReaderWithReader(compReader).ReadNameWith(nil)
+			return NewReaderWithReader(compReader).ReadNameWith(reader.CompressionReader())
 		}
 		if nextNameLen == 0 {
 			break
