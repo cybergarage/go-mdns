@@ -14,6 +14,10 @@
 
 package dns
 
+import (
+	"strings"
+)
+
 type Attributes []*Attribute
 
 // NewAttributes returns a new attributes instance.
@@ -35,4 +39,13 @@ func (attrs Attributes) LookupAttribute(name string) (*Attribute, bool) {
 func (attrs Attributes) HasAttribute(name string) bool {
 	_, ok := attrs.LookupAttribute(name)
 	return ok
+}
+
+// String returns the attribute string.
+func (attrs Attributes) String() string {
+	strs := []string{}
+	for _, attr := range attrs {
+		strs = append(strs, attr.String())
+	}
+	return strings.Join(strs, " ")
 }
