@@ -12,17 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-type Class uint
+// Answer represents an answer resource record.
+type Answer = ResourceRecord
 
-const (
-	IN Class = 0x0001
-)
-
-const (
-	unicastResponseMask = 0x8000
-	typeMask            = 0x7FFF
-	cacheFlushMask      = 0x8000
-	classMask           = 0x7FFF
-)
+// Answers represents an answer resource record array.
+type Answers = ResourceRecords

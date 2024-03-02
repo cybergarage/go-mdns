@@ -15,31 +15,31 @@
 package mdns
 
 import (
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // Message represents a protocol message.
-type Message = protocol.Message
+type Message = dns.Message
 
 // NewMessage returns a nil message instance.
 func NewRequestWithQuery(query *Query) *Message {
-	msg := protocol.NewRequestMessage()
-	q := protocol.NewQuestion()
+	msg := dns.NewRequestMessage()
+	q := dns.NewQuestion()
 	q.SetName(query.String())
-	q.SetType(protocol.PTR)
-	q.SetClass(protocol.IN)
+	q.SetType(dns.PTR)
+	q.SetClass(dns.IN)
 	msg.AddQuestion(q)
 	return msg
 }
 
 // NewRequestWithQueries returns a new request message with the specified queries.
 func NewRequestWithQueries(queries []*Query) *Message {
-	msg := protocol.NewRequestMessage()
+	msg := dns.NewRequestMessage()
 	for _, query := range queries {
-		q := protocol.NewQuestion()
+		q := dns.NewQuestion()
 		q.SetName(query.String())
-		q.SetType(protocol.PTR)
-		q.SetClass(protocol.IN)
+		q.SetType(dns.PTR)
+		q.SetClass(dns.IN)
 		msg.AddQuestion(q)
 	}
 	return msg

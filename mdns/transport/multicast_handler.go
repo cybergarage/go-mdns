@@ -15,10 +15,10 @@
 package transport
 
 import (
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // A MulticastHandler represents a listener for MulticastServer.
 type MulticastHandler interface {
-	protocol.MessageHandler
+	dns.MessageHandler
 }

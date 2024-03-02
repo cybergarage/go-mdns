@@ -15,7 +15,7 @@
 package mdns
 
 import (
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 	"github.com/cybergarage/go-mdns/mdns/transport"
 )
 
@@ -63,7 +63,7 @@ func (server *Server) Restart() error {
 	return server.Start()
 }
 
-func (server *Server) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+func (server *Server) MessageReceived(msg *dns.Message) (*dns.Message, error) {
 	if server.userListener != nil {
 		server.userListener.MessageReceived(msg)
 	}

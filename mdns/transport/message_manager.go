@@ -15,12 +15,12 @@
 package transport
 
 import (
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // A MessageManager represents a multicast server list.
 type MessageManager struct {
-	messageHandler protocol.MessageHandler
+	messageHandler dns.MessageHandler
 	*MulticastManager
 }
 
@@ -34,12 +34,12 @@ func NewMessageManager() *MessageManager {
 }
 
 // SetMessageHandler set a listener to all managers.
-func (mgr *MessageManager) SetMessageHandler(h protocol.MessageHandler) {
+func (mgr *MessageManager) SetMessageHandler(h dns.MessageHandler) {
 	mgr.SetHandler(h)
 	mgr.messageHandler = h
 }
 
 // GetMessageHandler returns the listener of the manager.
-func (mgr *MessageManager) GetMessageHandler() protocol.MessageHandler {
+func (mgr *MessageManager) GetMessageHandler() dns.MessageHandler {
 	return mgr.messageHandler
 }

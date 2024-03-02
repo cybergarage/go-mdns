@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
 // SRVRecord represents a SRV record.
 // RFC 2782: A DNS RR for specifying the location of services (DNS SRV).

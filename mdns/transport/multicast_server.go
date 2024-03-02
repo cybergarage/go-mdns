@@ -20,7 +20,7 @@ import (
 	"net"
 
 	"github.com/cybergarage/go-logger/log"
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // A MulticastServer represents a multicast server.
@@ -66,7 +66,7 @@ func (server *MulticastServer) Stop() error {
 	return nil
 }
 
-func handleMulticastRequestMessage(server *MulticastServer, reqMsg *protocol.Message) {
+func handleMulticastRequestMessage(server *MulticastServer, reqMsg *dns.Message) {
 	if server.Handler == nil {
 		return
 	}

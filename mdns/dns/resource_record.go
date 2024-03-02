@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-import (
-	"testing"
-)
-
-func TestNewMessage(t *testing.T) {
-	NewRequestMessage()
+// ResourceRecord represents a resource record interface.
+type ResourceRecord interface {
+	Record
+	// RequestBytes returns only the binary representation of the request fields.
+	RequestBytes() []byte
+	// ResponseBytes returns only the binary representation of the all fields.
+	ResponseBytes() []byte
+	// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+	Equal(res ResourceRecord) bool
 }

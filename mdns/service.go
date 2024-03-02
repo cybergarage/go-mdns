@@ -19,7 +19,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // Service represents a SRV record.
@@ -30,7 +30,7 @@ type Service struct {
 	AddrV4 net.IP
 	AddrV6 net.IP
 	Port   uint
-	protocol.Attributes
+	dns.Attributes
 }
 
 // NewService returns a new service instance.
@@ -42,7 +42,7 @@ func NewService(name, domain string, port uint) *Service {
 		AddrV4:     nil,
 		AddrV6:     nil,
 		Port:       port,
-		Attributes: protocol.Attributes{},
+		Attributes: dns.Attributes{},
 	}
 }
 
@@ -57,9 +57,9 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 func (srv *Service) Update(msg *Message) {
 	for _, record := range msg.ResourceRecords() {
 		switch rr := record.(type) {
-		case *protocol.PTRRecord:
+		case *dns.PTRRecord:
 			srv.Name = rr.DomainName()
-		case *protocol.SRVRecord:
+		case *dns.SRVRecord:
 			host := rr.Target()
 			if 0 < len(host) {
 				srv.Host = host
@@ -68,14 +68,14 @@ func (srv *Service) Update(msg *Message) {
 			if 0 < port {
 				srv.Port = port
 			}
-		case *protocol.TXTRecord:
+		case *dns.TXTRecord:
 			srv.Attributes = append(srv.Attributes, rr.Attributes()...)
-		case *protocol.ARecord:
+		case *dns.ARecord:
 			ip := rr.Address()
 			if ip != nil {
 				srv.AddrV4 = ip
 			}
-		case *protocol.AAAARecord:
+		case *dns.AAAARecord:
 			ip := rr.Address()
 			if ip != nil {
 				srv.AddrV6 = ip

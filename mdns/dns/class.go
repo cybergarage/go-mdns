@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-// MessageHandler represents a protocol message handler interface.
-type MessageHandler interface {
-	MessageReceived(*Message) (*Message, error)
-}
+type Class uint
+
+const (
+	IN Class = 0x0001
+)
+
+const (
+	unicastResponseMask = 0x8000
+	typeMask            = 0x7FFF
+	cacheFlushMask      = 0x8000
+	classMask           = 0x7FFF
+)

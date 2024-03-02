@@ -18,7 +18,7 @@ import (
 	"errors"
 	"net"
 
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // A MulticastManager represents a multicast server manager.
@@ -51,7 +51,7 @@ func (mgr *MulticastManager) GetBoundInterfaces() []*net.Interface {
 }
 
 // AnnounceMessage announces the message from the all bound multicast interfaces.
-func (mgr *MulticastManager) AnnounceMessage(msg *protocol.Message) error {
+func (mgr *MulticastManager) AnnounceMessage(msg *dns.Message) error {
 	var lastErr error
 	for _, server := range mgr.Servers {
 		if err := server.AnnounceMessage(msg); err != nil {

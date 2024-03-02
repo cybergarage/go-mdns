@@ -12,43 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-import (
-	"fmt"
-	"net"
-)
-
-// AAAARecord represents a AAAA record.
-type AAAARecord struct {
+// Question represents a question.
+type Question struct {
 	*record
 }
 
-// NewAAAARecord returns a new AAAA record instance.
-func NewAAAARecord() *AAAARecord {
-	return &AAAARecord{
+// Questions represents a question array.
+type Questions []*Question
+
+// NewQuestion returns a new question instance.
+func NewQuestion() *Question {
+	return &Question{
 		record: newResourceRecord(),
 	}
 }
 
-// newAAAARecordWithResourceRecord returns a new AAAA record instance.
-func newAAAARecordWithResourceRecord(res *record) *AAAARecord {
-	return &AAAARecord{
-		record: res,
+// NewQuestionWithRecord returns a new question instance with the specified record.
+func NewQuestionWithRecord(record *record) *Question {
+	return &Question{
+		record: record,
 	}
 }
 
-// Address returns the resource ip address.
-func (a *AAAARecord) Address() net.IP {
-	if len(a.data) != 16 {
-		return nil
-	}
-	ipstr := ""
-	for n, b := range a.data {
-		if (n != 0) && ((n % 2) == 0) {
-			ipstr += ":"
-		}
-		ipstr += fmt.Sprintf("%02x", b)
-	}
-	return net.ParseIP(ipstr)
+// NewQuestionWithRecord returns a new question instance with the specified record.
+func NewQuestionWithReader(reader *Reader) (*Question, error) {
+	r, err := newRequestRecordWithReader(reader)
+	return NewQuestionWithRecord(r), err
 }

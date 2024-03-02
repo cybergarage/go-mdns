@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-// NameServer represents an authoritative nameserver resource record.
-type NameServer = ResourceRecord
+import (
+	"errors"
+	"fmt"
+)
 
-// NameServers represents an authoritative nameserver resource record array.
-type NameServers = ResourceRecords
+var ErrNil = errors.New("nil")
+var ErrInvalid = errors.New("invalid")
+var ErrNilReader = fmt.Errorf("reader is %w", ErrNil)
