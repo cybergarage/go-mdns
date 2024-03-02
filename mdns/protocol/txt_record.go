@@ -20,23 +20,23 @@ import (
 
 // TXTRecord represents a TXT record.
 type TXTRecord struct {
-	*record
+	*BaseRecord
 	attrs Attributes
 }
 
-// NewTXTRecord returns a new TXT record innstance.
+// NewTXTRecord returns a new TXT record instance.
 func NewTXTRecord() *TXTRecord {
 	return &TXTRecord{
-		record: newResourceRecord(),
-		attrs:  Attributes{},
+		BaseRecord: newResourceRecord(),
+		attrs:      Attributes{},
 	}
 }
 
-// newTXTRecordWithResourceRecord returns a new TXT record innstance.
-func newTXTRecordWithResourceRecord(res *record) (*TXTRecord, error) {
+// newTXTRecordWithResourceRecord returns a new TXT record instance.
+func newTXTRecordWithResourceRecord(res *BaseRecord) (*TXTRecord, error) {
 	txt := &TXTRecord{
-		record: res,
-		attrs:  Attributes{},
+		BaseRecord: res,
+		attrs:      Attributes{},
 	}
 	return txt, txt.parseResourceRecord()
 }

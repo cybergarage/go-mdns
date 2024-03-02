@@ -18,7 +18,7 @@ package protocol
 // RFC 2782: A DNS RR for specifying the location of services (DNS SRV).
 // https://www.rfc-editor.org/rfc/rfc2782
 type SRVRecord struct {
-	*record
+	*BaseRecord
 	service  string
 	proto    string
 	name     string
@@ -28,31 +28,31 @@ type SRVRecord struct {
 	target   string
 }
 
-// NewSRVRecord returns a new SRV record innstance.
+// NewSRVRecord returns a new SRV record instance.
 func NewSRVRecord() *SRVRecord {
 	return &SRVRecord{
-		record:   newResourceRecord(),
-		service:  "",
-		proto:    "",
-		name:     "",
-		priority: 0,
-		weight:   0,
-		port:     0,
-		target:   "",
+		BaseRecord: newResourceRecord(),
+		service:    "",
+		proto:      "",
+		name:       "",
+		priority:   0,
+		weight:     0,
+		port:       0,
+		target:     "",
 	}
 }
 
-// newSRVRecordWithResourceRecord returns a new SRV record innstance.
-func newSRVRecordWithResourceRecord(res *record) (*SRVRecord, error) {
+// newSRVRecordWithResourceRecord returns a new SRV record instance.
+func newSRVRecordWithResourceRecord(res *BaseRecord) (*SRVRecord, error) {
 	srv := &SRVRecord{
-		record:   res,
-		service:  "",
-		proto:    "",
-		name:     "",
-		priority: 0,
-		weight:   0,
-		port:     0,
-		target:   "",
+		BaseRecord: res,
+		service:    "",
+		proto:      "",
+		name:       "",
+		priority:   0,
+		weight:     0,
+		port:       0,
+		target:     "",
 	}
 	return srv, srv.parseResourceRecord()
 }

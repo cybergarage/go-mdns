@@ -21,16 +21,26 @@ import (
 // Message represents a protocol message.
 type Message = protocol.Message
 
+// NewMessage returns a nil message instance.
 func NewRequestWithQuery(query *Query) *Message {
 	msg := protocol.NewRequestMessage()
-	msg.AddQuestion(protocol.NewQuestion().SetName(query.String()).SetType(protocol.PTR).SetClass(protocol.IN))
+	q := protocol.NewQuestion()
+	q.SetName(query.String())
+	q.SetType(protocol.PTR)
+	q.SetClass(protocol.IN)
+	msg.AddQuestion(q)
 	return msg
 }
 
+// NewRequestWithQueries returns a new request message with the specified queries.
 func NewRequestWithQueries(queries []*Query) *Message {
 	msg := protocol.NewRequestMessage()
 	for _, query := range queries {
-		msg.AddQuestion(protocol.NewQuestion().SetName(query.String()).SetType(protocol.PTR).SetClass(protocol.IN))
+		q := protocol.NewQuestion()
+		q.SetName(query.String())
+		q.SetType(protocol.PTR)
+		q.SetClass(protocol.IN)
+		msg.AddQuestion(q)
 	}
 	return msg
 }

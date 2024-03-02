@@ -28,7 +28,7 @@ type Attribute struct {
 	value string
 }
 
-// NewAttribute returns a new attribute innstance.
+// NewAttribute returns a new attribute instance.
 func NewAttribute() *Attribute {
 	return &Attribute{
 		name:  "",
@@ -36,7 +36,7 @@ func NewAttribute() *Attribute {
 	}
 }
 
-// NewAttributeWithString returns a new attribute innstance with the specified string.
+// NewAttributeWithString returns a new attribute instance with the specified string.
 func NewAttributeWithString(str string) (*Attribute, error) {
 	attr := NewAttribute()
 	return attr, attr.parse(str)
