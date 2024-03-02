@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/cybergarage/go-logger/log"
+	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
@@ -43,9 +44,10 @@ func TestResponseMessage(t *testing.T) {
 		name string
 	}
 	tests := []struct {
-		name    string
-		msgLogs string
-		answers []answer
+		name       string
+		msgLogs    string
+		answers    []answer
+		attributes map[string]string
 	}{
 		/*
 			{
@@ -76,6 +78,10 @@ func TestResponseMessage(t *testing.T) {
 			[]answer{
 				{"_services._dns-sd"},
 			},
+			map[string]string{
+				"D":  "840",
+				"CM": "2",
+			},
 		},
 	}
 
@@ -93,11 +99,28 @@ func TestResponseMessage(t *testing.T) {
 				return
 			}
 
+			srv, err := mdns.NewServiceWithMessage(msg)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
 			for _, answer := range test.answers {
 				if !msg.Answers.HasResourceRecord(answer.name) {
 					t.Errorf("answer (%s) not found", answer.name)
 				}
 			}
+
+			for name, value := range test.attributes {
+				attr, ok := srv.LookupAttribute(name)
+				if !ok {
+					t.Errorf("attribute (%s) not found", name)
+				}
+				if attr.Value() != value {
+					t.Errorf("attribute (%s) value (%s) != (%s)", name, attr.Value(), value)
+				}
+			}
+
 			t.Log(msg.String())
 		})
 	}
