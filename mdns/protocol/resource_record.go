@@ -16,24 +16,11 @@ package protocol
 
 // ResourceRecord represents a resource record interface.
 type ResourceRecord interface {
-	// Name returns the resource record name.
-	Name() string
-	// Type returns the resource record type.
-	Type() Type
-	// Class returns the resource record class.
-	Class() Class
-	// UnicastResponse returns the unicast response flag.
-	UnicastResponse() bool
-	// TTL returns the TTL second.
-	TTL() uint
-	// Data returns the resource record data.
-	Data() []byte
+	Record
 	// RequestBytes returns only the binary representation of the request fields.
 	RequestBytes() []byte
 	// ResponseBytes returns only the binary representation of the all fields.
 	ResponseBytes() []byte
-	// Bytes returns the binary representation.
-	Bytes() []byte
 	// Equal returns true if this record is equal to  the specified resource record. otherwise false.
 	Equal(res ResourceRecord) bool
 }
