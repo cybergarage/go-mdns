@@ -42,3 +42,8 @@ func (a *ARecord) Address() net.IP {
 	}
 	return net.IPv4(a.data[0], a.data[1], a.data[2], a.data[3])
 }
+
+// Content returns a string representation to the record data.
+func (a *ARecord) Content() string {
+	return a.Address().String()
+}
