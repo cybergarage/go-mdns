@@ -102,7 +102,7 @@ func (msg *Message) Parse(reader *Reader) error {
 	}
 	// Parses questions.
 	for n := 0; n < int(msg.QD()); n++ {
-		var r *BaseRecord
+		var r *record
 		if msg.IsQuery() {
 			r, err = newRequestRecordWithReader(reader)
 		} else {
