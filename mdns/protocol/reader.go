@@ -23,15 +23,17 @@ import (
 
 // Reader represents a record reader.
 type Reader struct {
-	Reader io.Reader
-	Bytes  []byte
+	Reader        io.Reader
+	Bytes         []byte
+	rootCmpReader *CompressionReader
 }
 
 // NewReaderWithReader returns a new reader instance with the specified reader.
 func NewReaderWithReader(reader io.Reader) *Reader {
 	return &Reader{
-		Reader: reader,
-		Bytes:  []byte{},
+		Reader:        reader,
+		Bytes:         []byte{},
+		rootCmpReader: nil,
 	}
 }
 
@@ -85,8 +87,8 @@ func (reader *Reader) ReadString() (string, error) {
 	return string(strBytes), nil
 }
 
-// ReadNameWith returns a name from the reader with the read reader.
-func (reader *Reader) ReadNameWith(compReader *CompressionReader) (string, error) {
+// ReadName returns a name from the reader with the read reader.
+func (reader *Reader) ReadName() (string, error) {
 	nameLenIsCompressed := func(l uint8) bool {
 		return (l & nameIsCompressionMask) != 0
 	}
@@ -95,18 +97,20 @@ func (reader *Reader) ReadNameWith(compReader *CompressionReader) (string, error
 	nextNameLen, err := reader.ReadUint8()
 	for err == nil {
 		if nameLenIsCompressed(nextNameLen) {
-			if compReader == nil {
-				return "", ErrNilReader
-			}
 			remainNameOffset, err := reader.ReadUint8()
 			if err != nil {
 				return "", err
 			}
 			nameOffset := (int(nextNameLen & ^nameIsCompressionMask) << 8) + int(remainNameOffset)
+
+			compReader := reader.CompressionReader()
 			if err := compReader.Skip(nameOffset); err != nil {
 				return "", err
 			}
-			return NewReaderWithReader(compReader).ReadNameWith(reader.CompressionReader())
+
+			nextCompReader := NewReaderWithReader(compReader)
+			nextCompReader.SetCompressionReader(NewCompressionReaderWithBytes(compReader.bytes))
+			return nextCompReader.ReadName()
 		}
 		if nextNameLen == 0 {
 			break
@@ -147,7 +151,16 @@ func (reader *Reader) ReadAttributes() ([]*Attribute, error) {
 	return attrs, nil
 }
 
+// SetCompressionReader sets a read reader instance.
+func (reader *Reader) SetCompressionReader(cmpReader *CompressionReader) *Reader {
+	reader.rootCmpReader = cmpReader
+	return reader
+}
+
 // CompressionReader returns a read reader instance.
 func (reader *Reader) CompressionReader() *CompressionReader {
+	if reader.rootCmpReader != nil {
+		return reader.rootCmpReader
+	}
 	return NewCompressionReaderWithBytes(reader.Bytes)
 }
