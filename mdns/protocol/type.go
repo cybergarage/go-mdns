@@ -31,3 +31,34 @@ const (
 	AXFR  Type = 0x00FC
 	ANY   Type = 0x00FF
 )
+
+// String returns the string of the type.
+func (t Type) String() string {
+	switch t {
+	case A:
+		return "A"
+	case NS:
+		return "NS"
+	case CNAME:
+		return "CNAME"
+	case TXT:
+		return "TXT"
+	case SRV:
+		return "SRV"
+	case OPT:
+		return "OPT"
+	case PTR:
+		return "PTR"
+	case HINFO:
+		return "HINFO"
+	case MX:
+		return "MX"
+	case AAAA:
+		return "AAAA"
+	case AXFR:
+		return "AXFR"
+	case ANY:
+		return "ANY"
+	}
+	return ""
+}
