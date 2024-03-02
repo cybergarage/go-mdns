@@ -51,3 +51,8 @@ func (ptr *PTRRecord) parseResourceRecord() error {
 func (ptr *PTRRecord) DomainName() string {
 	return ptr.domainName
 }
+
+// Content returns a string representation to the record data.
+func (ptr *PTRRecord) Content() string {
+	return ptr.DomainName()
+}
