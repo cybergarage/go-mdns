@@ -24,8 +24,8 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
-// BaseRecord represents a base record.
-type BaseRecord struct {
+// record represents a base record.
+type record struct {
 	reader          *Reader
 	name            string
 	unicastResponse bool
@@ -36,8 +36,8 @@ type BaseRecord struct {
 }
 
 // newResourceRecord returns a new base record instance.
-func newResourceRecord() *BaseRecord {
-	return &BaseRecord{
+func newResourceRecord() *record {
+	return &record{
 		reader:          nil,
 		name:            "",
 		unicastResponse: false,
@@ -49,7 +49,7 @@ func newResourceRecord() *BaseRecord {
 }
 
 // newRecordWithReader returns a new base record instance with the specified reader.
-func newRecordWithReader(reader *Reader) *BaseRecord {
+func newRecordWithReader(reader *Reader) *record {
 	r := newResourceRecord()
 	r.reader = reader
 	return r
@@ -61,7 +61,7 @@ func newResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
 }
 
 // newRequestRecordWithReader returns a new request resource record instance with the specified reader.
-func newRequestRecordWithReader(reader *Reader) (*BaseRecord, error) {
+func newRequestRecordWithReader(reader *Reader) (*record, error) {
 	r := newRecordWithReader(reader)
 	return r, r.ParseRequest(reader)
 }
@@ -90,7 +90,7 @@ func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) 
 }
 
 // newResponseRecordWithReader returns a new response resource record instance with the specified reader.
-func newResponseRecordWithReader(reader *Reader) (*BaseRecord, error) {
+func newResponseRecordWithReader(reader *Reader) (*record, error) {
 	r := newRecordWithReader(reader)
 	return r, r.ParseResponse(reader)
 }
@@ -119,7 +119,7 @@ func newResponseResourceRecordWithReader(reader *Reader) (ResourceRecord, error)
 }
 
 // Reader returns a record reader.
-func (r *BaseRecord) Reader() (*Reader, error) {
+func (r *record) Reader() (*Reader, error) {
 	if r.reader == nil {
 		return nil, ErrNilReader
 	}
@@ -127,73 +127,73 @@ func (r *BaseRecord) Reader() (*Reader, error) {
 }
 
 // SetName sets the specified name.
-func (r *BaseRecord) SetName(name string) Record {
+func (r *record) SetName(name string) Record {
 	r.name = name
 	return r
 }
 
 // SetUnicastResponse sets the specified unicast response flag.
-func (r *BaseRecord) SetUnicastResponse(enabled bool) Record {
+func (r *record) SetUnicastResponse(enabled bool) Record {
 	r.unicastResponse = enabled
 	return r
 }
 
 // SetType sets the specified resource record type.
-func (r *BaseRecord) SetType(typ Type) Record {
+func (r *record) SetType(typ Type) Record {
 	r.typ = typ
 	return r
 }
 
 // SetClass sets the specified resource record class.
-func (r *BaseRecord) SetClass(cls Class) Record {
+func (r *record) SetClass(cls Class) Record {
 	r.class = cls
 	return r
 }
 
 // SetTTL returns the specified TTL second.
-func (r *BaseRecord) SetTTL(ttl uint) Record {
+func (r *record) SetTTL(ttl uint) Record {
 	r.ttl = ttl
 	return r
 }
 
 // SetData returns the specified record data.
-func (r *BaseRecord) SetData(b []byte) Record {
+func (r *record) SetData(b []byte) Record {
 	r.data = b
 	return r
 }
 
 // Name returns the resource record name.
-func (r *BaseRecord) Name() string {
+func (r *record) Name() string {
 	return r.name
 }
 
 // Type returns the resource record type.
-func (r *BaseRecord) Type() Type {
+func (r *record) Type() Type {
 	return r.typ
 }
 
 // UnicastResponse returns the unicast response flag.
-func (r *BaseRecord) UnicastResponse() bool {
+func (r *record) UnicastResponse() bool {
 	return r.unicastResponse
 }
 
 // Class returns the resource record class.
-func (r *BaseRecord) Class() Class {
+func (r *record) Class() Class {
 	return r.class
 }
 
 // TTL returns the TTL second.
-func (r *BaseRecord) TTL() uint {
+func (r *record) TTL() uint {
 	return r.ttl
 }
 
 // Data returns the record data.
-func (r *BaseRecord) Data() []byte {
+func (r *record) Data() []byte {
 	return r.data
 }
 
 // Content returns a string representation to the record data.
-func (r *BaseRecord) Content() string {
+func (r *record) Content() string {
 	c := ""
 	for n := 0; n < len(r.data); n++ {
 		rb := rune(r.data[n])
@@ -206,7 +206,7 @@ func (r *BaseRecord) Content() string {
 	return c
 }
 
-func (r *BaseRecord) parseResouce(reader *Reader) error {
+func (r *record) parseResouce(reader *Reader) error {
 	var err error
 
 	// Parses domain names
@@ -240,12 +240,12 @@ func (r *BaseRecord) parseResouce(reader *Reader) error {
 }
 
 // ParseRequest parses a request record from the specified reader.
-func (r *BaseRecord) ParseRequest(reader *Reader) error {
+func (r *record) ParseRequest(reader *Reader) error {
 	return r.parseResouce(reader)
 }
 
 // ParseResponse parses a response record from the specified reader.
-func (r *BaseRecord) ParseResponse(reader *Reader) error {
+func (r *record) ParseResponse(reader *Reader) error {
 	var err error
 
 	err = r.parseResouce(reader)
@@ -283,7 +283,7 @@ func (r *BaseRecord) ParseResponse(reader *Reader) error {
 }
 
 // RequestBytes returns only the binary representation of the request fields.
-func (r *BaseRecord) RequestBytes() []byte {
+func (r *record) RequestBytes() []byte {
 	bytes := nameToBytes(r.name)
 
 	typeBytes := make([]byte, 2)
@@ -301,7 +301,7 @@ func (r *BaseRecord) RequestBytes() []byte {
 }
 
 // ResponseBytes returns only the binary representation of the all fields.
-func (r *BaseRecord) ResponseBytes() []byte {
+func (r *record) ResponseBytes() []byte {
 	bytes := r.RequestBytes()
 
 	ttlBytes := make([]byte, 4)
@@ -315,11 +315,11 @@ func (r *BaseRecord) ResponseBytes() []byte {
 }
 
 // Bytes returns the binary representation.
-func (r *BaseRecord) Bytes() []byte {
+func (r *record) Bytes() []byte {
 	return r.ResponseBytes()
 }
 
 // Equal returns true if this record is equal to  the specified resource record. otherwise false.
-func (r *BaseRecord) Equal(other ResourceRecord) bool {
+func (r *record) Equal(other ResourceRecord) bool {
 	return bytes.Equal(r.Bytes(), other.Bytes())
 }

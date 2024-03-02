@@ -16,7 +16,7 @@ package protocol
 
 // Question represents a question.
 type Question struct {
-	*BaseRecord
+	*record
 }
 
 // Questions represents a question array.
@@ -25,14 +25,14 @@ type Questions []*Question
 // NewQuestion returns a new question instance.
 func NewQuestion() *Question {
 	return &Question{
-		BaseRecord: newResourceRecord(),
+		record: newResourceRecord(),
 	}
 }
 
 // NewQuestionWithRecord returns a new question instance with the specified record.
-func NewQuestionWithRecord(record *BaseRecord) *Question {
+func NewQuestionWithRecord(record *record) *Question {
 	return &Question{
-		BaseRecord: record,
+		record: record,
 	}
 }
 

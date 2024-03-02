@@ -18,22 +18,22 @@ import "bytes"
 
 // PTRRecord represents a PTR record.
 type PTRRecord struct {
-	*BaseRecord
+	*record
 	domainName string
 }
 
 // NewPTRRecord returns a new PTR record instance.
 func NewPTRRecord() *PTRRecord {
 	return &PTRRecord{
-		BaseRecord: newResourceRecord(),
+		record:     newResourceRecord(),
 		domainName: "",
 	}
 }
 
 // newPTRRecordWithResourceRecord returns a new PTR record instance.
-func newPTRRecordWithResourceRecord(res *BaseRecord) (*PTRRecord, error) {
+func newPTRRecordWithResourceRecord(res *record) (*PTRRecord, error) {
 	ptr := &PTRRecord{
-		BaseRecord: res,
+		record:     res,
 		domainName: "",
 	}
 	return ptr, ptr.parseResourceRecord()
