@@ -90,5 +90,6 @@ func main() {
 
 	for n, srv := range client.Services() {
 		fmt.Printf("[%d] %s\n", n, srv.String())
+		fmt.Printf("%s", srv.Records().String())
 	}
 }
