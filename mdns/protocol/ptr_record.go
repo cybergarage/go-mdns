@@ -41,7 +41,9 @@ func newPTRRecordWithResourceRecord(res *Record) (*PTRRecord, error) {
 
 func (ptr *PTRRecord) parseResourceRecord() error {
 	var err error
-	ptr.domainName, err = NewReaderWithReader(bytes.NewReader(ptr.data)).ReadNameWith(ptr.reader.CompressionReader())
+	reader := NewReaderWithReader(bytes.NewReader(ptr.data))
+	reader.SetCompressionReader(ptr.reader.CompressionReader())
+	ptr.domainName, err = reader.ReadName()
 	return err
 }
 

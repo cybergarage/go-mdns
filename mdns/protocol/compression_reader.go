@@ -21,12 +21,14 @@ import (
 
 // CompressionReader represents a read bytes reader.
 type CompressionReader struct {
+	bytes []byte
 	*bytes.Buffer
 }
 
 // NewCompressionReaderWithBytes returns a new reader instance with the specified bytes.
 func NewCompressionReaderWithBytes(b []byte) *CompressionReader {
 	reader := &CompressionReader{
+		bytes:  b,
 		Buffer: bytes.NewBuffer(b),
 	}
 	return reader
@@ -47,4 +49,9 @@ func (reader *CompressionReader) Skip(n int) error {
 		return io.EOF
 	}
 	return nil
+}
+
+// Bytes returns the read bytes.
+func (reader *CompressionReader) Bytes() []byte {
+	return reader.bytes
 }
