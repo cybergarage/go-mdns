@@ -52,3 +52,8 @@ func (a *AAAARecord) Address() net.IP {
 	}
 	return net.ParseIP(ipstr)
 }
+
+// Content returns a string representation to the record data.
+func (a *AAAARecord) Content() string {
+	return a.Address().String()
+}
