@@ -24,6 +24,7 @@ import (
 
 // Service represents a SRV record.
 type Service struct {
+	*Message
 	Name   string
 	Domain string
 	Host   string
@@ -36,6 +37,7 @@ type Service struct {
 // NewService returns a new service instance.
 func NewService(name, domain string, port uint) *Service {
 	return &Service{
+		Message:    nil,
 		Name:       name,
 		Domain:     domain,
 		Host:       "",
@@ -49,12 +51,17 @@ func NewService(name, domain string, port uint) *Service {
 // NewServiceWithMessage returns a new service instance.
 func NewServiceWithMessage(msg *Message) (*Service, error) {
 	srv := NewService("", "", 0)
-	srv.Update(msg)
+	err := srv.Update(msg)
+	if err != nil {
+		return nil, err
+	}
 	return srv, nil
 }
 
 // Update updates the service data by the specified message.
-func (srv *Service) Update(msg *Message) {
+func (srv *Service) Update(msg *Message) error {
+	srv.Message = msg
+
 	for _, record := range msg.ResourceRecords() {
 		switch rr := record.(type) {
 		case *dns.PTRRecord:
@@ -82,6 +89,8 @@ func (srv *Service) Update(msg *Message) {
 			}
 		}
 	}
+
+	return nil
 }
 
 // Equal returns true if the header is same as the specified header, otherwise false.
