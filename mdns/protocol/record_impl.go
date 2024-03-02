@@ -127,37 +127,37 @@ func (r *record) Reader() (*Reader, error) {
 }
 
 // SetName sets the specified name.
-func (r *record) SetName(name string) *record {
+func (r *record) SetName(name string) Record {
 	r.name = name
 	return r
 }
 
 // SetUnicastResponse sets the specified unicast response flag.
-func (r *record) SetUnicastResponse(enabled bool) *record {
+func (r *record) SetUnicastResponse(enabled bool) Record {
 	r.unicastResponse = enabled
 	return r
 }
 
 // SetType sets the specified resource record type.
-func (r *record) SetType(typ Type) *record {
+func (r *record) SetType(typ Type) Record {
 	r.typ = typ
 	return r
 }
 
 // SetClass sets the specified resource record class.
-func (r *record) SetClass(cls Class) *record {
+func (r *record) SetClass(cls Class) Record {
 	r.class = cls
 	return r
 }
 
 // SetTTL returns the specified TTL second.
-func (r *record) SetTTL(ttl uint) *record {
+func (r *record) SetTTL(ttl uint) Record {
 	r.ttl = ttl
 	return r
 }
 
-// SetData returns the specified resource record data.
-func (r *record) SetData(b []byte) *record {
+// SetData returns the specified record data.
+func (r *record) SetData(b []byte) Record {
 	r.data = b
 	return r
 }
@@ -187,12 +187,12 @@ func (r *record) TTL() uint {
 	return r.ttl
 }
 
-// Data returns the resource record data.
+// Data returns the record data.
 func (r *record) Data() []byte {
 	return r.data
 }
 
-// Data returns the resource record data.
+// Content returns a string representation to the record data.
 func (r *record) Content() string {
 	c := ""
 	for n := 0; n < len(r.data); n++ {
