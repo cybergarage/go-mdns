@@ -102,7 +102,7 @@ func (msg *Message) Parse(reader *Reader) error {
 	}
 	// Parses questions.
 	for n := 0; n < int(msg.QD()); n++ {
-		var r *record
+		var r *BaseRecord
 		if msg.IsQuery() {
 			r, err = newRequestRecordWithReader(reader)
 		} else {
@@ -172,6 +172,15 @@ func (msg *Message) Copy() *Message {
 		NameServers: msg.NameServers,
 		Additions:   msg.Additions,
 	}
+}
+
+// ResourceRecords returns all resource records.
+func (msg *Message) Records() Records {
+	records := Records{}
+	for _, q := range msg.Questions {
+		records = append(records, q)
+	}
+	return records
 }
 
 // ResourceRecords returns all resource records.
