@@ -65,3 +65,8 @@ func (txt *TXTRecord) LookupAttribute(name string) (*Attribute, bool) {
 func (txt *TXTRecord) HasAttribute(name string) bool {
 	return txt.attrs.HasAttribute(name)
 }
+
+// Content returns a string representation to the record data.
+func (txt *TXTRecord) Content() string {
+	return txt.attrs.String()
+}
