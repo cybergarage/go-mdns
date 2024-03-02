@@ -17,6 +17,7 @@ package main
 import (
 	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 type Client struct {
