@@ -16,18 +16,32 @@ package protocol
 
 // Record represents a record interface.
 type Record interface {
+	// SetName sets the resource record name.
+	SetName(name string) Record
 	// Name returns the resource record name.
 	Name() string
+	// SetType sets the resource record type.
+	SetType(t Type) Record
 	// Type returns the resource record type.
 	Type() Type
+	// SetClass sets the resource record class.
+	SetClass(c Class) Record
 	// Class returns the resource record class.
 	Class() Class
-	// UnicastResponse returns the unicast response flag.
-	UnicastResponse() bool
+	// SetTTL sets the TTL second.
+	SetTTL(ttl uint) Record
 	// TTL returns the TTL second.
 	TTL() uint
-	// Data returns the resource record data.
+	// SetUnicastResponse sets the unicast response flag.
+	SetUnicastResponse(flag bool) Record
+	// UnicastResponse returns the unicast response flag.
+	UnicastResponse() bool
+	// SetData sets the  record data.
+	SetData(data []byte) Record
+	// Data returns the record data.
 	Data() []byte
+	// Content returns a string representation to the record data.
+	Content() string
 	// Bytes returns the binary representation.
 	Bytes() []byte
 }
