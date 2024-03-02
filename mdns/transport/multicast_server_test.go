@@ -20,12 +20,12 @@ import (
 	"time"
 
 	"github.com/cybergarage/go-logger/log"
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 type testMulticastServer struct {
 	*MulticastServer
-	lastMessage *protocol.Message
+	lastMessage *dns.Message
 }
 
 // NewMessageManager returns a new message manager.
@@ -38,7 +38,7 @@ func newTestMulticastServer() *testMulticastServer {
 	return server
 }
 
-func (server *testMulticastServer) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+func (server *testMulticastServer) MessageReceived(msg *dns.Message) (*dns.Message, error) {
 	if isTestMessage(msg) {
 		server.lastMessage = msg.Copy()
 	}

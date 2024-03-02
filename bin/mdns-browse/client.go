@@ -17,7 +17,6 @@ package main
 import (
 	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns"
-	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 type Client struct {
@@ -30,6 +29,6 @@ func NewClient() *Client {
 	}
 	return client
 }
-func (client *Client) MessageReceived(msg *protocol.Message) {
+func (client *Client) MessageReceived(msg *dns.Message) {
 	log.HexInfo(msg.Bytes())
 }

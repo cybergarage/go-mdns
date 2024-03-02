@@ -17,7 +17,7 @@ package mdns
 import (
 	"sync"
 
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 	"github.com/cybergarage/go-mdns/mdns/transport"
 )
 
@@ -73,7 +73,7 @@ func (client *Client) Query(q []*Query) error {
 	return client.AnnounceMessage(msg)
 }
 
-func (client *Client) MessageReceived(msg *protocol.Message) (*protocol.Message, error) {
+func (client *Client) MessageReceived(msg *dns.Message) (*dns.Message, error) {
 	client.Lock()
 	defer client.Unlock()
 

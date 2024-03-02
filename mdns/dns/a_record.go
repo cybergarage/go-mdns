@@ -12,12 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-import (
-	"testing"
-)
+import "net"
 
-func TestNewMessage(t *testing.T) {
-	NewRequestMessage()
+// ARecord represents a A record.
+type ARecord struct {
+	*record
+}
+
+// NewARecord returns a new A record instance.
+func NewARecord(res *record) *ARecord {
+	return &ARecord{
+		record: newResourceRecord(),
+	}
+}
+
+// newARecordWithResourceRecord returns a new A record instance.
+func newARecordWithResourceRecord(res *record) *ARecord {
+	return &ARecord{
+		record: res,
+	}
+}
+
+// Address returns the resource ip address.
+func (a *ARecord) Address() net.IP {
+	if len(a.data) < 4 {
+		return nil
+	}
+	return net.IPv4(a.data[0], a.data[1], a.data[2], a.data[3])
 }

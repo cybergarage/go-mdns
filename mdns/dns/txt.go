@@ -12,28 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-import (
-	"strings"
-)
-
-const (
-	nameSep               = "."
-	nameIsCompressionMask = uint8(0xC0)
-	nameLenMask           = uint8(0x3F)
-)
-
-func nameToBytes(name string) []byte {
+func txtToBytes(attrs []string) []byte {
 	bytes := []byte{}
-	tokens := strings.Split(name, nameSep)
-	for _, token := range tokens {
-		if len(token) == 0 {
-			continue
-		}
-		nameLen := byte(len(token) & 0xFF)
-		bytes = append(bytes, nameLen)
-		bytes = append(bytes, []byte(token)...)
+	for _, attr := range attrs {
+		attrLen := byte(len(attr) & 0xFF)
+		bytes = append(bytes, attrLen)
+		bytes = append(bytes, []byte(attr)...)
 	}
 	bytes = append(bytes, 0x00)
 	return bytes

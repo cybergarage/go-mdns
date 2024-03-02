@@ -12,13 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-import (
-	"errors"
-	"fmt"
-)
+type Attributes []*Attribute
 
-var ErrNil = errors.New("nil")
-var ErrInvalid = errors.New("invalid")
-var ErrNilReader = fmt.Errorf("reader is %w", ErrNil)
+// NewAttributes returns a new attributes instance.
+func NewAttributes() Attributes {
+	return Attributes{}
+}
+
+// LookupAttribute returns the attribute with the specified name.
+func (attrs Attributes) LookupAttribute(name string) (*Attribute, bool) {
+	for _, attr := range attrs {
+		if attr.Name() == name {
+			return attr, true
+		}
+	}
+	return nil, false
+}
+
+// HasAttribute returns true if this instance has the specified attribute.
+func (attrs Attributes) HasAttribute(name string) bool {
+	_, ok := attrs.LookupAttribute(name)
+	return ok
+}

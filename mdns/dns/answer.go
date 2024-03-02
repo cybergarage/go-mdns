@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
 // Answer represents an answer resource record.
 type Answer = ResourceRecord

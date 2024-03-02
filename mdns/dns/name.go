@@ -12,10 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-// NameServer represents an authoritative nameserver resource record.
-type NameServer = ResourceRecord
+import (
+	"strings"
+)
 
-// NameServers represents an authoritative nameserver resource record array.
-type NameServers = ResourceRecords
+const (
+	nameSep               = "."
+	nameIsCompressionMask = uint8(0xC0)
+	nameLenMask           = uint8(0x3F)
+)
+
+func nameToBytes(name string) []byte {
+	bytes := []byte{}
+	tokens := strings.Split(name, nameSep)
+	for _, token := range tokens {
+		if len(token) == 0 {
+			continue
+		}
+		nameLen := byte(len(token) & 0xFF)
+		bytes = append(bytes, nameLen)
+		bytes = append(bytes, []byte(token)...)
+	}
+	bytes = append(bytes, 0x00)
+	return bytes
+}

@@ -21,7 +21,7 @@ import (
 
 	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns"
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 //go:embed log/service01.log
@@ -107,7 +107,7 @@ func TestResponseMessage(t *testing.T) {
 				return
 			}
 
-			msg, err := protocol.NewMessageWithBytes(msgBytes)
+			msg, err := dns.NewMessageWithBytes(msgBytes)
 			if err != nil {
 				t.Error(err)
 				return

@@ -12,27 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-type Attributes []*Attribute
+// Addition represents an additional resource record.
+type Addition = ResourceRecord
 
-// NewAttributes returns a new attributes instance.
-func NewAttributes() Attributes {
-	return Attributes{}
-}
-
-// LookupAttribute returns the attribute with the specified name.
-func (attrs Attributes) LookupAttribute(name string) (*Attribute, bool) {
-	for _, attr := range attrs {
-		if attr.Name() == name {
-			return attr, true
-		}
-	}
-	return nil, false
-}
-
-// HasAttribute returns true if this instance has the specified attribute.
-func (attrs Attributes) HasAttribute(name string) bool {
-	_, ok := attrs.LookupAttribute(name)
-	return ok
-}
+// Additions represents an additional resource record array.
+type Additions = ResourceRecords

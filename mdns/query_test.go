@@ -19,7 +19,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // nolint: gocyclo
@@ -37,7 +37,7 @@ func TestQuery(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			qmsg := NewRequestWithQuery(test.query)
 			qmsgBytes := qmsg.Bytes()
-			msg, err := protocol.NewMessageWithBytes(qmsgBytes)
+			msg, err := dns.NewMessageWithBytes(qmsgBytes)
 			if err != nil {
 				t.Error(err)
 				return

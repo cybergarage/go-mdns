@@ -12,33 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package protocol
+package dns
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
 
-// ARecord represents a A record.
-type ARecord struct {
+// AAAARecord represents a AAAA record.
+type AAAARecord struct {
 	*record
 }
 
-// NewARecord returns a new A record instance.
-func NewARecord(res *record) *ARecord {
-	return &ARecord{
+// NewAAAARecord returns a new AAAA record instance.
+func NewAAAARecord() *AAAARecord {
+	return &AAAARecord{
 		record: newResourceRecord(),
 	}
 }
 
-// newARecordWithResourceRecord returns a new A record instance.
-func newARecordWithResourceRecord(res *record) *ARecord {
-	return &ARecord{
+// newAAAARecordWithResourceRecord returns a new AAAA record instance.
+func newAAAARecordWithResourceRecord(res *record) *AAAARecord {
+	return &AAAARecord{
 		record: res,
 	}
 }
 
 // Address returns the resource ip address.
-func (a *ARecord) Address() net.IP {
-	if len(a.data) < 4 {
+func (a *AAAARecord) Address() net.IP {
+	if len(a.data) != 16 {
 		return nil
 	}
-	return net.IPv4(a.data[0], a.data[1], a.data[2], a.data[3])
+	ipstr := ""
+	for n, b := range a.data {
+		if (n != 0) && ((n % 2) == 0) {
+			ipstr += ":"
+		}
+		ipstr += fmt.Sprintf("%02x", b)
+	}
+	return net.ParseIP(ipstr)
 }

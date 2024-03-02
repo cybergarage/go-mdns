@@ -16,7 +16,6 @@ package main
 
 import (
 	"github.com/cybergarage/go-mdns/mdns"
-	"github.com/cybergarage/go-mdns/mdns/protocol"
 )
 
 type Server struct {
@@ -29,5 +28,5 @@ func NewServer() *Server {
 	}
 	return server
 }
-func (server *Server) MessageReceived(msg *protocol.Message) {
+func (server *Server) MessageReceived(msg *dns.Message) {
 }

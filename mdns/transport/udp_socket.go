@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/cybergarage/go-logger/log"
-	"github.com/cybergarage/go-mdns/mdns/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // A UDPSocket represents a socket for UDP.
@@ -78,7 +78,7 @@ func (sock *UDPSocket) Close() error {
 }
 
 // SendMessage sends the message to the destination address.
-func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg *protocol.Message) (int, error) {
+func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg *dns.Message) (int, error) {
 	toUDPAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 	if err != nil {
 		return 0, err
@@ -96,7 +96,7 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg *protocol.Mess
 }
 
 // ReadMessage reads a message from the current opened socket.
-func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
+func (sock *UDPSocket) ReadMessage() (*dns.Message, error) {
 	if sock.Conn == nil {
 		return nil, fmt.Errorf("%w: %s", io.EOF, errorSocketClosed)
 	}
@@ -112,7 +112,7 @@ func (sock *UDPSocket) ReadMessage() (*protocol.Message, error) {
 
 	log.Debugf("RECV %s -> %s", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 
-	msg, err := protocol.NewMessageWithBytes(sock.ReadBuffer[:n])
+	msg, err := dns.NewMessageWithBytes(sock.ReadBuffer[:n])
 	if err != nil {
 		log.Error(err)
 		log.HexError(sock.ReadBuffer[:n])
