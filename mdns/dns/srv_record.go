@@ -14,6 +14,8 @@
 
 package dns
 
+import "fmt"
+
 // SRVRecord represents a SRV record.
 // RFC 2782: A DNS RR for specifying the location of services (DNS SRV).
 // https://www.rfc-editor.org/rfc/rfc2782
@@ -118,4 +120,9 @@ func (srv *SRVRecord) Port() uint {
 // Target returns the resource target.
 func (srv *SRVRecord) Target() string {
 	return srv.target
+}
+
+// Content returns a string representation to the record data.
+func (srv *SRVRecord) Content() string {
+	return fmt.Sprintf("%d %d %d %s", srv.priority, srv.weight, srv.port, srv.target)
 }
