@@ -14,6 +14,8 @@
 
 package dns
 
+import "fmt"
+
 // Type represents a message type.
 type Type uint
 
@@ -60,5 +62,5 @@ func (t Type) String() string {
 	case ANY:
 		return "ANY"
 	}
-	return ""
+	return fmt.Sprintf("%04X(%d)", uint16(t), uint16(t))
 }
