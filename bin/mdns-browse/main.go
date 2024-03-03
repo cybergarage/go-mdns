@@ -84,7 +84,7 @@ func main() {
 
 	// Wait node responses in the local network
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 5)
 
 	// Output all found nodes
 
