@@ -113,6 +113,8 @@ func TestResponseMessage(t *testing.T) {
 				return
 			}
 
+			t.Log("\n" + msg.String())
+
 			srv, err := mdns.NewServiceWithMessage(msg)
 			if err != nil {
 				t.Error(err)
@@ -134,8 +136,6 @@ func TestResponseMessage(t *testing.T) {
 					t.Errorf("attribute (%s) value (%s) != (%s)", name, attr.Value(), value)
 				}
 			}
-
-			t.Log(msg.String())
 		})
 	}
 }
