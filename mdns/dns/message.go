@@ -215,6 +215,11 @@ func (msg *Message) HasResourceRecord(name string) bool {
 	return ok
 }
 
+// String returns the string representation.
+func (msg *Message) String() string {
+	return msg.Records().String()
+}
+
 // Bytes returns the binary representation.
 func (msg *Message) Bytes() []byte {
 	bytes := msg.Header.Bytes()
