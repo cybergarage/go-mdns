@@ -88,11 +88,7 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg *dns.Message) 
 	fromPort, _ := sock.GetBoundPort()
 	log.Debugf("SEND %s -> %s", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 
-	n, err := sock.Conn.WriteToUDP(msg.Bytes(), toUDPAddr)
-	if err != nil {
-		log.Error(err)
-	}
-	return n, err
+	return sock.Conn.WriteToUDP(msg.Bytes(), toUDPAddr)
 }
 
 // ReadMessage reads a message from the current opened socket.
@@ -103,7 +99,6 @@ func (sock *UDPSocket) ReadMessage() (*dns.Message, error) {
 
 	n, fromAddr, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)
 	if err != nil {
-		log.Error(err)
 		return nil, err
 	}
 
