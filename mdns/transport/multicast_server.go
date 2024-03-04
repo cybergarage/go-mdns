@@ -86,10 +86,10 @@ func handleMulticastConnection(server *MulticastServer, cancel chan interface{})
 		default:
 			msg, err := server.MulticastSocket.ReadMessage()
 			if err != nil {
-				if !errors.Is(err, io.EOF) {
-					log.Error(err)
+				if errors.Is(err, net.ErrClosed) || errors.Is(err, io.EOF) {
+					return
 				}
-				return
+				log.Error(err)
 			}
 			go handleMulticastRequestMessage(server, msg)
 		}
