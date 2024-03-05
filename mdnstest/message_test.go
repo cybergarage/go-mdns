@@ -58,40 +58,40 @@ func TestResponseMessage(t *testing.T) {
 		answers    []answer
 		attributes map[string]string
 	}{
+		{
+			"service01",
+			service01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
+			},
+			map[string]string{},
+		},
 		/*
 			{
-				"service01",
-				service01,
+				"matter01",
+				matter01,
 				[]answer{
 					{"_services._dns-sd._udp.local"},
 				},
 				map[string]string{},
 			},
-				{
-					"matter01",
-					matter01,
-					[]answer{
-						{"_services._dns-sd._udp.local"},
-					},
-					map[string]string{},
+			{
+				"matter02",
+				matter02,
+				[]answer{
+					{"_services._dns-sd._udp.local"},
 				},
-				{
-					"matter02",
-					matter02,
-					[]answer{
-						{"_services._dns-sd._udp.local"},
-					},
-					map[string]string{},
-				},
-				{
-					"googlecast01",
-					googlecast01,
-					[]answer{
-						{"_services._dns-sd._udp.local"},
-					},
-					map[string]string{},
-				},
+				map[string]string{},
+			},
 		*/
+		{
+			"googlecast01",
+			googlecast01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
+			},
+			map[string]string{},
+		},
 		{
 			"googlecast02",
 			googlecast02,
@@ -106,7 +106,9 @@ func TestResponseMessage(t *testing.T) {
 			[]answer{
 				{"_googlezone._tcp.local"},
 			},
-			map[string]string{},
+			map[string]string{
+				"id": "4E50AF186C368EE8A98A648BE272AAD5",
+			},
 		},
 		{
 			"matter 120 4.3.1.13",
