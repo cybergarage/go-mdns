@@ -31,7 +31,7 @@ func NewAttributesFromStrings(strs []string) (Attributes, error) {
 	for _, str := range strs {
 		attr, err := NewAttributeFromString(str)
 		if err != nil {
-			return nil, err
+			continue
 		}
 		attrs = append(attrs, attr)
 	}
