@@ -160,7 +160,7 @@ func (reader *Reader) ReadAttributes() ([]*Attribute, error) {
 			break
 		}
 		var attr *Attribute
-		attr, err = NewAttributeWithString(str)
+		attr, err = NewAttributeFromString(str)
 		if err != nil {
 			return nil, err
 		}
