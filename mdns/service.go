@@ -77,7 +77,7 @@ func (srv *Service) Update(msg *Message) error {
 			}
 		case *dns.TXTRecord:
 			attrs, err := rr.Attributes()
-			if err != nil {
+			if err == nil {
 				srv.Attributes = append(srv.Attributes, attrs...)
 			}
 		case *dns.ARecord:
