@@ -25,6 +25,19 @@ func NewAttributes() Attributes {
 	return Attributes{}
 }
 
+// NewAttributesFromStrings returns a new attributes instance from the specified strings.
+func NewAttributesFromStrings(strs []string) (Attributes, error) {
+	attrs := NewAttributes()
+	for _, str := range strs {
+		attr, err := NewAttributeFromString(str)
+		if err != nil {
+			return nil, err
+		}
+		attrs = append(attrs, attr)
+	}
+	return attrs, nil
+}
+
 // LookupAttribute returns the attribute with the specified name.
 func (attrs Attributes) LookupAttribute(name string) (*Attribute, bool) {
 	for _, attr := range attrs {
