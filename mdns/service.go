@@ -76,7 +76,10 @@ func (srv *Service) Update(msg *Message) error {
 				srv.Port = port
 			}
 		case *dns.TXTRecord:
-			srv.Attributes = append(srv.Attributes, rr.Attributes()...)
+			attrs, err := rr.Attributes()
+			if err != nil {
+				srv.Attributes = append(srv.Attributes, attrs...)
+			}
 		case *dns.ARecord:
 			ip := rr.Address()
 			if ip != nil {
