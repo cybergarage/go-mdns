@@ -153,6 +153,7 @@ func TestResponseMessage(t *testing.T) {
 				attr, ok := srv.LookupAttribute(name)
 				if !ok {
 					t.Errorf("attribute (%s) not found", name)
+					continue
 				}
 				if attr.Value() != value {
 					t.Errorf("attribute (%s) value (%s) != (%s)", name, attr.Value(), value)
