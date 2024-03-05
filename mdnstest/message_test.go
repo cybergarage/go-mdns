@@ -104,7 +104,7 @@ func TestResponseMessage(t *testing.T) {
 			"googlecast03",
 			googlecast03,
 			[]answer{
-				{"_googlecast._tcp.local"},
+				{"_googlezone._tcp.local"},
 			},
 			map[string]string{},
 		},
