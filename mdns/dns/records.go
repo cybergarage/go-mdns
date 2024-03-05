@@ -46,7 +46,7 @@ func (records Records) String() string {
 	}
 
 	str := ""
-	for _, r := range lines {
+	for n, r := range lines {
 		for n, s := range r {
 			sfmt := "%-" + strconv.Itoa(maxRecordLen[n]) + "s"
 			str += fmt.Sprintf(sfmt, s)
@@ -54,7 +54,9 @@ func (records Records) String() string {
 				str += " "
 			}
 		}
-		str += "\n"
+		if n < len(lines)-1 {
+			str += "\n"
+		}
 	}
 
 	return str
