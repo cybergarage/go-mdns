@@ -97,6 +97,7 @@ func (reader *Reader) ReadName() (string, error) {
 	nextNameLen, err := reader.ReadUint8()
 	for err == nil {
 		if nameLenIsCompressed(nextNameLen) {
+			// RFC1035: 4.1.4. Message compression
 			remainNameOffset, err := reader.ReadUint8()
 			if err != nil {
 				return "", err
