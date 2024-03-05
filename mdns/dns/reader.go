@@ -16,6 +16,7 @@ package dns
 
 import (
 	"bytes"
+	"errors"
 	"io"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
@@ -85,6 +86,23 @@ func (reader *Reader) ReadString() (string, error) {
 		return "", err
 	}
 	return string(strBytes), nil
+}
+
+// ReadStrings returns strings from the reader.
+func (reader *Reader) ReadStrings() ([]string, error) {
+	strs := make([]string, 0)
+	str, err := reader.ReadString()
+	for err == nil {
+		if len(str) == 0 {
+			break
+		}
+		strs = append(strs, str)
+		str, err = reader.ReadString()
+	}
+	if !errors.Is(err, io.EOF) {
+		return nil, err
+	}
+	return strs, nil
 }
 
 // ReadName returns a name from the reader with the read reader.
