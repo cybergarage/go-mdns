@@ -99,7 +99,7 @@ func (reader *Reader) ReadStrings() ([]string, error) {
 		strs = append(strs, str)
 		str, err = reader.ReadString()
 	}
-	if !errors.Is(err, io.EOF) {
+	if err != nil && !errors.Is(err, io.EOF) {
 		return nil, err
 	}
 	return strs, nil
