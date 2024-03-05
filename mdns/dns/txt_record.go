@@ -58,18 +58,26 @@ func (txt *TXTRecord) Strings() []string {
 }
 
 // Attributes returns the resource attribute strings.
-func (txt *TXTRecord) Attributes() Attributes {
-	return txt.attrs
+func (txt *TXTRecord) Attributes() (Attributes, error) {
+	return NewAttributesFromStrings(txt.strs)
 }
 
 // LookupAttribute returns the attribute with the specified name.
 func (txt *TXTRecord) LookupAttribute(name string) (*Attribute, bool) {
-	return txt.attrs.LookupAttribute(name)
+	attrs, err := txt.Attributes()
+	if err != nil {
+		return nil, false
+	}
+	return attrs.LookupAttribute(name)
 }
 
 // HasAttribute returns true if this instance has the specified attribute.
 func (txt *TXTRecord) HasAttribute(name string) bool {
-	return txt.attrs.HasAttribute(name)
+	attrs, err := txt.Attributes()
+	if err != nil {
+		return false
+	}
+	return attrs.HasAttribute(name)
 }
 
 // Content returns a string representation to the record data.

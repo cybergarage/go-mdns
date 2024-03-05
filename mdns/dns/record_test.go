@@ -139,7 +139,11 @@ func TestResourceRecord(t *testing.T) {
 				if txt.TTL() != test.expectedTTL {
 					t.Errorf("TTL: %d != %d", txt.TTL(), test.expectedTTL)
 				}
-				attrs := txt.Attributes()
+				attrs, err := txt.Attributes()
+				if err != nil {
+					t.Error(err)
+					return
+				}
 				if len(attrs) != len(test.expectedAttrs) {
 					t.Errorf("Attrs: %d != %d", len(attrs), len(test.expectedAttrs))
 					return
