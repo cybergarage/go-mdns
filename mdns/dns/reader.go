@@ -151,25 +151,6 @@ func (reader *Reader) ReadName() (string, error) {
 	return name, nil
 }
 
-// ReadAttributes returns attributes from the reader.
-func (reader *Reader) ReadAttributes() ([]*Attribute, error) {
-	attrs := make([]*Attribute, 0)
-	str, err := reader.ReadString()
-	for err == nil {
-		if len(str) == 0 {
-			break
-		}
-		var attr *Attribute
-		attr, err = NewAttributeFromString(str)
-		if err != nil {
-			return nil, err
-		}
-		attrs = append(attrs, attr)
-		str, err = reader.ReadString()
-	}
-	return attrs, nil
-}
-
 // SetCompressionReader sets a read reader instance.
 func (reader *Reader) SetCompressionReader(cmpReader *CompressionReader) *Reader {
 	reader.rootCmpReader = cmpReader
