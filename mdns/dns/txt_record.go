@@ -16,19 +16,20 @@ package dns
 
 import (
 	"bytes"
+	"strings"
 )
 
 // TXTRecord represents a TXT record.
 type TXTRecord struct {
 	*record
-	attrs Attributes
+	strs []string
 }
 
 // NewTXTRecord returns a new TXT record instance.
 func NewTXTRecord() *TXTRecord {
 	return &TXTRecord{
 		record: newResourceRecord(),
-		attrs:  Attributes{},
+		strs:   []string{},
 	}
 }
 
@@ -36,7 +37,7 @@ func NewTXTRecord() *TXTRecord {
 func newTXTRecordWithResourceRecord(res *record) (*TXTRecord, error) {
 	txt := &TXTRecord{
 		record: res,
-		attrs:  Attributes{},
+		strs:   []string{},
 	}
 	return txt, txt.parseResourceRecord()
 }
@@ -47,8 +48,13 @@ func (txt *TXTRecord) parseResourceRecord() error {
 		return nil
 	}
 	reader := NewReaderWithReader(bytes.NewReader(txt.data))
-	txt.attrs, err = reader.ReadAttributes()
+	txt.strs, err = reader.ReadStrings()
 	return err
+}
+
+// Strings returns the resource attribute strings.
+func (txt *TXTRecord) Strings() []string {
+	return txt.strs
 }
 
 // Attributes returns the resource attribute strings.
@@ -68,5 +74,5 @@ func (txt *TXTRecord) HasAttribute(name string) bool {
 
 // Content returns a string representation to the record data.
 func (txt *TXTRecord) Content() string {
-	return txt.attrs.String()
+	return strings.Join(txt.strs, " ")
 }
