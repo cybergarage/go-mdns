@@ -36,8 +36,8 @@ func NewAttribute() *Attribute {
 	}
 }
 
-// NewAttributeWithString returns a new attribute instance with the specified string.
-func NewAttributeWithString(str string) (*Attribute, error) {
+// NewAttributeFromString returns a new attribute instance from the specified string.
+func NewAttributeFromString(str string) (*Attribute, error) {
 	attr := NewAttribute()
 	return attr, attr.parse(str)
 }
