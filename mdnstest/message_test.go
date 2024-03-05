@@ -36,6 +36,12 @@ var matter02 string
 //go:embed log/googlecast01.log
 var googlecast01 string
 
+//go:embed log/googlecast02.log
+var googlecast02 string
+
+//go:embed log/googlecast03.log
+var googlecast03 string
+
 // 4.3.1.13. Examples
 // dns-sd -R DD200C20D25AE5F7 _matterc._udp,_S3,_L840,_CM . 11111 D=840 CM=2
 //
@@ -86,6 +92,22 @@ func TestResponseMessage(t *testing.T) {
 					map[string]string{},
 				},
 		*/
+		{
+			"googlecast02",
+			googlecast02,
+			[]answer{
+				{"_googlecast._tcp.local"},
+			},
+			map[string]string{},
+		},
+		{
+			"googlecast03",
+			googlecast03,
+			[]answer{
+				{"_googlecast._tcp.local"},
+			},
+			map[string]string{},
+		},
 		{
 			"matter 120 4.3.1.13",
 			matterSpec12043113,
