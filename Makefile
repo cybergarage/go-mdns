@@ -55,7 +55,7 @@ test: lint
 	go test -v -p 1 -timeout 10m -cover -coverpkg=${PKG}/... -coverprofile=${PKG_COVER}.out ${PKG}/... ${TEST_PKG}/...
 	go tool cover -html=${PKG_COVER}.out -o ${PKG_COVER}.html
 
-install: test
+install:
 	go install ${BINS}
 
 clean:
