@@ -176,7 +176,7 @@ func (r *record) IsName(name string) bool {
 
 // HasNamePrefix returns true if the resource record name has the specified prefix.
 func (r *record) HasNamePrefix(prefix string) bool {
-	return strings.HasPrefix(strings.ToLower(r.name), strings.ToLower(prefix))
+	return strings.HasPrefix(r.name, prefix)
 }
 
 // Type returns the resource record type.
