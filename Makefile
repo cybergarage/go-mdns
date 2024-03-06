@@ -33,10 +33,12 @@ BIN_ROOT_DIR=bin
 BIN_ID=${MODULE_ROOT}/${BIN_ROOT_DIR}
 BIN_SRCS=\
 	${BIN_ROOT_DIR}/mdns-browse \
-	${BIN_ROOT_DIR}/mdns-server
+	${BIN_ROOT_DIR}/mdns-server \
+	${BIN_ROOT_DIR}/mdns-dump
 BINS=\
 	${BIN_ID}/mdns-browse \
-	${BIN_ID}/mdns-server
+	${BIN_ID}/mdns-server \
+	${BIN_ID}/mdns-dump
 
 .PHONY: format vet lint clean
 
