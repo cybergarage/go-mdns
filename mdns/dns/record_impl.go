@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"unicode"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
@@ -165,6 +166,12 @@ func (r *record) SetData(b []byte) Record {
 // Name returns the resource record name.
 func (r *record) Name() string {
 	return r.name
+}
+
+// IsName returns true if the resource record name is the specified name.
+func (r *record) IsName(name string) bool {
+	// RFC1035: 2.3.3. Character Case
+	return strings.EqualFold(r.Name(), name)
 }
 
 // Type returns the resource record type.

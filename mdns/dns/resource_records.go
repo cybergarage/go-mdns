@@ -14,10 +14,6 @@
 
 package dns
 
-import (
-	"strings"
-)
-
 // ResourceRecords is a list of ResourceRecord.
 type ResourceRecords []ResourceRecord
 
@@ -30,8 +26,7 @@ func (records ResourceRecords) HasResourceRecord(name string) bool {
 // LookupResourceRecordForName returns the resource record of the specified name.
 func (records ResourceRecords) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
 	for _, record := range records {
-		// RFC1035: 2.3.3. Character Case
-		if strings.EqualFold(record.Name(), name) {
+		if record.IsName(name) {
 			return record, true
 		}
 	}
