@@ -202,11 +202,12 @@ func (msg *Message) ResourceRecords() ResourceRecords {
 
 // LookupResourceRecordForName returns the resource record of the specified name.
 func (msg *Message) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
-	res, ok := msg.ResourceRecords().LookupResourceRecordForName(name)
-	if ok {
-		return res, true
-	}
-	return nil, false
+	return msg.ResourceRecords().LookupResourceRecordForName(name)
+}
+
+// LookupResourceRecordForNamePrefix returns the resource record of the specified name prefix.
+func (msg *Message) LookupResourceRecordForNamePrefix(prefix string) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupResourceRecordForNamePrefix(prefix)
 }
 
 // HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
