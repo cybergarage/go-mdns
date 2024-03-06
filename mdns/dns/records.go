@@ -22,6 +22,15 @@ import (
 // Records is a list of Record.
 type Records []Record
 
+// NewRecorsWithResourceRecords returns a new Records with the specified resource records.
+func NewRecorsWithResourceRecords(resourceRecords ResourceRecords) Records {
+	records := Records{}
+	for _, resourceRecord := range resourceRecords {
+		records = append(records, resourceRecord)
+	}
+	return records
+}
+
 // String returns the string representation.
 func (records Records) String() string {
 	type record []string
