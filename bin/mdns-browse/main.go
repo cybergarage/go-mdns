@@ -75,6 +75,7 @@ func main() {
 		"_services._dns-sd._udp",
 		"_rdlink._tcp",
 		"_companion - link._tcp",
+		"_services._dns-sd._udp",
 	}
 
 	err = client.Query(mdns.NewQueryWithServices(services))
@@ -84,7 +85,7 @@ func main() {
 
 	// Wait node responses in the local network
 
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 10)
 
 	// Output all found nodes
 
