@@ -25,29 +25,27 @@ func (records ResourceRecords) HasResourceRecord(name string) bool {
 
 // LookupResourceRecordForName returns the resource record of the specified name.
 func (records ResourceRecords) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
-	for _, record := range records {
-		if record.IsName(name) {
-			return record, true
-		}
+	lookupRecords := records.LookupResourceRecordsForName(name)
+	if len(lookupRecords) == 0 {
+		return nil, false
 	}
-	return nil, false
+	return lookupRecords[0], true
 }
 
 // LookupResourceRecordForType returns the resource record of the specified type.
 func (records ResourceRecords) LookupResourceRecordForType(t Type) (ResourceRecord, bool) {
-	for _, record := range records {
-		if record.Type() == t {
-			return record, true
-		}
+	lookupRecords := records.LookupResourceRecordsForType(t)
+	if len(lookupRecords) == 0 {
+		return nil, false
 	}
-	return nil, false
+	return lookupRecords[0], true
 }
 
 // LookupResourceRecordsForName returns the resource records of the specified name.
 func (records ResourceRecords) LookupResourceRecordsForName(name string) ResourceRecords {
 	resRecords := ResourceRecords{}
 	for _, record := range records {
-		if record.Name() == name {
+		if record.IsName(name) {
 			resRecords = append(resRecords, record)
 		}
 	}
