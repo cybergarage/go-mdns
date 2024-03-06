@@ -20,6 +20,8 @@ type Record interface {
 	SetName(name string) Record
 	// Name returns the resource record name.
 	Name() string
+	// IsName returns true if the resource record name is the specified name.
+	IsName(name string) bool
 	// SetType sets the resource record type.
 	SetType(t Type) Record
 	// Type returns the resource record type.
