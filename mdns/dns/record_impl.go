@@ -171,7 +171,12 @@ func (r *record) Name() string {
 // IsName returns true if the resource record name is the specified name.
 func (r *record) IsName(name string) bool {
 	// RFC1035: 2.3.3. Character Case
-	return strings.EqualFold(r.Name(), name)
+	return strings.EqualFold(r.name, name)
+}
+
+// HasNamePrefix returns true if the resource record name has the specified prefix.
+func (r *record) HasNamePrefix(prefix string) bool {
+	return strings.HasPrefix(strings.ToLower(r.name), strings.ToLower(prefix))
 }
 
 // Type returns the resource record type.
