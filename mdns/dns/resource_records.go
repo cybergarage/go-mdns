@@ -32,6 +32,15 @@ func (records ResourceRecords) LookupResourceRecordForName(name string) (Resourc
 	return lookupRecords[0], true
 }
 
+// LookupResourceRecordForNamePrefix returns the resource record of the specified name prefix.
+func (records ResourceRecords) LookupResourceRecordForNamePrefix(prefix string) (ResourceRecord, bool) {
+	lookupRecords := records.LookupResourceRecordsForNamePrefix(prefix)
+	if len(lookupRecords) == 0 {
+		return nil, false
+	}
+	return lookupRecords[0], true
+}
+
 // LookupResourceRecordForType returns the resource record of the specified type.
 func (records ResourceRecords) LookupResourceRecordForType(t Type) (ResourceRecord, bool) {
 	lookupRecords := records.LookupResourceRecordsForType(t)
@@ -41,15 +50,26 @@ func (records ResourceRecords) LookupResourceRecordForType(t Type) (ResourceReco
 	return lookupRecords[0], true
 }
 
-// LookupResourceRecordsForName returns the resource records of the specified name.
-func (records ResourceRecords) LookupResourceRecordsForName(name string) ResourceRecords {
-	resRecords := ResourceRecords{}
+// LookupResourceRecordsForNamePrefix returns the resource records of the specified name prefix.
+func (records ResourceRecords) LookupResourceRecordsForNamePrefix(prefix string) ResourceRecords {
+	lookupRecords := ResourceRecords{}
 	for _, record := range records {
-		if record.IsName(name) {
-			resRecords = append(resRecords, record)
+		if record.HasNamePrefix(prefix) {
+			lookupRecords = append(lookupRecords, record)
 		}
 	}
-	return resRecords
+	return lookupRecords
+}
+
+// LookupResourceRecordsForName returns the resource records of the specified name.
+func (records ResourceRecords) LookupResourceRecordsForName(name string) ResourceRecords {
+	lookupRecords := ResourceRecords{}
+	for _, record := range records {
+		if record.IsName(name) {
+			lookupRecords = append(lookupRecords, record)
+		}
+	}
+	return lookupRecords
 }
 
 // LookupResourceRecordForType returns the resource records of the specified type.
