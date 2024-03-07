@@ -210,6 +210,11 @@ func (msg *Message) LookupResourceRecordForNamePrefix(prefix string) (ResourceRe
 	return msg.ResourceRecords().LookupResourceRecordForNamePrefix(prefix)
 }
 
+// LookupResourceRecordForNameSuffix returns the resource record of the specified name suffix.
+func (msg *Message) LookupResourceRecordForNameSuffix(prefix string) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupResourceRecordForNameSuffix(prefix)
+}
+
 // HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
 func (msg *Message) HasResourceRecord(name string) bool {
 	_, ok := msg.LookupResourceRecordForName(name)
