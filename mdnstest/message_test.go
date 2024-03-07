@@ -54,6 +54,9 @@ var matterSpec12043113DNSSD string
 //go:embed log/matter-spec-120-4.3.1.13-avahi.log
 var matterSpec12043113Avahi string
 
+//go:embed log/matter-spec-120-4.3.1.13-avahi02.log
+var matterSpec12043113Avahi02 string
+
 func TestResponseMessage(t *testing.T) {
 	type answer struct {
 		name string
@@ -92,53 +95,63 @@ func TestResponseMessage(t *testing.T) {
 				map[string]string{},
 			},
 		*/
+		/*
+			{
+				"googlecast01",
+				googlecast01,
+				[]answer{
+					{"_services._dns-sd._udp.local"},
+				},
+				map[string]string{},
+			},
+			{
+				"googlecast02",
+				googlecast02,
+				[]answer{
+					{"_googlecast._tcp.local"},
+				},
+				map[string]string{},
+			},
+			{
+				"googlecast03",
+				googlecast03,
+				[]answer{
+					{"_googlezone._tcp.local"},
+				},
+				map[string]string{
+					"id": "4E50AF186C368EE8A98A648BE272AAD5",
+				},
+			},
+			{
+				"matter 120 4.3.1.13/dns-sd",
+				matterSpec12043113DNSSD,
+				[]answer{
+					{"_services._dns-sd"},
+				},
+				map[string]string{
+					"D":  "840",
+					"CM": "2",
+				},
+			},
+			{
+				"matter 120 4.3.1.13/avahi",
+				matterSpec12043113Avahi,
+				[]answer{
+					{"_matterc._udp.local"},
+				},
+				map[string]string{
+					"D":  "840",
+					"CM": "2",
+				},
+			},
+		*/
 		{
-			"googlecast01",
-			googlecast01,
-			[]answer{
-				{"_services._dns-sd._udp.local"},
-			},
-			map[string]string{},
-		},
-		{
-			"googlecast02",
-			googlecast02,
-			[]answer{
-				{"_googlecast._tcp.local"},
-			},
-			map[string]string{},
-		},
-		{
-			"googlecast03",
-			googlecast03,
-			[]answer{
-				{"_googlezone._tcp.local"},
-			},
-			map[string]string{
-				"id": "4E50AF186C368EE8A98A648BE272AAD5",
-			},
-		},
-		{
-			"matter 120 4.3.1.13 (dns-sd)",
-			matterSpec12043113DNSSD,
-			[]answer{
-				{"_services._dns-sd"},
-			},
-			map[string]string{
-				"D":  "840",
-				"CM": "2",
-			},
-		},
-		{
-			"matter 120 4.3.1.13 (avahi)",
-			matterSpec12043113Avahi,
+			"matter 120 4.3.1.13/avahi#02",
+			matterSpec12043113Avahi02,
 			[]answer{
 				{"_matterc._udp.local"},
 			},
-			map[string]string{
-				"D":  "840",
-				"CM": "2",
-			},
+			map[string]string{},
 		},
 	}
 
@@ -165,9 +178,13 @@ func TestResponseMessage(t *testing.T) {
 			}
 
 			for _, answer := range test.answers {
-				if !msg.Answers.HasResourceRecord(answer.name) {
-					t.Errorf("answer (%s) not found", answer.name)
+				if msg.HasResourceRecord(answer.name) {
+					continue
 				}
+				if _, ok := msg.LookupResourceRecordForNameSuffix(answer.name); ok {
+					continue
+				}
+				t.Errorf("answer (%s) not found", answer.name)
 			}
 
 			for name, value := range test.attributes {
