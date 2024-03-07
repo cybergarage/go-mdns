@@ -68,31 +68,31 @@ func TestResponseMessage(t *testing.T) {
 		attributes map[string]string
 	}{
 		/*
+				{
+					"service01",
+					service01,
+					[]answer{
+						{"_services._dns-sd._udp.local"},
+					},
+					map[string]string{},
+				},
 			{
-				"service01",
-				service01,
+				"matter01",
+				matter01,
+				[]answer{
+					{"_services._dns-sd._udp.local"},
+				},
+				map[string]string{},
+			},
+			{
+				"matter02",
+				matter02,
 				[]answer{
 					{"_services._dns-sd._udp.local"},
 				},
 				map[string]string{},
 			},
 		*/
-		{
-			"matter01",
-			matter01,
-			[]answer{
-				{"_services._dns-sd._udp.local"},
-			},
-			map[string]string{},
-		},
-		{
-			"matter02",
-			matter02,
-			[]answer{
-				{"_services._dns-sd._udp.local"},
-			},
-			map[string]string{},
-		},
 		{
 			"googlecast01",
 			googlecast01,
