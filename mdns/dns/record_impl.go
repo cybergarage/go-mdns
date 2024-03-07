@@ -179,6 +179,11 @@ func (r *record) HasNamePrefix(prefix string) bool {
 	return strings.HasPrefix(r.name, prefix)
 }
 
+// HasNameSuffix returns true if the resource record name has the specified suffix.
+func (r *record) HasNameSuffix(suffix string) bool {
+	return strings.HasSuffix(r.name, suffix)
+}
+
 // Type returns the resource record type.
 func (r *record) Type() Type {
 	return r.typ

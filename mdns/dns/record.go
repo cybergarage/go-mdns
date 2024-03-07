@@ -20,10 +20,12 @@ type Record interface {
 	SetName(name string) Record
 	// Name returns the resource record name.
 	Name() string
-	// IsName returns true if the resource record name is the specified name.
+	// IsName returns true if the resource record name is the specified name, ignoring case.
 	IsName(name string) bool
 	// HasNamePrefix returns true if the resource record name has the specified prefix.
 	HasNamePrefix(prefix string) bool
+	// HasNameSuffix returns true if the resource record name has the specified suffix.
+	HasNameSuffix(prefix string) bool
 	// SetType sets the resource record type.
 	SetType(t Type) Record
 	// Type returns the resource record type.
