@@ -29,7 +29,6 @@ mdns-dump is a dumpr utility for mDNS protocol.
 package main
 
 import (
-	"flag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,22 +38,10 @@ import (
 )
 
 func main() {
-	verbose := flag.Bool("v", false, "Enable verbose messages")
-	debug := flag.Bool("d", false, "Enable debug messages")
-	flag.Parse()
-
-	if *verbose {
-		log.SetSharedLogger(log.NewStdoutLogger(log.LevelTrace))
-	}
-	if *debug {
-		log.SetSharedLogger(log.NewStdoutLogger(log.LevelDebug))
-	}
+	log.SetSharedLogger(log.NewStdoutLogger(log.LevelTrace))
 
 	client := NewClient()
-
-	if *verbose {
-		client.SetListener(client)
-	}
+	client.SetListener(client)
 
 	err := client.Start()
 	if err != nil {
