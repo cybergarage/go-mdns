@@ -60,6 +60,10 @@ func newSRVRecordWithResourceRecord(res *record) (*SRVRecord, error) {
 }
 
 func (srv *SRVRecord) parseResourceRecord() error {
+	if len(srv.data) == 0 {
+		return nil
+	}
+
 	var err error
 
 	reader := NewReaderWithBytes(srv.data)
