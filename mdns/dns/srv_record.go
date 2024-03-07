@@ -128,5 +128,8 @@ func (srv *SRVRecord) Target() string {
 
 // Content returns a string representation to the record data.
 func (srv *SRVRecord) Content() string {
+	if len(srv.data) == 0 {
+		return ""
+	}
 	return fmt.Sprintf("%d %d %d %s", srv.priority, srv.weight, srv.port, srv.target)
 }
