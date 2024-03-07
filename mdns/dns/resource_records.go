@@ -41,6 +41,15 @@ func (records ResourceRecords) LookupResourceRecordForNamePrefix(prefix string) 
 	return lookupRecords[0], true
 }
 
+// LookupResourceRecordForNameSuffix returns the resource record of the specified name suffix.
+func (records ResourceRecords) LookupResourceRecordForNameSuffix(suffix string) (ResourceRecord, bool) {
+	lookupRecords := records.LookupResourceRecordsForNameSuffix(suffix)
+	if len(lookupRecords) == 0 {
+		return nil, false
+	}
+	return lookupRecords[0], true
+}
+
 // LookupResourceRecordForType returns the resource record of the specified type.
 func (records ResourceRecords) LookupResourceRecordForType(t Type) (ResourceRecord, bool) {
 	lookupRecords := records.LookupResourceRecordsForType(t)
@@ -55,6 +64,17 @@ func (records ResourceRecords) LookupResourceRecordsForNamePrefix(prefix string)
 	lookupRecords := ResourceRecords{}
 	for _, record := range records {
 		if record.HasNamePrefix(prefix) {
+			lookupRecords = append(lookupRecords, record)
+		}
+	}
+	return lookupRecords
+}
+
+// LookupResourceRecordsForNameSuffix returns the resource records of the specified name suffix.
+func (records ResourceRecords) LookupResourceRecordsForNameSuffix(suffix string) ResourceRecords {
+	lookupRecords := ResourceRecords{}
+	for _, record := range records {
+		if record.HasNameSuffix(suffix) {
 			lookupRecords = append(lookupRecords, record)
 		}
 	}
