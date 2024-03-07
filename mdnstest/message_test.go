@@ -51,8 +51,8 @@ var matterSpec12043113DNSSD string
 // 4.3.1.13. Examples
 // avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=840 CM=2
 //
-//go:embed log/matter-spec-120-4.3.1.13-avahi.log
-var matterSpec12043113Avahi string
+//go:embed log/matter-spec-120-4.3.1.13-avahi01.log
+var matterSpec12043113Avahi01 string
 
 //go:embed log/matter-spec-120-4.3.1.13-avahi02.log
 var matterSpec12043113Avahi02 string
@@ -68,83 +68,79 @@ func TestResponseMessage(t *testing.T) {
 		attributes map[string]string
 	}{
 		/*
-				{
-					"service01",
-					service01,
-					[]answer{
-						{"_services._dns-sd._udp.local"},
-					},
-					map[string]string{},
-				},
 			{
-				"matter01",
-				matter01,
+				"service01",
+				service01,
 				[]answer{
 					{"_services._dns-sd._udp.local"},
 				},
 				map[string]string{},
 			},
 		*/
-		/*
-			{
-				"matter02",
-				matter02,
-				[]answer{
-					{"_services._dns-sd._udp.local"},
-				},
-				map[string]string{},
+		{
+			"matter01",
+			matter01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
 			},
-		*/
-		/*
-			{
-				"googlecast01",
-				googlecast01,
-				[]answer{
-					{"_services._dns-sd._udp.local"},
-				},
-				map[string]string{},
+			map[string]string{},
+		},
+		{
+			"matter02",
+			matter02,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
 			},
-			{
-				"googlecast02",
-				googlecast02,
-				[]answer{
-					{"_googlecast._tcp.local"},
-				},
-				map[string]string{},
+			map[string]string{},
+		},
+		{
+			"googlecast01",
+			googlecast01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
 			},
-			{
-				"googlecast03",
-				googlecast03,
-				[]answer{
-					{"_googlezone._tcp.local"},
-				},
-				map[string]string{
-					"id": "4E50AF186C368EE8A98A648BE272AAD5",
-				},
+			map[string]string{},
+		},
+		{
+			"googlecast02",
+			googlecast02,
+			[]answer{
+				{"_googlecast._tcp.local"},
 			},
-			{
-				"matter 120 4.3.1.13/dns-sd",
-				matterSpec12043113DNSSD,
-				[]answer{
-					{"_services._dns-sd"},
-				},
-				map[string]string{
-					"D":  "840",
-					"CM": "2",
-				},
+			map[string]string{},
+		},
+		{
+			"googlecast03",
+			googlecast03,
+			[]answer{
+				{"_googlezone._tcp.local"},
 			},
-			{
-				"matter 120 4.3.1.13/avahi",
-				matterSpec12043113Avahi,
-				[]answer{
-					{"_matterc._udp.local"},
-				},
-				map[string]string{
-					"D":  "840",
-					"CM": "2",
-				},
+			map[string]string{
+				"id": "4E50AF186C368EE8A98A648BE272AAD5",
 			},
-		*/
+		},
+		{
+			"matter 120 4.3.1.13/dns-sd",
+			matterSpec12043113DNSSD,
+			[]answer{
+				{"_services._dns-sd"},
+			},
+			map[string]string{
+				"D":  "840",
+				"CM": "2",
+			},
+		},
+		{
+			"matter 120 4.3.1.13/avahi#01",
+			matterSpec12043113Avahi01,
+			[]answer{
+				{"_matterc._udp.local"},
+			},
+			map[string]string{
+				"D":  "840",
+				"CM": "2",
+			},
+		},
 		{
 			"matter 120 4.3.1.13/avahi#02",
 			matterSpec12043113Avahi02,
