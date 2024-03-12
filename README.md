@@ -15,9 +15,8 @@ go-mdns is a Go library for Multicast DNS (mDNS) and DNS Service Discovery (DNS-
 - [RFC 1034: DOMAIN NAMES - CONCEPTS AND FACILITIES](https://www.rfc-editor.org/rfc/rfc1034)
 - [RFC 1035: DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION](https://www.rfc-editor.org/rfc/rfc1035)
 - [RFC 2782: A DNS RR for specifying the location of services (DNS SRV)](https://www.rfc-editor.org/rfc/rfc2782)
-- [RFC 3845: DNS Security (DNSSEC) NextSECure (NSEC) RDATA Format](https://datatracker.ietf.org/doc/html/rfc3845)
 - [RFC 3901: DNS IPv6 Transport Operational Guidelines](https://www.rfc-editor.org/rfc/rfc3901)
-- [DNS records | Cloudflare](https://www.cloudflare.com/learning/dns/dns-records/)
+- [RFC 4034: Resource Records for the DNS Security Extensions](https://datatracker.ietf.org/doc/html/rfc4034)
 
 ### mDNS and DNS-SD
 
