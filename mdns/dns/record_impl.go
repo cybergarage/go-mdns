@@ -85,6 +85,8 @@ func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) 
 		return newARecordWithResourceRecord(r), nil
 	case AAAA:
 		return newAAAARecordWithResourceRecord(r), nil
+	case NSEC:
+		return newNSECRecordWithResourceRecord(r)
 	}
 
 	return r, nil
