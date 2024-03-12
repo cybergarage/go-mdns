@@ -82,7 +82,7 @@ func TestResponseMessage(t *testing.T) {
 			"service02",
 			service02,
 			[]answer{
-				{"_services._dns-sd._udp.local"},
+				{"_companion-link._tcp.local"},
 			},
 			map[string]string{},
 		},
