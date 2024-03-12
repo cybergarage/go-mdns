@@ -31,6 +31,7 @@ const (
 	MX    Type = 0x000F
 	AAAA  Type = 0x001C
 	AXFR  Type = 0x00FC
+	NSEC  Type = 0x002F
 	ANY   Type = 0x00FF
 )
 
@@ -59,6 +60,8 @@ func (t Type) String() string {
 		return "AAAA"
 	case AXFR:
 		return "AXFR"
+	case NSEC:
+		return "NSEC"
 	case ANY:
 		return "ANY"
 	}
