@@ -28,8 +28,7 @@ type Service struct {
 	name   string
 	domain string
 	Host   string
-	AddrV4 net.IP
-	AddrV6 net.IP
+	addrs  []net.IP
 	port   uint
 	dns.Attributes
 }
@@ -41,8 +40,7 @@ func NewService(name, domain string, port uint) *Service {
 		name:       name,
 		domain:     domain,
 		Host:       "",
-		AddrV4:     nil,
-		AddrV6:     nil,
+		addrs:      []net.IP{},
 		port:       port,
 		Attributes: dns.Attributes{},
 	}
@@ -66,6 +64,11 @@ func (srv *Service) Name() string {
 // Domain returns the service domain.
 func (srv *Service) Domain() string {
 	return srv.domain
+}
+
+// Addresses returns the service addresses.
+func (srv *Service) Addresses() []net.IP {
+	return srv.addrs
 }
 
 // Port returns the service port.
@@ -98,12 +101,12 @@ func (srv *Service) parseMessage(msg *Message) error {
 		case *dns.ARecord:
 			ip := rr.Address()
 			if ip != nil {
-				srv.AddrV4 = ip
+				srv.addrs = append(srv.addrs, ip)
 			}
 		case *dns.AAAARecord:
 			ip := rr.Address()
 			if ip != nil {
-				srv.AddrV6 = ip
+				srv.addrs = append(srv.addrs, ip)
 			}
 		}
 	}
@@ -131,11 +134,9 @@ func (srv *Service) Equal(other *Service) bool {
 // String returns the string representation.
 func (srv *Service) String() string {
 	return fmt.Sprintf(
-		"%s (%s:%d, %s:%d)",
+		"%s (%s:%d)",
 		strings.Join([]string{srv.name, srv.Host, srv.domain}, nameSep),
-		srv.AddrV4,
-		srv.port,
-		srv.AddrV6,
+		srv.Host,
 		srv.port,
 	)
 }
