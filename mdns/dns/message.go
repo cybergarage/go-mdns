@@ -173,7 +173,7 @@ func (msg *Message) Copy() *Message {
 	}
 }
 
-// ResourceRecords returns all resource records.
+// Records returns all resource records.
 func (msg *Message) Records() Records {
 	records := Records{}
 	for _, r := range msg.Questions {
@@ -187,8 +187,8 @@ func (msg *Message) Records() Records {
 }
 
 // ResourceRecords returns all resource records.
-func (msg *Message) ResourceRecords() ResourceRecords {
-	records := ResourceRecords{}
+func (msg *Message) ResourceRecords() Records {
+	records := Records{}
 	records = append(records, msg.Answers...)
 	records = append(records, msg.NameServers...)
 	records = append(records, msg.Additions...)
