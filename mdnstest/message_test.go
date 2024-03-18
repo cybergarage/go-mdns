@@ -54,7 +54,7 @@ var matterSpec12043113Avahi01 string
 //go:embed log/matter-spec-120-4.3.1.13-avahi02.log
 var matterSpec12043113Avahi02 string
 
-func TestResponseMessage(t *testing.T) {
+func TestResponseMessages(t *testing.T) {
 	type answer struct {
 		name string
 	}
