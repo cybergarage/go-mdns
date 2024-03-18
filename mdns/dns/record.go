@@ -50,4 +50,8 @@ type Record interface {
 	Content() string
 	// Bytes returns the binary representation.
 	Bytes() []byte
+	// RequestBytes returns only the binary representation of the request fields.
+	RequestBytes() []byte
+	// ResponseBytes returns only the binary representation of the all fields.
+	ResponseBytes() []byte
 }
