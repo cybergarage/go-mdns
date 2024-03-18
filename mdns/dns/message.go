@@ -187,8 +187,8 @@ func (msg *Message) Records() Records {
 }
 
 // ResourceRecords returns all resource records.
-func (msg *Message) ResourceRecords() Records {
-	records := Records{}
+func (msg *Message) ResourceRecords() ResourceRecords {
+	records := ResourceRecords{}
 	records = append(records, msg.Answers...)
 	records = append(records, msg.NameServers...)
 	records = append(records, msg.Additions...)
