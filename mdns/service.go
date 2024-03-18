@@ -87,8 +87,6 @@ func (srv *Service) parseMessage(msg *Message) error {
 
 	for _, record := range msg.ResourceRecords() {
 		switch rr := record.(type) {
-		case *dns.PTRRecord:
-			srv.name = rr.DomainName()
 		case *dns.SRVRecord:
 			host := rr.Target()
 			if 0 < len(host) {
@@ -99,6 +97,7 @@ func (srv *Service) parseMessage(msg *Message) error {
 				srv.port = port
 			}
 		case *dns.TXTRecord:
+			srv.name = rr.Name()
 			attrs, err := rr.Attributes()
 			if err == nil {
 				srv.Attributes = append(srv.Attributes, attrs...)
