@@ -30,7 +30,7 @@ type Service struct {
 	Host   string
 	AddrV4 net.IP
 	AddrV6 net.IP
-	Port   uint
+	port   uint
 	dns.Attributes
 }
 
@@ -43,7 +43,7 @@ func NewService(name, domain string, port uint) *Service {
 		Host:       "",
 		AddrV4:     nil,
 		AddrV6:     nil,
-		Port:       port,
+		port:       port,
 		Attributes: dns.Attributes{},
 	}
 }
@@ -68,6 +68,11 @@ func (srv *Service) Domain() string {
 	return srv.domain
 }
 
+// Port returns the service port.
+func (srv *Service) Port() int {
+	return int(srv.port)
+}
+
 // parseMessage updates the service data by the specified message.
 func (srv *Service) parseMessage(msg *Message) error {
 	srv.Message = msg
@@ -83,7 +88,7 @@ func (srv *Service) parseMessage(msg *Message) error {
 			}
 			port := rr.Port()
 			if 0 < port {
-				srv.Port = port
+				srv.port = port
 			}
 		case *dns.TXTRecord:
 			attrs, err := rr.Attributes()
@@ -129,8 +134,8 @@ func (srv *Service) String() string {
 		"%s (%s:%d, %s:%d)",
 		strings.Join([]string{srv.name, srv.Host, srv.domain}, nameSep),
 		srv.AddrV4,
-		srv.Port,
+		srv.port,
 		srv.AddrV6,
-		srv.Port,
+		srv.port,
 	)
 }
