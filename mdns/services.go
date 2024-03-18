@@ -43,9 +43,9 @@ func (services *services) FindService(targetService *Service) *Service {
 
 // AddService adds the specified service into th service array.
 func (services *services) AddService(service *Service) bool {
-	if services.FindService(service) != nil {
-		return false
-	}
+	// if services.FindService(service) != nil {
+	// 	return false
+	// }
 	services.services = append(services.services, service)
 	return true
 }

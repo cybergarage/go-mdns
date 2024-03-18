@@ -90,12 +90,6 @@ func (client *Client) MessageReceived(msg *dns.Message) (*dns.Message, error) {
 		return nil, err
 	}
 
-	addedService := client.FindService(newService)
-	if addedService != nil {
-		addedService.Update(msg)
-		return nil, nil
-	}
-
 	client.AddService(newService)
 
 	return nil, nil
