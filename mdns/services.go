@@ -31,21 +31,20 @@ func (services *services) Services() []*Service {
 	return services.services
 }
 
-// FindService returns the added service by the specified domain name.
-func (services *services) FindService(targetService *Service) *Service {
+func (services *services) HasService(targetService *Service) bool {
 	for _, service := range services.services {
 		if service.Equal(targetService) {
-			return service
+			return true
 		}
 	}
-	return nil
+	return false
 }
 
 // AddService adds the specified service into th service array.
 func (services *services) AddService(service *Service) bool {
-	// if services.FindService(service) != nil {
-	// 	return false
-	// }
+	if services.HasService(service) {
+		return false
+	}
 	services.services = append(services.services, service)
 	return true
 }
