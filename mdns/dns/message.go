@@ -193,31 +193,31 @@ func (msg *Message) Records() Records {
 
 // ResourceRecords returns all resource records.
 func (msg *Message) ResourceRecords() ResourceRecords {
-	records := []ResourceRecord{}
+	records := ResourceRecords{}
 	records = append(records, msg.Answers...)
 	records = append(records, msg.NameServers...)
 	records = append(records, msg.Additions...)
 	return records
 }
 
-// LookupResourceRecordForName returns the resource record of the specified name.
-func (msg *Message) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupResourceRecordForName(name)
+// LookupRecordForName returns the resource record of the specified name.
+func (msg *Message) LookupRecordForName(name string) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupRecordForName(name)
 }
 
-// LookupResourceRecordForNamePrefix returns the resource record of the specified name prefix.
-func (msg *Message) LookupResourceRecordForNamePrefix(prefix string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupResourceRecordForNamePrefix(prefix)
+// LookupRecordForNamePrefix returns the resource record of the specified name prefix.
+func (msg *Message) LookupRecordForNamePrefix(prefix string) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupRecordForNamePrefix(prefix)
 }
 
-// LookupResourceRecordForNameSuffix returns the resource record of the specified name suffix.
-func (msg *Message) LookupResourceRecordForNameSuffix(prefix string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupResourceRecordForNameSuffix(prefix)
+// LookupRecordForNameSuffix returns the resource record of the specified name suffix.
+func (msg *Message) LookupRecordForNameSuffix(prefix string) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupRecordForNameSuffix(prefix)
 }
 
 // HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
 func (msg *Message) HasResourceRecord(name string) bool {
-	_, ok := msg.LookupResourceRecordForName(name)
+	_, ok := msg.LookupRecordForName(name)
 	return ok
 }
 
