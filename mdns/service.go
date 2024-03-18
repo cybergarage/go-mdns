@@ -26,7 +26,7 @@ import (
 type Service struct {
 	*Message
 	name   string
-	Domain string
+	domain string
 	Host   string
 	AddrV4 net.IP
 	AddrV6 net.IP
@@ -39,7 +39,7 @@ func NewService(name, domain string, port uint) *Service {
 	return &Service{
 		Message:    nil,
 		name:       name,
-		Domain:     domain,
+		domain:     domain,
 		Host:       "",
 		AddrV4:     nil,
 		AddrV6:     nil,
@@ -61,6 +61,11 @@ func NewServiceWithMessage(msg *Message) (*Service, error) {
 // Name returns the service name.
 func (srv *Service) Name() string {
 	return srv.name
+}
+
+// Domain returns the service domain.
+func (srv *Service) Domain() string {
+	return srv.domain
 }
 
 // parseMessage updates the service data by the specified message.
@@ -112,7 +117,7 @@ func (srv *Service) Equal(other *Service) bool {
 	if srv.Host != other.Host {
 		return false
 	}
-	if srv.Domain != other.Domain {
+	if srv.domain != other.domain {
 		return false
 	}
 	return true
@@ -122,7 +127,7 @@ func (srv *Service) Equal(other *Service) bool {
 func (srv *Service) String() string {
 	return fmt.Sprintf(
 		"%s (%s:%d, %s:%d)",
-		strings.Join([]string{srv.name, srv.Host, srv.Domain}, nameSep),
+		strings.Join([]string{srv.name, srv.Host, srv.domain}, nameSep),
 		srv.AddrV4,
 		srv.Port,
 		srv.AddrV6,
