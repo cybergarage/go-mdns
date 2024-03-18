@@ -160,6 +160,10 @@ func TestResponseMessages(t *testing.T) {
 				return
 			}
 
+			if !srv.Equal(srv) {
+				t.Error("service not equal")
+			}
+
 			for _, answer := range test.answers {
 				if msg.HasResourceRecord(answer.name) {
 					continue
