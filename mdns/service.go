@@ -25,7 +25,7 @@ import (
 // Service represents a SRV record.
 type Service struct {
 	*Message
-	Name   string
+	name   string
 	Domain string
 	Host   string
 	AddrV4 net.IP
@@ -38,7 +38,7 @@ type Service struct {
 func NewService(name, domain string, port uint) *Service {
 	return &Service{
 		Message:    nil,
-		Name:       name,
+		name:       name,
 		Domain:     domain,
 		Host:       "",
 		AddrV4:     nil,
@@ -51,21 +51,26 @@ func NewService(name, domain string, port uint) *Service {
 // NewServiceWithMessage returns a new service instance.
 func NewServiceWithMessage(msg *Message) (*Service, error) {
 	srv := NewService("", "", 0)
-	err := srv.Update(msg)
+	err := srv.parseMessage(msg)
 	if err != nil {
 		return nil, err
 	}
 	return srv, nil
 }
 
-// Update updates the service data by the specified message.
-func (srv *Service) Update(msg *Message) error {
+// Name returns the service name.
+func (srv *Service) Name() string {
+	return srv.name
+}
+
+// parseMessage updates the service data by the specified message.
+func (srv *Service) parseMessage(msg *Message) error {
 	srv.Message = msg
 
 	for _, record := range msg.ResourceRecords() {
 		switch rr := record.(type) {
 		case *dns.PTRRecord:
-			srv.Name = rr.DomainName()
+			srv.name = rr.DomainName()
 		case *dns.SRVRecord:
 			host := rr.Target()
 			if 0 < len(host) {
@@ -101,7 +106,7 @@ func (srv *Service) Equal(other *Service) bool {
 	if other == nil {
 		return false
 	}
-	if srv.Name != other.Name {
+	if srv.name != other.name {
 		return false
 	}
 	if srv.Host != other.Host {
@@ -117,7 +122,7 @@ func (srv *Service) Equal(other *Service) bool {
 func (srv *Service) String() string {
 	return fmt.Sprintf(
 		"%s (%s:%d, %s:%d)",
-		strings.Join([]string{srv.Name, srv.Host, srv.Domain}, nameSep),
+		strings.Join([]string{srv.name, srv.Host, srv.Domain}, nameSep),
 		srv.AddrV4,
 		srv.Port,
 		srv.AddrV6,
