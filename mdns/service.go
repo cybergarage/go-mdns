@@ -27,7 +27,7 @@ type Service struct {
 	*Message
 	name   string
 	domain string
-	Host   string
+	host   string
 	addrs  []net.IP
 	port   uint
 	dns.Attributes
@@ -39,7 +39,7 @@ func NewService(name, domain string, port uint) *Service {
 		Message:    nil,
 		name:       name,
 		domain:     domain,
-		Host:       "",
+		host:       "",
 		addrs:      []net.IP{},
 		port:       port,
 		Attributes: dns.Attributes{},
@@ -66,14 +66,19 @@ func (srv *Service) Domain() string {
 	return srv.domain
 }
 
-// Addresses returns the service addresses.
-func (srv *Service) Addresses() []net.IP {
-	return srv.addrs
+// Host returns the service host.
+func (srv *Service) Host() string {
+	return srv.host
 }
 
 // Port returns the service port.
 func (srv *Service) Port() int {
 	return int(srv.port)
+}
+
+// Addresses returns the service addresses.
+func (srv *Service) Addresses() []net.IP {
+	return srv.addrs
 }
 
 // parseMessage updates the service data by the specified message.
@@ -87,7 +92,7 @@ func (srv *Service) parseMessage(msg *Message) error {
 		case *dns.SRVRecord:
 			host := rr.Target()
 			if 0 < len(host) {
-				srv.Host = host
+				srv.host = host
 			}
 			port := rr.Port()
 			if 0 < port {
@@ -122,7 +127,7 @@ func (srv *Service) Equal(other *Service) bool {
 	if srv.name != other.name {
 		return false
 	}
-	if srv.Host != other.Host {
+	if srv.host != other.host {
 		return false
 	}
 	if srv.domain != other.domain {
@@ -135,8 +140,8 @@ func (srv *Service) Equal(other *Service) bool {
 func (srv *Service) String() string {
 	return fmt.Sprintf(
 		"%s (%s:%d)",
-		strings.Join([]string{srv.name, srv.Host, srv.domain}, nameSep),
-		srv.Host,
+		strings.Join([]string{srv.name, srv.host, srv.domain}, nameSep),
+		srv.host,
 		srv.port,
 	)
 }
