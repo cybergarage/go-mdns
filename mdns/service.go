@@ -124,15 +124,34 @@ func (srv *Service) Equal(other *Service) bool {
 	if other == nil {
 		return false
 	}
+
+	if len(srv.addrs) != len(other.addrs) {
+		return false
+	}
+
+	equalAddrCount := 0
+	for n, addr := range srv.addrs {
+		if addr.Equal(other.addrs[n]) {
+			equalAddrCount++
+		}
+	}
+	if equalAddrCount != len(srv.addrs) {
+		return false
+	}
+
 	if srv.name != other.name {
 		return false
 	}
 	if srv.host != other.host {
 		return false
 	}
+	if srv.port != other.port {
+		return false
+	}
 	if srv.domain != other.domain {
 		return false
 	}
+
 	return true
 }
 
