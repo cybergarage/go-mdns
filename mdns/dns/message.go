@@ -179,15 +179,10 @@ func (msg *Message) Records() Records {
 	for _, r := range msg.Questions {
 		records = append(records, r)
 	}
-	for _, r := range msg.Answers {
-		records = append(records, r)
-	}
-	for _, r := range msg.NameServers {
-		records = append(records, r)
-	}
-	for _, r := range msg.Additions {
-		records = append(records, r)
-	}
+	records = append(records, msg.Answers...)
+	records = append(records, msg.Answers...)
+	records = append(records, msg.NameServers...)
+	records = append(records, msg.Additions...)
 	return records
 }
 
