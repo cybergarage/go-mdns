@@ -195,24 +195,24 @@ func (msg *Message) ResourceRecords() Records {
 	return records
 }
 
-// LookupRecordForName returns the resource record of the specified name.
-func (msg *Message) LookupRecordForName(name string) (ResourceRecord, bool) {
+// LookupResourceRecordForName returns the resource record of the specified name.
+func (msg *Message) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
 	return msg.ResourceRecords().LookupRecordForName(name)
 }
 
-// LookupRecordForNamePrefix returns the resource record of the specified name prefix.
-func (msg *Message) LookupRecordForNamePrefix(prefix string) (ResourceRecord, bool) {
+// LookupResourceRecordForNamePrefix returns the resource record of the specified name prefix.
+func (msg *Message) LookupResourceRecordForNamePrefix(prefix string) (ResourceRecord, bool) {
 	return msg.ResourceRecords().LookupRecordForNamePrefix(prefix)
 }
 
-// LookupRecordForNameSuffix returns the resource record of the specified name suffix.
-func (msg *Message) LookupRecordForNameSuffix(prefix string) (ResourceRecord, bool) {
+// LookupResourceRecordForNameSuffix returns the resource record of the specified name suffix.
+func (msg *Message) LookupResourceRecordForNameSuffix(prefix string) (ResourceRecord, bool) {
 	return msg.ResourceRecords().LookupRecordForNameSuffix(prefix)
 }
 
 // HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
 func (msg *Message) HasResourceRecord(name string) bool {
-	_, ok := msg.LookupRecordForName(name)
+	_, ok := msg.LookupResourceRecordForName(name)
 	return ok
 }
 

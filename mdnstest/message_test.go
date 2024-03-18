@@ -164,7 +164,7 @@ func TestResponseMessages(t *testing.T) {
 				if msg.HasResourceRecord(answer.name) {
 					continue
 				}
-				if _, ok := msg.LookupRecordForNameSuffix(answer.name); ok {
+				if _, ok := msg.LookupResourceRecordForNameSuffix(answer.name); ok {
 					continue
 				}
 				t.Errorf("answer (%s) not found", answer.name)
