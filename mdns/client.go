@@ -17,6 +17,7 @@ package mdns
 import (
 	"sync"
 
+	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns/dns"
 	"github.com/cybergarage/go-mdns/mdns/transport"
 )
@@ -90,7 +91,9 @@ func (client *Client) MessageReceived(msg *dns.Message) (*dns.Message, error) {
 		return nil, err
 	}
 
-	client.AddService(newService)
+	ok := client.AddService(newService)
+
+	log.Infof("Add new service (%s): %t", newService.String(), ok)
 
 	return nil, nil
 }
