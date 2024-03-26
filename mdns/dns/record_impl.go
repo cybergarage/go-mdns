@@ -228,13 +228,12 @@ func (r *record) Content() string {
 }
 
 func (r *record) parseResouce(reader *Reader) error {
-	var err error
-
 	// Parses domain names
-	r.name, err = reader.ReadName()
+	name, err := reader.ReadName()
 	if err != nil {
 		return err
 	}
+	r.name = name
 
 	// Parses query type
 	typeBytes := make([]byte, 2)
