@@ -95,18 +95,24 @@ func (msg *Message) AddAddition(a Addition) {
 
 // Parse parses the specified reader.
 func (msg *Message) Parse(reader *Reader) error {
-	var err error
 	if err := msg.Header.Parse(reader); err != nil {
 		return fmt.Errorf("header : %w", err)
 	}
-	// Parses questions.
-	for n := 0; n < int(msg.QD()); n++ {
+
+	parseRecordWithReader := func(reader *Reader) (*record, error) {
 		var r *record
+		var err error
 		if msg.IsQuery() {
 			r, err = newRequestRecordWithReader(reader)
 		} else {
 			r, err = newResponseRecordWithReader(reader)
 		}
+		return r, err
+	}
+
+	// Parses questions.
+	for n := 0; n < int(msg.QD()); n++ {
+		r, err := parseRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("question[%d] : %w", n, err)
 		}
@@ -114,12 +120,7 @@ func (msg *Message) Parse(reader *Reader) error {
 	}
 	// Parses answers.
 	for n := 0; n < int(msg.AN()); n++ {
-		var a ResourceRecord
-		if msg.IsQuery() {
-			a, err = newRequestResourceRecordWithReader(reader)
-		} else {
-			a, err = newResponseResourceRecordWithReader(reader)
-		}
+		a, err := parseRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("answer[%d] : %w", n, err)
 		}
@@ -127,12 +128,7 @@ func (msg *Message) Parse(reader *Reader) error {
 	}
 	// Parses authorities.
 	for n := 0; n < int(msg.NS()); n++ {
-		var ns ResourceRecord
-		if msg.IsQuery() {
-			ns, err = newRequestResourceRecordWithReader(reader)
-		} else {
-			ns, err = newResponseResourceRecordWithReader(reader)
-		}
+		ns, err := parseRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("authority[%d] : %w", n, err)
 		}
@@ -140,12 +136,7 @@ func (msg *Message) Parse(reader *Reader) error {
 	}
 	// Parses additional records.
 	for n := 0; n < int(msg.AR()); n++ {
-		var a ResourceRecord
-		if msg.IsQuery() {
-			a, err = newRequestResourceRecordWithReader(reader)
-		} else {
-			a, err = newResponseResourceRecordWithReader(reader)
-		}
+		a, err := parseRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("additional[%d] : %w", n, err)
 		}
