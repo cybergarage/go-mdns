@@ -15,7 +15,6 @@
 package dns
 
 import (
-	"bytes"
 	"errors"
 	"io"
 
@@ -24,33 +23,28 @@ import (
 
 // Reader represents a record reader.
 type Reader struct {
-	Reader        io.Reader
-	Bytes         []byte
-	rootCmpReader *CompressionReader
-}
-
-// NewReaderWithReader returns a new reader instance with the specified reader.
-func NewReaderWithReader(reader io.Reader) *Reader {
-	return &Reader{
-		Reader:        reader,
-		Bytes:         []byte{},
-		rootCmpReader: nil,
-	}
+	Buffer     []byte
+	bufferSize int
+	offset     int
 }
 
 // NewReaderWithBytes returns a new reader instance with the specified bytes.
 func NewReaderWithBytes(b []byte) *Reader {
-	return NewReaderWithReader(bytes.NewReader(b))
+	return &Reader{
+		Buffer:     b,
+		bufferSize: int(len(b)),
+		offset:     0,
+	}
 }
 
 // Read overwrites the io.Reader interface.
 func (reader *Reader) Read(p []byte) (int, error) {
-	n, err := reader.Reader.Read(p)
-	if err != nil {
-		return n, err
+	if reader.bufferSize < (reader.offset + len(p)) {
+		return 0, io.EOF
 	}
-	reader.Bytes = append(reader.Bytes, p[:n]...)
-	return n, nil
+	copy(p, reader.Buffer[reader.offset:])
+	reader.offset += len(p)
+	return len(p), nil
 }
 
 // ReadUint8 returns a uint8 from the reader.
@@ -162,5 +156,5 @@ func (reader *Reader) CompressionReader() *CompressionReader {
 	if reader.rootCmpReader != nil {
 		return reader.rootCmpReader
 	}
-	return NewCompressionReaderWithBytes(reader.Bytes)
+	return NewCompressionReaderWithBytes(reader.Buffer)
 }
