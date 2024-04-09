@@ -14,8 +14,6 @@
 
 package dns
 
-import "bytes"
-
 // PTRRecord represents a PTR record.
 type PTRRecord struct {
 	*record
@@ -44,7 +42,7 @@ func (ptr *PTRRecord) parseResourceRecord() error {
 		return nil
 	}
 	var err error
-	reader := NewReaderWithReader(bytes.NewReader(ptr.data))
+	reader := NewReaderWithBytes(ptr.data)
 	reader.SetCompressionReader(ptr.reader.CompressionReader())
 	ptr.domainName, err = reader.ReadName()
 	return err
