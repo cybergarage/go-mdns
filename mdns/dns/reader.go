@@ -44,6 +44,11 @@ func (reader *Reader) SetCompressionBytes(b []byte) {
 	reader.cmpBytes = b
 }
 
+// CompressionBytes returns the compression bytes.
+func (reader *Reader) CompressionBytes() []byte {
+	return reader.cmpBytes
+}
+
 // Read overwrites the io.Reader interface.
 func (reader *Reader) Read(p []byte) (int, error) {
 	if reader.bufferSize < (reader.offset + len(p)) {
