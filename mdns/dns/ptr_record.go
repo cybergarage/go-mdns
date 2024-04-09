@@ -34,15 +34,16 @@ func newPTRRecordWithResourceRecord(res *record) (*PTRRecord, error) {
 		record:     res,
 		domainName: "",
 	}
-	return ptr, ptr.parseResourceRecord()
+	return ptr, ptr.parseResourceRecord(res.CompressionBytes())
 }
 
-func (ptr *PTRRecord) parseResourceRecord() error {
+func (ptr *PTRRecord) parseResourceRecord(cmpBytes []byte) error {
 	if len(ptr.data) == 0 {
 		return nil
 	}
 	var err error
 	reader := NewReaderWithBytes(ptr.data)
+	reader.SetCompressionBytes(cmpBytes)
 	ptr.domainName, err = reader.ReadName()
 	return err
 }
