@@ -75,6 +75,7 @@ func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) 
 	if err != nil {
 		return nil, err
 	}
+	r.SetCompressionBytes(reader.CompressionBytes())
 
 	switch r.Type() {
 	case PTR:
@@ -106,6 +107,7 @@ func newResponseResourceRecordWithReader(reader *Reader) (ResourceRecord, error)
 	if err != nil {
 		return nil, err
 	}
+	r.SetCompressionBytes(reader.CompressionBytes())
 
 	switch r.Type() {
 	case PTR:
