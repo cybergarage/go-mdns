@@ -15,7 +15,6 @@
 package dns
 
 import (
-	"bytes"
 	"strings"
 )
 
@@ -47,7 +46,7 @@ func (txt *TXTRecord) parseResourceRecord() error {
 	if len(txt.data) == 0 {
 		return nil
 	}
-	reader := NewReaderWithReader(bytes.NewReader(txt.data))
+	reader := NewReaderWithBytes(txt.data)
 	txt.strs, err = reader.ReadStrings()
 	return err
 }
