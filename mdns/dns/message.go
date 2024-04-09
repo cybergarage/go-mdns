@@ -56,7 +56,11 @@ func NewResponseMessage() *Message {
 
 // NewMessageWithBytes returns a message instance with the specified bytes.
 func NewMessageWithBytes(msgBytes []byte) (*Message, error) {
-	return NewMessageWithReader(bytes.NewReader(msgBytes))
+	msg := NewMessage()
+	if err := msg.Parse(msgBytes); err != nil {
+		return nil, err
+	}
+	return msg, nil
 }
 
 // AddQuestion adds the specified question into the message.
@@ -84,7 +88,8 @@ func (msg *Message) AddAddition(a Addition) {
 }
 
 // Parse parses the specified reader.
-func (msg *Message) Parse(reader *Reader) error {
+func (msg *Message) Parse(msgBytes []byte) error {
+	reader := NewReaderWithBytes(msgBytes)
 	if err := msg.Header.Parse(reader); err != nil {
 		return fmt.Errorf("header : %w", err)
 	}
