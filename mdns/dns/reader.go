@@ -23,7 +23,8 @@ import (
 
 // Reader represents a record reader.
 type Reader struct {
-	Buffer     []byte
+	cmpBytes   []byte
+	buffer     []byte
 	bufferSize int
 	offset     int
 }
@@ -31,10 +32,16 @@ type Reader struct {
 // NewReaderWithBytes returns a new reader instance with the specified bytes.
 func NewReaderWithBytes(b []byte) *Reader {
 	return &Reader{
-		Buffer:     b,
+		cmpBytes:   b,
+		buffer:     b,
 		bufferSize: int(len(b)),
 		offset:     0,
 	}
+}
+
+// SetCompressionBytes sets the compression bytes.
+func (reader *Reader) SetCompressionBytes(b []byte) {
+	reader.cmpBytes = b
 }
 
 // Read overwrites the io.Reader interface.
@@ -42,7 +49,7 @@ func (reader *Reader) Read(p []byte) (int, error) {
 	if reader.bufferSize < (reader.offset + len(p)) {
 		return 0, io.EOF
 	}
-	copy(p, reader.Buffer[reader.offset:])
+	copy(p, reader.buffer[reader.offset:])
 	reader.offset += len(p)
 	return len(p), nil
 }
@@ -52,7 +59,7 @@ func (reader *Reader) ReadUint8() (uint8, error) {
 	if reader.bufferSize < (reader.offset + 1) {
 		return 0, io.EOF
 	}
-	v := uint8(reader.Buffer[reader.offset])
+	v := uint8(reader.buffer[reader.offset])
 	reader.offset++
 	return v, nil
 }
@@ -62,7 +69,7 @@ func (reader *Reader) ReadUint16() (uint16, error) {
 	if reader.bufferSize < (reader.offset + 2) {
 		return 0, io.EOF
 	}
-	v := encoding.BytesToInteger(reader.Buffer[reader.offset : reader.offset+2])
+	v := encoding.BytesToInteger(reader.buffer[reader.offset : reader.offset+2])
 	reader.offset += 2
 	return uint16(v), nil
 }
@@ -158,5 +165,5 @@ func (reader *Reader) CompressionReader() *CompressionReader {
 	if reader.rootCmpReader != nil {
 		return reader.rootCmpReader
 	}
-	return NewCompressionReaderWithBytes(reader.Buffer)
+	return NewCompressionReaderWithBytes(reader.buffer)
 }
