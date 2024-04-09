@@ -48,6 +48,10 @@ type Record interface {
 	Data() []byte
 	// Content returns a string representation to the record data.
 	Content() string
+	// SetCompressionBytes sets the compression bytes.
+	SetCompressionBytes(b []byte)
+	// CompressionBytes returns the compression bytes.
+	CompressionBytes() []byte
 	// Bytes returns the binary representation.
 	Bytes() []byte
 	// RequestBytes returns only the binary representation of the request fields.

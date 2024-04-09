@@ -43,7 +43,6 @@ func (ptr *PTRRecord) parseResourceRecord() error {
 	}
 	var err error
 	reader := NewReaderWithBytes(ptr.data)
-	reader.SetCompressionReader(ptr.reader.CompressionReader())
 	ptr.domainName, err = reader.ReadName()
 	return err
 }

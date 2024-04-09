@@ -34,6 +34,7 @@ type record struct {
 	class           Class
 	ttl             uint
 	data            []byte
+	cmpBytes        []byte
 }
 
 // newResourceRecord returns a new base record instance.
@@ -46,6 +47,7 @@ func newResourceRecord() *record {
 		class:           0,
 		ttl:             0,
 		data:            nil,
+		cmpBytes:        nil,
 	}
 }
 
@@ -332,6 +334,16 @@ func (r *record) ResponseBytes() []byte {
 	bytes = append(bytes, r.data...)
 
 	return bytes
+}
+
+// SetCompressionBytes sets the compression bytes.
+func (r *record) SetCompressionBytes(b []byte) {
+	r.cmpBytes = b
+}
+
+// CompressionBytes returns the compression bytes.
+func (r *record) CompressionBytes() []byte {
+	return r.cmpBytes
 }
 
 // Bytes returns the binary representation.
