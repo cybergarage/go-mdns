@@ -16,6 +16,7 @@ package dns
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/cybergarage/go-mdns/mdns/encoding"
@@ -130,13 +131,13 @@ func (reader *Reader) ReadName() (string, error) {
 			}
 			nameOffset := (int(nextNameLen & ^nameIsCompressionMask) << 8) + int(remainNameOffset)
 
-			compReader := reader.CompressionReader()
-			if err := compReader.Skip(nameOffset); err != nil {
-				return "", err
+			cmpBytes := reader.CompressionBytes()
+			if len(cmpBytes) <= nameOffset {
+				return "", fmt.Errorf("invalid compression offset : %d", nameOffset)
 			}
 
-			nextCompReader := NewReaderWithReader(compReader)
-			nextCompReader.SetCompressionReader(NewCompressionReaderWithBytes(compReader.Bytes()))
+			nextCompReader := NewReaderWithBytes(cmpBytes[nameOffset:])
+			nextCompReader.SetCompressionBytes(cmpBytes)
 			return nextCompReader.ReadName()
 		}
 		if nextNameLen == 0 {
@@ -157,18 +158,4 @@ func (reader *Reader) ReadName() (string, error) {
 		return "", err
 	}
 	return name, nil
-}
-
-// SetCompressionReader sets a read reader instance.
-func (reader *Reader) SetCompressionReader(cmpReader *CompressionReader) *Reader {
-	reader.rootCmpReader = cmpReader
-	return reader
-}
-
-// CompressionReader returns a read reader instance.
-func (reader *Reader) CompressionReader() *CompressionReader {
-	if reader.rootCmpReader != nil {
-		return reader.rootCmpReader
-	}
-	return NewCompressionReaderWithBytes(reader.buffer)
 }
