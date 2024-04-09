@@ -17,7 +17,6 @@ package dns
 import (
 	"bytes"
 	"fmt"
-	"io"
 )
 
 // Message represents a protocol message.
@@ -53,15 +52,6 @@ func NewResponseMessage() *Message {
 	msg := NewMessage()
 	msg.Header = NewResponseHeader()
 	return msg
-}
-
-// NewMessageWithReader returns a message instance with the specified reader.
-func NewMessageWithReader(reader io.Reader) (*Message, error) {
-	msg := NewMessage()
-	if err := msg.Parse(NewReaderWithReader(reader)); err != nil {
-		return nil, err
-	}
-	return msg, nil
 }
 
 // NewMessageWithBytes returns a message instance with the specified bytes.
