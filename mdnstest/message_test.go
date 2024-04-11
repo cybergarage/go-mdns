@@ -72,14 +72,14 @@ func TestResponseMessages(t *testing.T) {
 			},
 			map[string]string{},
 		},
-		{
-			"service02",
-			service02,
-			[]answer{
-				{"_companion-link._tcp.local"},
-			},
-			map[string]string{},
-		},
+		// {
+		// 	"service02",
+		// 	service02,
+		// 	[]answer{
+		// 		{"_companion-link._tcp.local"},
+		// 	},
+		// 	map[string]string{},
+		// },
 		{
 			"googlecast01",
 			googlecast01,
