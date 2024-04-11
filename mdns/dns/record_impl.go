@@ -90,15 +90,10 @@ func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) 
 	return r, nil
 }
 
-// newResponseRecordWithReader returns a new response resource record instance with the specified reader.
-func newResponseRecordWithReader(reader *Reader) (*record, error) {
-	r := newRecordWithReader(reader)
-	return r, r.ParseResponse(reader)
-}
-
 // newResponseResourceRecordWithReader returns a new response resource record instance with the specified reader.
 func newResponseResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
-	r, err := newResponseRecordWithReader(reader)
+	r := newRecordWithReader(reader)
+	err := r.ParseResponse(reader)
 	if err != nil {
 		return nil, err
 	}
