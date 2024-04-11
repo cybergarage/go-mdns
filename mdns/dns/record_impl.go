@@ -16,9 +16,7 @@ package dns
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"io"
 	"strings"
 	"unicode"
 
@@ -237,23 +235,17 @@ func (r *record) parseResourceRecord(reader *Reader) error {
 	}
 
 	// Parses TTL
-	ttlBytes := make([]byte, 4)
-	_, err = reader.Read(ttlBytes)
+	ttl, err := reader.ReadUint32()
 	if err != nil {
-		if errors.Is(err, io.EOF) { // QR == 0
-			return nil
-		}
 		return err
 	}
-	r.ttl = encoding.BytesToInteger(ttlBytes)
+	r.ttl = uint(ttl)
 
 	// Parses data
-	dataLenBytes := make([]byte, 2)
-	_, err = reader.Read(dataLenBytes)
+	dataLen, err := reader.ReadUint16()
 	if err != nil {
 		return err
 	}
-	dataLen := encoding.BytesToInteger(dataLenBytes)
 	r.data = make([]byte, dataLen)
 	if 0 < dataLen {
 		_, err = reader.Read(r.data)
