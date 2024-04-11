@@ -38,6 +38,6 @@ func NewQuestionWithRecord(record *record) *Question {
 
 // NewQuestionWithRecord returns a new question instance with the specified record.
 func NewQuestionWithReader(reader *Reader) (*Question, error) {
-	r, err := newRequestRecordWithReader(reader)
+	r, err := NewRequestRecordWithReader(reader)
 	return NewQuestionWithRecord(r), err
 }

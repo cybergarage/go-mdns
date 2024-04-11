@@ -240,7 +240,7 @@ func TestResourceRecord(t *testing.T) {
 			},
 		}
 		for _, test := range tests {
-			q, err := newRequestRecordWithReader(NewReaderWithBytes(test.query))
+			q, err := NewRequestRecordWithReader(NewReaderWithBytes(test.query))
 			if err != nil {
 				t.Error(err)
 			}
