@@ -94,27 +94,9 @@ func (msg *Message) Parse(msgBytes []byte) error {
 		return fmt.Errorf("header : %w", err)
 	}
 
-	parseRecordWithReader := func(reader *Reader) (*record, error) {
-		var r *record
-		var err error
-		r, err = newRequestRecordWithReader(reader)
-		return r, err
-	}
-
-	parseResourceRecordWithReader := func(reader *Reader) (ResourceRecord, error) {
-		var r ResourceRecord
-		var err error
-		if msg.IsQuery() {
-			r, err = newRequestResourceRecordWithReader(reader)
-		} else {
-			r, err = newResponseResourceRecordWithReader(reader)
-		}
-		return r, err
-	}
-
 	// Parses questions.
 	for n := 0; n < int(msg.QD()); n++ {
-		r, err := parseRecordWithReader(reader)
+		r, err := newRequestRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("question[%d] : %w", n, err)
 		}
@@ -122,7 +104,7 @@ func (msg *Message) Parse(msgBytes []byte) error {
 	}
 	// Parses answers.
 	for n := 0; n < int(msg.AN()); n++ {
-		a, err := parseResourceRecordWithReader(reader)
+		a, err := newResponseResourceRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("answer[%d] : %w", n, err)
 		}
@@ -130,7 +112,7 @@ func (msg *Message) Parse(msgBytes []byte) error {
 	}
 	// Parses authorities.
 	for n := 0; n < int(msg.NS()); n++ {
-		ns, err := parseResourceRecordWithReader(reader)
+		ns, err := newResponseResourceRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("authority[%d] : %w", n, err)
 		}
@@ -138,7 +120,7 @@ func (msg *Message) Parse(msgBytes []byte) error {
 	}
 	// Parses additional records.
 	for n := 0; n < int(msg.AR()); n++ {
-		a, err := parseResourceRecordWithReader(reader)
+		a, err := newResponseResourceRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("additional[%d] : %w", n, err)
 		}
