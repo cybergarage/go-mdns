@@ -64,32 +64,6 @@ func newRequestRecordWithReader(reader *Reader) (*record, error) {
 	return r, r.ParseRequest(reader)
 }
 
-// newRequestResourceRecordWithReader returns a new request resource record instance with the specified reader.
-func newRequestResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
-	r, err := newRequestRecordWithReader(reader)
-	if err != nil {
-		return nil, err
-	}
-	r.SetCompressionBytes(reader.CompressionBytes())
-
-	switch r.Type() {
-	case PTR:
-		return newPTRRecordWithResourceRecord(r)
-	case SRV:
-		return newSRVRecordWithResourceRecord(r)
-	case TXT:
-		return newTXTRecordWithResourceRecord(r)
-	case A:
-		return newARecordWithResourceRecord(r), nil
-	case AAAA:
-		return newAAAARecordWithResourceRecord(r), nil
-	case NSEC:
-		return newNSECRecordWithResourceRecord(r)
-	}
-
-	return r, nil
-}
-
 // newResponseResourceRecordWithReader returns a new response resource record instance with the specified reader.
 func newResponseResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
 	r := newRecordWithReader(reader)
