@@ -231,7 +231,7 @@ func (r *record) Content() string {
 	return c
 }
 
-func (r *record) parseResouce(reader *Reader) error {
+func (r *record) parseSection(reader *Reader) error {
 	// Parses domain names
 	name, err := reader.ReadName()
 	if err != nil {
@@ -265,14 +265,14 @@ func (r *record) parseResouce(reader *Reader) error {
 
 // ParseRequest parses a request record from the specified reader.
 func (r *record) ParseRequest(reader *Reader) error {
-	return r.parseResouce(reader)
+	return r.parseSection(reader)
 }
 
 // ParseResponse parses a response record from the specified reader.
 func (r *record) ParseResponse(reader *Reader) error {
 	var err error
 
-	err = r.parseResouce(reader)
+	err = r.parseSection(reader)
 	if err != nil {
 		return err
 	}
