@@ -58,11 +58,6 @@ func newRecordWithReader(reader *Reader) *record {
 	return r
 }
 
-// newResourceRecordWithReader returns a new resource record instance with the specified reader.
-func newResourceRecordWithReader(reader *Reader) (ResourceRecord, error) {
-	return newResponseResourceRecordWithReader(reader)
-}
-
 // newRequestRecordWithReader returns a new request resource record instance with the specified reader.
 func newRequestRecordWithReader(reader *Reader) (*record, error) {
 	r := newRecordWithReader(reader)
