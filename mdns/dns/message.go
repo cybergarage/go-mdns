@@ -96,7 +96,7 @@ func (msg *Message) Parse(msgBytes []byte) error {
 
 	// Parses questions.
 	for n := 0; n < int(msg.QD()); n++ {
-		r, err := newRequestRecordWithReader(reader)
+		r, err := NewRequestRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("question[%d] : %w", n, err)
 		}
