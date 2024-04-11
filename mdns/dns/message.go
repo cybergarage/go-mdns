@@ -104,7 +104,7 @@ func (msg *Message) Parse(msgBytes []byte) error {
 	}
 	// Parses answers.
 	for n := 0; n < int(msg.AN()); n++ {
-		a, err := newResponseResourceRecordWithReader(reader)
+		a, err := NewResourceRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("answer[%d] : %w", n, err)
 		}
@@ -112,7 +112,7 @@ func (msg *Message) Parse(msgBytes []byte) error {
 	}
 	// Parses authorities.
 	for n := 0; n < int(msg.NS()); n++ {
-		ns, err := newResponseResourceRecordWithReader(reader)
+		ns, err := NewResourceRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("authority[%d] : %w", n, err)
 		}
@@ -120,7 +120,7 @@ func (msg *Message) Parse(msgBytes []byte) error {
 	}
 	// Parses additional records.
 	for n := 0; n < int(msg.AR()); n++ {
-		a, err := newResponseResourceRecordWithReader(reader)
+		a, err := NewResourceRecordWithReader(reader)
 		if err != nil {
 			return fmt.Errorf("additional[%d] : %w", n, err)
 		}
