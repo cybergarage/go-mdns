@@ -80,6 +80,16 @@ func (reader *Reader) ReadUint16() (uint16, error) {
 	return uint16(v), nil
 }
 
+// ReadUint32 returns a uint32 from the reader.
+func (reader *Reader) ReadUint32() (uint32, error) {
+	if reader.bufferSize < (reader.offset + 4) {
+		return 0, io.EOF
+	}
+	v := encoding.BytesToInteger(reader.buffer[reader.offset : reader.offset+4])
+	reader.offset += 4
+	return uint32(v), nil
+}
+
 // ReadString returns a string from the reader.
 func (reader *Reader) ReadString() (string, error) {
 	l, err := reader.ReadUint8()
