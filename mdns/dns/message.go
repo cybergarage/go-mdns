@@ -97,11 +97,7 @@ func (msg *Message) Parse(msgBytes []byte) error {
 	parseRecordWithReader := func(reader *Reader) (*record, error) {
 		var r *record
 		var err error
-		if msg.IsQuery() {
-			r, err = newRequestRecordWithReader(reader)
-		} else {
-			r, err = newResponseRecordWithReader(reader)
-		}
+		r, err = newRequestRecordWithReader(reader)
 		return r, err
 	}
 
