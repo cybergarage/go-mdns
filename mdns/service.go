@@ -86,35 +86,43 @@ func (srv *Service) parseMessage(msg *Message) error {
 	srv.Message = msg
 
 	for _, record := range msg.ResourceRecords() {
-		switch rr := record.(type) {
-		case *dns.SRVRecord:
-			host := rr.Target()
-			if 0 < len(host) {
-				srv.host = host
-			}
-			port := rr.Port()
-			if 0 < port {
-				srv.port = port
-			}
-		case *dns.TXTRecord:
-			srv.name = rr.Name()
-			attrs, err := rr.Attributes()
-			if err == nil {
-				srv.Attributes = append(srv.Attributes, attrs...)
-			}
-		case *dns.ARecord:
-			ip := rr.Address()
-			if ip != nil {
-				srv.addrs = append(srv.addrs, ip)
-			}
-		case *dns.AAAARecord:
-			ip := rr.Address()
-			if ip != nil {
-				srv.addrs = append(srv.addrs, ip)
-			}
+		err := srv.parseRecord(record)
+		if err != nil {
+			return err
 		}
 	}
 
+	return nil
+}
+
+func (srv *Service) parseRecord(record dns.Record) error {
+	switch rr := record.(type) {
+	case *dns.SRVRecord:
+		host := rr.Target()
+		if 0 < len(host) {
+			srv.host = host
+		}
+		port := rr.Port()
+		if 0 < port {
+			srv.port = port
+		}
+	case *dns.TXTRecord:
+		srv.name = rr.Name()
+		attrs, err := rr.Attributes()
+		if err == nil {
+			srv.Attributes = append(srv.Attributes, attrs...)
+		}
+	case *dns.ARecord:
+		ip := rr.Address()
+		if ip != nil {
+			srv.addrs = append(srv.addrs, ip)
+		}
+	case *dns.AAAARecord:
+		ip := rr.Address()
+		if ip != nil {
+			srv.addrs = append(srv.addrs, ip)
+		}
+	}
 	return nil
 }
 
