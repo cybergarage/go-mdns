@@ -38,14 +38,41 @@ func (writer *Writer) WriteUint8(v uint8) error {
 
 // WriteUint16 writes a uint16 value.
 func (writer *Writer) WriteUint16(v uint16) error {
-	_, err := writer.Write([]byte{byte(v >> 8), byte(v)})
-	return err
+	return writer.WriteBytes([]byte{byte(v >> 8), byte(v)})
 }
 
 // WriteUint32 writes a uint32 value.
 func (writer *Writer) WriteUint32(v uint32) error {
-	_, err := writer.Write([]byte{byte(v >> 24), byte(v >> 16), byte(v >> 8), byte(v)})
+	return writer.WriteBytes([]byte{byte(v >> 24), byte(v >> 16), byte(v >> 8), byte(v)})
+}
+
+// WriteBytes writes bytes.
+func (writer *Writer) WriteBytes(v []byte) error {
+	_, err := writer.Write(v)
 	return err
+}
+
+// WriteType writes a type.
+func (writer *Writer) WriteType(v Type) error {
+	return writer.WriteUint16(uint16(v))
+}
+
+// WriteClass writes a class.
+func (writer *Writer) WriteClass(v Class) error {
+	return writer.WriteUint16(uint16(v))
+}
+
+// WriteTTL writes a TTL.
+func (writer *Writer) WriteTTL(v uint) error {
+	return writer.WriteUint32(uint32(v))
+}
+
+// WriteData writes data.
+func (writer *Writer) WriteData(v []byte) error {
+	if err := writer.WriteUint16(uint16(len(v))); err != nil {
+		return err
+	}
+	return writer.WriteBytes(v)
 }
 
 // WriteString writes a string with a length.
