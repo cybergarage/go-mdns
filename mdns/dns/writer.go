@@ -80,7 +80,8 @@ func (writer *Writer) WriteString(v string) error {
 	if err := writer.WriteUint8(uint8(len(v))); err != nil {
 		return err
 	}
-	return writer.WriteString(v)
+	_, err := writer.Buffer.WriteString(v)
+	return err
 }
 
 // WriteName writes a name.
