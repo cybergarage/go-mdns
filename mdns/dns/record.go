@@ -52,10 +52,10 @@ type Record interface {
 	SetCompressionBytes(b []byte)
 	// CompressionBytes returns the compression bytes.
 	CompressionBytes() []byte
-	// Bytes returns the binary representation.
-	Bytes() []byte
 	// RequestBytes returns only the binary representation of the request fields.
-	RequestBytes() []byte
+	RequestBytes() ([]byte, error)
 	// ResponseBytes returns only the binary representation of the all fields.
-	ResponseBytes() []byte
+	ResponseBytes() ([]byte, error)
+	// Bytes returns the binary representation of the record.
+	Bytes() ([]byte, error)
 }
