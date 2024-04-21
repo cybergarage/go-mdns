@@ -201,29 +201,45 @@ func (msg *Message) Bytes() []byte {
 	bytes := msg.Header.Bytes()
 	if msg.IsQuery() {
 		for _, q := range msg.Questions {
-			bytes = append(bytes, q.RequestBytes()...)
+			if b, err := q.RequestBytes(); err == nil {
+				bytes = append(bytes, b...)
+			}
 		}
 		for _, an := range msg.Answers {
-			bytes = append(bytes, an.RequestBytes()...)
+			if b, err := an.RequestBytes(); err == nil {
+				bytes = append(bytes, b...)
+			}
 		}
 		for _, ns := range msg.NameServers {
-			bytes = append(bytes, ns.RequestBytes()...)
+			if b, err := ns.RequestBytes(); err == nil {
+				bytes = append(bytes, b...)
+			}
 		}
 		for _, a := range msg.Additions {
-			bytes = append(bytes, a.RequestBytes()...)
+			if b, err := a.RequestBytes(); err == nil {
+				bytes = append(bytes, b...)
+			}
 		}
 	} else {
 		for _, q := range msg.Questions {
-			bytes = append(bytes, q.ResponseBytes()...)
+			if b, err := q.ResponseBytes(); err == nil {
+				bytes = append(bytes, b...)
+			}
 		}
 		for _, an := range msg.Answers {
-			bytes = append(bytes, an.ResponseBytes()...)
+			if b, err := an.ResponseBytes(); err == nil {
+				bytes = append(bytes, b...)
+			}
 		}
 		for _, ns := range msg.NameServers {
-			bytes = append(bytes, ns.ResponseBytes()...)
+			if b, err := ns.ResponseBytes(); err == nil {
+				bytes = append(bytes, b...)
+			}
 		}
 		for _, a := range msg.Additions {
-			bytes = append(bytes, a.ResponseBytes()...)
+			if b, err := a.ResponseBytes(); err == nil {
+				bytes = append(bytes, b...)
+			}
 		}
 	}
 	return bytes

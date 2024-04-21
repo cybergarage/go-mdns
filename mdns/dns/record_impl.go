@@ -258,26 +258,35 @@ func (r *record) parseResourceRecord(reader *Reader) error {
 }
 
 // RequestBytes returns only the binary representation of the request fields.
-func (r *record) RequestBytes() []byte {
-	bytes := nameToBytes(r.name)
+func (r *record) RequestBytes() ([]byte, error) {
+	w := NewWriter()
+	if err := w.WriteName(r.name); err != nil {
+		return nil, err
+	}
+	if err := w.WriteType(r.typ); err != nil {
+		return nil, err
+	}
+	if err := w.WriteClass(r.class); err != nil {
+		return nil, err
+	}
 
-	typeBytes := make([]byte, 2)
-	typ := r.typ
-	bytes = append(bytes, encoding.IntegerToBytes(uint(typ), typeBytes)...)
-
-	classBytes := make([]byte, 2)
 	cls := r.class
 	if r.unicastResponse {
 		cls |= cacheFlushMask
 	}
-	bytes = append(bytes, encoding.IntegerToBytes(uint(cls), classBytes)...)
+	if err := w.WriteClass(cls); err != nil {
+		return nil, err
+	}
 
-	return bytes
+	return w.Bytes(), nil
 }
 
 // ResponseBytes returns only the binary representation of the all fields.
-func (r *record) ResponseBytes() []byte {
-	bytes := r.RequestBytes()
+func (r *record) ResponseBytes() ([]byte, error) {
+	bytes, err := r.RequestBytes()
+	if err != nil {
+		return nil, err
+	}
 
 	ttlBytes := make([]byte, 4)
 	bytes = append(bytes, encoding.IntegerToBytes(r.ttl, ttlBytes)...)
@@ -286,7 +295,12 @@ func (r *record) ResponseBytes() []byte {
 	bytes = append(bytes, encoding.IntegerToBytes(uint(len(r.data)), dataLenBytes)...)
 	bytes = append(bytes, r.data...)
 
-	return bytes
+	return bytes, nil
+}
+
+// Bytes returns the binary representation.
+func (r *record) Bytes() ([]byte, error) {
+	return r.ResponseBytes()
 }
 
 // SetCompressionBytes sets the compression bytes.
@@ -299,12 +313,15 @@ func (r *record) CompressionBytes() []byte {
 	return r.cmpBytes
 }
 
-// Bytes returns the binary representation.
-func (r *record) Bytes() []byte {
-	return r.ResponseBytes()
-}
-
 // Equal returns true if this record is equal to  the specified resource record. otherwise false.
 func (r *record) Equal(other ResourceRecord) bool {
-	return bytes.Equal(r.Bytes(), other.Bytes())
+	rBytes, err := r.Bytes()
+	if err != nil {
+		return false
+	}
+	otherBytes, err := other.Bytes()
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(rBytes, otherBytes)
 }
