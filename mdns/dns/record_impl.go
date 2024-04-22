@@ -279,19 +279,19 @@ func (r *record) RequestBytes() ([]byte, error) {
 
 // ResponseBytes returns only the binary representation of the all fields.
 func (r *record) ResponseBytes() ([]byte, error) {
-	bytes, err := r.RequestBytes()
+	commonBytes, err := r.RequestBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	ttlBytes := make([]byte, 4)
-	bytes = append(bytes, encoding.IntegerToBytes(r.ttl, ttlBytes)...)
-
-	dataLenBytes := make([]byte, 2)
-	bytes = append(bytes, encoding.IntegerToBytes(uint(len(r.data)), dataLenBytes)...)
-	bytes = append(bytes, r.data...)
-
-	return bytes, nil
+	w := NewWriter()
+	if err := w.WriteTTL(r.ttl); err != nil {
+		return nil, err
+	}
+	if err := w.WriteData(r.data); err != nil {
+		return nil, err
+	}
+	return append(commonBytes, w.Bytes()...), nil
 }
 
 // Bytes returns the binary representation.
