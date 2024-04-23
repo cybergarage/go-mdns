@@ -266,10 +266,6 @@ func (r *record) RequestBytes() ([]byte, error) {
 	if err := w.WriteType(r.typ); err != nil {
 		return nil, err
 	}
-	if err := w.WriteClass(r.class); err != nil {
-		return nil, err
-	}
-
 	cls := r.class
 	if r.unicastResponse {
 		cls |= cacheFlushMask
