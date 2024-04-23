@@ -199,47 +199,24 @@ func (msg *Message) String() string {
 // Bytes returns the binary representation.
 func (msg *Message) Bytes() []byte {
 	bytes := msg.Header.Bytes()
-	if msg.IsQuery() {
-		for _, q := range msg.Questions {
-			if b, err := q.RequestBytes(); err == nil {
-				bytes = append(bytes, b...)
-			}
+	for _, q := range msg.Questions {
+		if b, err := q.RequestBytes(); err == nil {
+			bytes = append(bytes, b...)
 		}
-		for _, an := range msg.Answers {
-			if b, err := an.RequestBytes(); err == nil {
-				bytes = append(bytes, b...)
-			}
+	}
+	for _, an := range msg.Answers {
+		if b, err := an.ResponseBytes(); err == nil {
+			bytes = append(bytes, b...)
 		}
-		for _, ns := range msg.NameServers {
-			if b, err := ns.RequestBytes(); err == nil {
-				bytes = append(bytes, b...)
-			}
+	}
+	for _, ns := range msg.NameServers {
+		if b, err := ns.ResponseBytes(); err == nil {
+			bytes = append(bytes, b...)
 		}
-		for _, a := range msg.Additions {
-			if b, err := a.RequestBytes(); err == nil {
-				bytes = append(bytes, b...)
-			}
-		}
-	} else {
-		for _, q := range msg.Questions {
-			if b, err := q.ResponseBytes(); err == nil {
-				bytes = append(bytes, b...)
-			}
-		}
-		for _, an := range msg.Answers {
-			if b, err := an.ResponseBytes(); err == nil {
-				bytes = append(bytes, b...)
-			}
-		}
-		for _, ns := range msg.NameServers {
-			if b, err := ns.ResponseBytes(); err == nil {
-				bytes = append(bytes, b...)
-			}
-		}
-		for _, a := range msg.Additions {
-			if b, err := a.ResponseBytes(); err == nil {
-				bytes = append(bytes, b...)
-			}
+	}
+	for _, a := range msg.Additions {
+		if b, err := a.ResponseBytes(); err == nil {
+			bytes = append(bytes, b...)
 		}
 	}
 	return bytes
