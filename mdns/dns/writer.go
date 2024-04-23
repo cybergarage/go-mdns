@@ -31,6 +31,29 @@ func NewWriter() *Writer {
 	}
 }
 
+// WriteHeader writes a header.
+func (writer *Writer) WriteHeader(header *Header) error {
+	if err := writer.WriteUint16(uint16(header.ID())); err != nil {
+		return err
+	}
+	if err := writer.WriteBytes(header.Flags()); err != nil {
+		return err
+	}
+	if err := writer.WriteUint16(uint16(header.QD())); err != nil {
+		return err
+	}
+	if err := writer.WriteUint16(uint16(header.AN())); err != nil {
+		return err
+	}
+	if err := writer.WriteUint16(uint16(header.NS())); err != nil {
+		return err
+	}
+	if err := writer.WriteUint16(uint16(header.AR())); err != nil {
+		return err
+	}
+	return nil
+}
+
 // WriteByte writes a byte value.
 func (writer *Writer) WriteUint8(v uint8) error {
 	return writer.WriteByte(v)
