@@ -108,6 +108,11 @@ func (header *Header) Parse(reader io.Reader) error {
 	return err
 }
 
+// Flags returns the flags.
+func (header *Header) Flags() []byte {
+	return header.bytes[2:4]
+}
+
 // ID returns the query identifier.
 // RFC 6762: 18.1. ID (Query Identifier)
 // In multicast query messages, the Query Identifier SHOULD be set to zero on transmission.
