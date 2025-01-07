@@ -140,7 +140,7 @@ func TestResponseMessages(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			msgBytes, err := log.DecodeHexLog(strings.Split(test.msgLogs, "\n"))
+			msgBytes, err := log.DecodeHexLogs(strings.Split(test.msgLogs, "\n"))
 			if err != nil {
 				t.Error(err)
 				return
