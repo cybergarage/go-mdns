@@ -19,7 +19,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cybergarage/go-logger/log"
+	"github.com/cybergarage/go-logger/log/hexdump"
 	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
@@ -140,7 +140,7 @@ func TestResponseMessages(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			msgBytes, err := log.DecodeHexLogs(strings.Split(test.msgLogs, "\n"))
+			msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.msgLogs, "\n"))
 			if err != nil {
 				t.Error(err)
 				return
