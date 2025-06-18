@@ -103,8 +103,8 @@ func testMulticastServerWithInterface(t *testing.T, ifi *net.Interface, ifaddr s
 }
 
 func TestMulticastServerWithInterface(t *testing.T) {
-	log.SetStdoutDebugEnbled(true)
-	defer log.SetStdoutDebugEnbled(false)
+	log.EnableStdoutDebug(true)
+	defer log.EnableStdoutDebug(false)
 
 	ifis, err := GetAvailableInterfaces()
 	if err != nil {

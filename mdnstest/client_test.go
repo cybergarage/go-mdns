@@ -22,8 +22,8 @@ import (
 )
 
 func TestClient(t *testing.T) {
-	log.SetStdoutDebugEnbled(true)
-	defer log.SetStdoutDebugEnbled(false)
+	log.EnableStdoutDebug(true)
+	defer log.EnableStdoutDebug(false)
 
 	client := mdns.NewClient()
 
