@@ -182,7 +182,7 @@ func (r *record) Data() []byte {
 // Content returns a string representation to the record data.
 func (r *record) Content() string {
 	c := ""
-	for n := 0; n < len(r.data); n++ {
+	for n := range r.data {
 		rb := rune(r.data[n])
 		if unicode.IsPrint(rb) {
 			c += fmt.Sprintf("%c", rb)
