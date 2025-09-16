@@ -93,7 +93,7 @@ func (client *Client) MessageReceived(msg *dns.Message) (*dns.Message, error) {
 
 	ok := client.AddService(newService)
 
-	log.Infof("Add new service (%s): %t", newService.String(), ok)
+	log.Debugf("Add new service (%s): %t", newService.String(), ok)
 
 	return nil, nil
 }
