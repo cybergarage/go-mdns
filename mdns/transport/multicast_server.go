@@ -89,7 +89,7 @@ func handleMulticastConnection(server *MulticastServer, cancel chan interface{})
 				if errors.Is(err, net.ErrClosed) || errors.Is(err, io.EOF) {
 					return
 				}
-				log.Error(err)
+				log.Debugf("Failed to read multicast message: %s", err)
 			}
 			go handleMulticastRequestMessage(server, msg)
 		}

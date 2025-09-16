@@ -109,8 +109,8 @@ func (sock *UDPSocket) ReadMessage() (*dns.Message, error) {
 
 	msg, err := dns.NewMessageWithBytes(sock.ReadBuffer[:n])
 	if err != nil {
-		log.Error(err)
-		log.HexError(sock.ReadBuffer[:n])
+		log.Debugf("Failed to parse DNS message: %s", err)
+		log.HexDebug(sock.ReadBuffer[:n])
 		return nil, err
 	}
 
