@@ -9,6 +9,7 @@
 
 go-mdns is a Go library for Multicast DNS (mDNS) and DNS Service Discovery (DNS-SD) as defined in [RFC 6762](https://www.rfc-editor.org/rfc/rfc6762) and [RFC 6763](https://www.rfc-editor.org/rfc/rfc6763).
 
+**Note:** 🌱 This is a spare-time hobby project, so progress may be slow and changes may appear irregular. Thank you for your patience 🙂
 
 ## References
 
