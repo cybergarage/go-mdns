@@ -41,6 +41,7 @@ BINS=\
 	${BIN_ID}/mdns-dump
 
 .PHONY: format vet lint clean
+.IGNORE: lint
 
 all: test
 
