@@ -21,7 +21,7 @@ import (
 // Message represents a protocol message.
 type Message = dns.Message
 
-// NewMessage returns a nil message instance.
+// NewRequestWithQuery returns a nil message instance.
 func NewRequestWithQuery(query *Query) *Message {
 	msg := dns.NewRequestMessage()
 	q := dns.NewQuestion()

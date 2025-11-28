@@ -37,7 +37,7 @@ func NewServer() *Server {
 	return server
 }
 
-// Set sets a message listner to listen raw protocol messages.
+// SetListener sets a message listner to listen raw protocol messages.
 func (server *Server) SetListener(l MessageListener) {
 	server.userListener = l
 }

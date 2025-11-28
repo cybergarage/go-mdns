@@ -42,7 +42,7 @@ func NewClient() *Client {
 	return client
 }
 
-// Set sets a message listner to listen raw protocol messages.
+// SetListener sets a message listner to listen raw protocol messages.
 func (client *Client) SetListener(l MessageListener) {
 	client.userListener = l
 }

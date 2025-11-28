@@ -36,7 +36,7 @@ func (writer *Writer) WriteHeader(header *Header) error {
 	return writer.WriteBytes(header.Bytes())
 }
 
-// WriteByte writes a byte value.
+// WriteUint8 writes a byte value.
 func (writer *Writer) WriteUint8(v uint8) error {
 	return writer.WriteByte(v)
 }

@@ -25,7 +25,7 @@ const (
 	libvirtInterfaceName = "virbr0"
 )
 
-// IsIPv6Interface returns true whether the specified interface has a IPv6 address.
+// IsIPv6Address returns true whether the specified interface has a IPv6 address.
 func IsIPv6Address(addr string) bool {
 	if len(addr) == 0 {
 		return false

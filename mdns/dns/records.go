@@ -98,7 +98,7 @@ func (records Records) LookupRecordsForName(name string) Records {
 	return lookupRecords
 }
 
-// LookupRecordForType returns the resource records of the specified type.
+// LookupRecordsForType returns the resource records of the specified type.
 func (records Records) LookupRecordsForType(t Type) []Record {
 	resRecords := []Record{}
 	for _, record := range records {
