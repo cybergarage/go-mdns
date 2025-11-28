@@ -1,4 +1,4 @@
-// Copyright (C) 2025 The go-matter Authors. All rights reserved.
+// Copyright (C) 2022 The go-mdns Authors All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cmd
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/cybergarage/go-mdns/mdns/cmd"
+	"github.com/cybergarage/go-logger/log"
+	"github.com/cybergarage/go-mdns/mdns"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
-func main() {
-	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+type Client struct {
+	*mdns.Client
+}
+
+func NewClient() *Client {
+	client := &Client{
+		Client: mdns.NewClient(),
 	}
+	return client
+}
+func (client *Client) MessageReceived(msg *dns.Message) {
+	if msg.IsQuery() {
+		return
+	}
+	log.HexInfo(msg.Bytes())
 }

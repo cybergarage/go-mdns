@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cmd
 
 import (
+	"fmt"
+
 	"github.com/cybergarage/go-logger/log"
-	"github.com/cybergarage/go-mdns/mdns"
-	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
-type Client struct {
-	*mdns.Client
+func outputf(format string, args ...any) {
+	fmt.Printf(format, args...)
 }
 
-func NewClient() *Client {
-	client := &Client{
-		Client: mdns.NewClient(),
-	}
-	return client
+func errorf(format string, args ...any) {
+	fmt.Printf(format, args...)
 }
-func (client *Client) MessageReceived(msg *dns.Message) {
-	if msg.IsQuery() {
-		return
+
+func enableStdoutVerbose(flag bool) {
+	if flag {
+		log.SetSharedLogger(log.NewStdoutLogger(log.LevelInfo))
+	} else {
+		log.SetSharedLogger(nil)
 	}
-	log.HexInfo(msg.Bytes())
 }
