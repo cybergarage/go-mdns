@@ -29,16 +29,14 @@ TEST_PKG_ID=${MODULE_ROOT}/${TEST_PKG_NAME}
 TEST_PKG_DIR=${TEST_PKG_NAME}
 TEST_PKG=${MODULE_ROOT}/${TEST_PKG_DIR}
 
-BIN_ROOT_DIR=bin
+BIN_ROOT_DIR=cmd
 BIN_ID=${MODULE_ROOT}/${BIN_ROOT_DIR}
 BIN_SRCS=\
-	${BIN_ROOT_DIR}/mdns-browse \
-	${BIN_ROOT_DIR}/mdns-server \
-	${BIN_ROOT_DIR}/mdns-dump
+	${BIN_ROOT_DIR}/mdnsctrl \
+	${BIN_ROOT_DIR}/mdnsd
 BINS=\
-	${BIN_ID}/mdns-browse \
-	${BIN_ID}/mdns-server \
-	${BIN_ID}/mdns-dump
+	${BIN_ID}/mdnsctrl \
+	${BIN_ID}/mdnsd
 
 .PHONY: format vet lint clean
 .IGNORE: lint
