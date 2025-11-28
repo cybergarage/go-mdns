@@ -27,7 +27,7 @@ import (
 type MulticastServer struct {
 	*Server
 	*MulticastSocket
-	Channel chan interface{}
+	Channel chan any
 	Handler MulticastHandler
 }
 
@@ -52,7 +52,7 @@ func (server *MulticastServer) Start(ifi *net.Interface, ifaddr string) error {
 	if err := server.MulticastSocket.Bind(ifi, ifaddr); err != nil {
 		return err
 	}
-	server.Channel = make(chan interface{})
+	server.Channel = make(chan any)
 	go handleMulticastConnection(server, server.Channel)
 	return nil
 }
@@ -77,7 +77,7 @@ func handleMulticastRequestMessage(server *MulticastServer, reqMsg *dns.Message)
 	server.AnnounceMessage(resMsg)
 }
 
-func handleMulticastConnection(server *MulticastServer, cancel chan interface{}) {
+func handleMulticastConnection(server *MulticastServer, cancel chan any) {
 	defer server.Socket.Close()
 	for {
 		select {

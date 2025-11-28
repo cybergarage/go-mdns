@@ -17,6 +17,7 @@ package dns
 import (
 	"fmt"
 	"net"
+	"strings"
 )
 
 // AAAARecord represents a AAAA record.
@@ -43,14 +44,14 @@ func (a *AAAARecord) Address() net.IP {
 	if len(a.data) != 16 {
 		return nil
 	}
-	ipstr := ""
+	var ipstr strings.Builder
 	for n, b := range a.data {
 		if (n != 0) && ((n % 2) == 0) {
-			ipstr += ":"
+			ipstr.WriteString(":")
 		}
-		ipstr += fmt.Sprintf("%02x", b)
+		ipstr.WriteString(fmt.Sprintf("%02x", b))
 	}
-	return net.ParseIP(ipstr)
+	return net.ParseIP(ipstr.String())
 }
 
 // Content returns a string representation to the record data.

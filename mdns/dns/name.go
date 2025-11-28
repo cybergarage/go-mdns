@@ -26,8 +26,8 @@ const (
 
 func nameToBytes(name string) []byte {
 	bytes := []byte{}
-	tokens := strings.Split(name, nameSep)
-	for _, token := range tokens {
+	tokens := strings.SplitSeq(name, nameSep)
+	for token := range tokens {
 		if len(token) == 0 {
 			continue
 		}

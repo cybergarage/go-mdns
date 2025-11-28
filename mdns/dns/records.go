@@ -17,6 +17,7 @@ package dns
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // Records is a list of Record.
@@ -186,19 +187,19 @@ func (records Records) String() string {
 		}
 	}
 
-	str := ""
+	var str strings.Builder
 	for n, r := range lines {
 		for n, s := range r {
 			sfmt := "%-" + strconv.Itoa(maxRecordLen[n]) + "s"
-			str += fmt.Sprintf(sfmt, s)
+			str.WriteString(fmt.Sprintf(sfmt, s))
 			if n < len(r)-1 {
-				str += " "
+				str.WriteString(" ")
 			}
 		}
 		if n < len(lines)-1 {
-			str += "\n"
+			str.WriteString("\n")
 		}
 	}
 
-	return str
+	return str.String()
 }

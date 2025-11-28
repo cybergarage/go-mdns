@@ -17,6 +17,7 @@ package transport
 import (
 	"errors"
 	"net"
+	"slices"
 	"strings"
 )
 
@@ -49,12 +50,7 @@ func IsIPv6Interface(ifi *net.Interface) bool {
 	if err != nil {
 		return false
 	}
-	for _, addr := range addrs {
-		if IsIPv6Address(addr) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(addrs, IsIPv6Address)
 }
 
 // IsIPv4Interface returns true whether the specified address is a IPv4 address.
@@ -63,12 +59,7 @@ func IsIPv4Interface(ifi *net.Interface) bool {
 	if err != nil {
 		return false
 	}
-	for _, addr := range addrs {
-		if IsIPv4Address(addr) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(addrs, IsIPv4Address)
 }
 
 // IsLoopbackAddress returns true whether the specified address is a loopback addresses.
@@ -77,12 +68,7 @@ func IsLoopbackAddress(addr string) bool {
 		"127.0.0.1",
 		"::1",
 	}
-	for _, localAddr := range localAddrs {
-		if localAddr == addr {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(localAddrs, addr)
 }
 
 // IsCommunicableAddress returns true whether the address is a effective address to commnicate with other nodes, othwise false.

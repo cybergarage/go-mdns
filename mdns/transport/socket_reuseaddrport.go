@@ -13,7 +13,6 @@
 // limitations under the License.
 
 //go:build bsd || freebsd || darwin
-// +build bsd freebsd darwin
 
 package transport
 

@@ -181,16 +181,16 @@ func (r *record) Data() []byte {
 
 // Content returns a string representation to the record data.
 func (r *record) Content() string {
-	c := ""
+	var c strings.Builder
 	for n := range r.data {
 		rb := rune(r.data[n])
 		if unicode.IsPrint(rb) {
-			c += fmt.Sprintf("%c", rb)
+			c.WriteString(fmt.Sprintf("%c", rb))
 		} else {
-			c += "."
+			c.WriteString(".")
 		}
 	}
-	return c
+	return c.String()
 }
 
 func (r *record) parseSection(reader *Reader) error {
