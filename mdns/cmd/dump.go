@@ -16,9 +16,11 @@ package cmd
 
 import (
 	"fmt"
-	"time"
+	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/cybergarage/go-mdns/mdns"
+	"github.com/cybergarage/go-logger/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -27,10 +29,10 @@ func init() {
 	rootCmd.AddCommand(dumpCmd)
 }
 
-var scanCmd = &cobra.Command{ // nolint:exhaustruct
-	Use:   "scan",
-	Short: "Scan for mDNS devices.",
-	Long:  "Scan for mDNS devices.",
+var dumpCmd = &cobra.Command{ // nolint:exhaustruct
+	Use:   "dump",
+	Short: "Dump mDNS messages.",
+	Long:  "Dump mDNS messages.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		verbose := viper.GetBool(VerboseParamStr)
 		if verbose {
@@ -38,6 +40,8 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 		}
 
 		client := NewClient()
+		client.SetListener(client)
+
 		err := client.Start()
 		if err != nil {
 			return err
@@ -45,27 +49,33 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 
 		defer client.Stop()
 
-		services := []string{
-			"_services._dns-sd._udp",
-			"_rdlink._tcp",
-			"_companion - link._tcp",
-			"_services._dns-sd._udp",
-		}
+		sigCh := make(chan os.Signal, 1)
 
-		err = client.Query(mdns.NewQueryWithServices(services))
-		if err != nil {
-			return err
-		}
+		signal.Notify(sigCh,
+			os.Interrupt,
+			syscall.SIGHUP,
+			syscall.SIGINT,
+			syscall.SIGTERM)
 
-		// Wait node responses in the local network
+		exitCh := make(chan int)
 
-		time.Sleep(time.Second * 10)
+		go func() {
+			for {
+				s := <-sigCh
+				switch s {
+				case syscall.SIGINT, syscall.SIGTERM:
+					if err := client.Stop(); err != nil {
+						log.Errorf("couldn't be terminated (%s)", err.Error())
+						os.Exit(1)
+					}
+					exitCh <- 0
+				}
+			}
+		}()
 
-		// Output all found nodes
-
-		for n, srv := range client.Services() {
-			fmt.Printf("[%d] %s\n", n, srv.String())
-			fmt.Printf("%s\n", srv.Records().String())
+		code := <-exitCh
+		if code != 0 {
+			return fmt.Errorf("dump failed with code (%d)", code)
 		}
 
 		return nil
