@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(dumpCmd)
+	rootCmd.AddCommand(scanCmd)
 }
 
 var scanCmd = &cobra.Command{ // nolint:exhaustruct
