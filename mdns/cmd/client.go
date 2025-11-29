@@ -18,6 +18,7 @@ import (
 	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/cybergarage/go-mdns/mdns/dns"
+	"github.com/spf13/viper"
 )
 
 type Client struct {
@@ -28,8 +29,18 @@ func NewClient() *Client {
 	client := &Client{
 		Client: mdns.NewClient(),
 	}
+	verbose := viper.GetBool(VerboseParamStr)
+	debug := viper.GetBool(DebugParamStr)
+	if debug {
+		verbose = true
+	}
+	if verbose {
+		enableStdoutVerbose(verbose, debug)
+		client.SetListener(client)
+	}
 	return client
 }
+
 func (client *Client) MessageReceived(msg *dns.Message) {
 	if msg.IsQuery() {
 		return

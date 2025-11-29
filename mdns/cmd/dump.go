@@ -22,7 +22,6 @@ import (
 
 	"github.com/cybergarage/go-logger/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func init() {
@@ -34,12 +33,6 @@ var dumpCmd = &cobra.Command{ // nolint:exhaustruct
 	Short: "Dump mDNS messages.",
 	Long:  "Dump mDNS messages.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		verbose := viper.GetBool(VerboseParamStr)
-		if verbose {
-			debug := viper.GetBool(DebugParamStr)
-			enableStdoutVerbose(true, debug)
-		}
-
 		client := NewClient()
 		client.SetListener(client)
 

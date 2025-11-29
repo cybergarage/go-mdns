@@ -20,7 +20,6 @@ import (
 
 	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func init() {
@@ -34,14 +33,6 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		client := NewClient()
-
-		verbose := viper.GetBool(VerboseParamStr)
-		if verbose {
-			debug := viper.GetBool(DebugParamStr)
-			enableStdoutVerbose(verbose, debug)
-			client.SetListener(client)
-		}
-
 		err := client.Start()
 		if err != nil {
 			return err
