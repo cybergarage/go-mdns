@@ -52,7 +52,11 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 			"_services._dns-sd._udp",
 		}
 
-		err = client.Query(mdns.NewQueryWithServices(services))
+		query := mdns.NewQuery(
+			mdns.WithQueryServices(services...),
+		)
+
+		err = client.Query(query)
 		if err != nil {
 			return err
 		}

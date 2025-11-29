@@ -14,10 +14,6 @@
 
 package mdns
 
-import (
-	"strings"
-)
-
 // RFC 6765: 11. Discovery of Browsing and Registration Domains (Domain Enumeration).
 const (
 	// A list of domains recommended for browsing.
@@ -33,29 +29,11 @@ const (
 )
 
 // Query represents a question query.
-type Query struct {
-	Service string
-	Domain  string
-}
-
-// NewQueryWithService returns a new query instance with the specified service name.
-func NewQueryWithService(service string) *Query {
-	return &Query{
-		Service: service,
-		Domain:  DefaultDomain,
-	}
-}
-
-// String returns the string representation.
-func (q *Query) String() string {
-	return strings.Join([]string{q.Service, q.Domain}, nameSep)
-}
-
-// NewQueryWithServices returns a new query instance array with the specified service names.
-func NewQueryWithServices(services []string) []*Query {
-	queries := make([]*Query, len(services))
-	for n, service := range services {
-		queries[n] = NewQueryWithService(service)
-	}
-	return queries
+type Query interface {
+	// Services returns the service names of the query.
+	Services() []string
+	// Domain returns the domain name of the query.
+	Domain() string
+	// String returns the string representation of the query.
+	String() string
 }

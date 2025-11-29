@@ -14,7 +14,15 @@
 
 package mdns
 
+import "time"
+
 const (
-	DefaultDomain = "local"
-	nameSep       = "."
+	// DefaultQueryDomain is the default domain for mDNS queries.
+	DefaultQueryDomain = "local"
+	// DefaultQueryTimeout is the default timeout duration for mDNS queries.
+	DefaultQueryTimeout = time.Duration(5) * time.Second
+)
+
+const (
+	queryNameSep = "."
 )

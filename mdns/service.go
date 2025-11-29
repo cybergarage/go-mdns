@@ -166,7 +166,7 @@ func (srv *Service) Equal(other *Service) bool {
 func (srv *Service) String() string {
 	return fmt.Sprintf(
 		"%s (%s:%d)",
-		strings.Join([]string{srv.name, srv.host, srv.domain}, nameSep),
+		strings.Join([]string{srv.name, srv.host, srv.domain}, queryNameSep),
 		srv.host,
 		srv.port,
 	)

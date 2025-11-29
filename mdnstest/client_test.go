@@ -33,8 +33,11 @@ func TestClient(t *testing.T) {
 		return
 	}
 
-	q := []*mdns.Query{mdns.NewQueryWithService(mdns.AutomaticBrowsingService)}
-	err = client.Query(q)
+	query := mdns.NewQuery(
+		mdns.WithQueryServices(mdns.AutomaticBrowsingService),
+	)
+
+	err = client.Query(query)
 	if err != nil {
 		t.Error(err)
 		return

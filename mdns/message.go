@@ -15,6 +15,8 @@
 package mdns
 
 import (
+	"strings"
+
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
@@ -22,22 +24,11 @@ import (
 type Message = dns.Message
 
 // NewRequestWithQuery returns a nil message instance.
-func NewRequestWithQuery(query *Query) *Message {
+func NewRequestWithQuery(query Query) *Message {
 	msg := dns.NewRequestMessage()
-	q := dns.NewQuestion()
-	q.SetName(query.String())
-	q.SetType(dns.PTR)
-	q.SetClass(dns.IN)
-	msg.AddQuestion(q)
-	return msg
-}
-
-// NewRequestWithQueries returns a new request message with the specified queries.
-func NewRequestWithQueries(queries []*Query) *Message {
-	msg := dns.NewRequestMessage()
-	for _, query := range queries {
+	for _, service := range query.Services() {
 		q := dns.NewQuestion()
-		q.SetName(query.String())
+		q.SetName(strings.Join([]string{service, query.Domain()}, queryNameSep))
 		q.SetType(dns.PTR)
 		q.SetClass(dns.IN)
 		msg.AddQuestion(q)
