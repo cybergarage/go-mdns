@@ -14,6 +14,9 @@
 
 SHELL := bash
 
+PATH := $(GOBIN):$(PATH)
+GOBIN := $(shell go env GOPATH)/bin
+
 MODULE_ROOT=github.com/cybergarage/go-mdns
 
 PKG_NAME=mdns
@@ -37,6 +40,8 @@ BIN_SRCS=\
 BINS=\
 	${BIN_ID}/mdnsctrl \
 	${BIN_ID}/mdnsd
+
+DOCS_ROOT_DIR=doc
 
 .PHONY: format vet lint clean
 .IGNORE: lint
@@ -62,6 +67,8 @@ test: lint
 
 install:
 	go install ${BINS}
+	${GOBIN}/mdnsctrl doc > ${DOCS_ROOT_DIR}/mdnsctl.md
+	git commit ${DOCS_ROOT_DIR}/mdnsctl.md -m "docs: update mdnsctl command reference"
 
 clean:
 	go clean -i ${PKG} ${TEST_PKG} ${BINS}
