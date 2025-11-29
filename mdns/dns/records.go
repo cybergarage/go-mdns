@@ -16,6 +16,7 @@ package dns
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -25,70 +26,51 @@ type Records []Record
 
 // HasRecord returns true if the resource record of the specified name is included in the list. otherwise false.
 func (records Records) HasRecord(name string) bool {
-	_, ok := records.LookupRecordForName(name)
+	_, ok := records.LookupRecordByName(name)
 	return ok
 }
 
-// LookupRecordForName returns the resource record of the specified name.
-func (records Records) LookupRecordForName(name string) (Record, bool) {
-	lookupRecords := records.LookupRecordsForName(name)
+// LookupRecordByName returns the resource record of the specified name.
+func (records Records) LookupRecordByName(name string) (Record, bool) {
+	lookupRecords := records.LookupRecordsByName(name)
 	if len(lookupRecords) == 0 {
 		return nil, false
 	}
 	return lookupRecords[0], true
 }
 
-// LookupRecordForNamePrefix returns the resource record of the specified name prefix.
-func (records Records) LookupRecordForNamePrefix(prefix string) (Record, bool) {
-	lookupRecords := records.LookupRecordsForNamePrefix(prefix)
+// LookupRecordByName returns the resource record of the specified name.
+func (records Records) LookupRecordByNameRegex(re *regexp.Regexp) (Record, bool) {
+	lookupRecords := records.LookupRecordsByNameRegex(re)
 	if len(lookupRecords) == 0 {
 		return nil, false
 	}
 	return lookupRecords[0], true
 }
 
-// LookupRecordForNameSuffix returns the resource record of the specified name suffix.
-func (records Records) LookupRecordForNameSuffix(suffix string) (Record, bool) {
-	lookupRecords := records.LookupRecordsForNameSuffix(suffix)
+// LookupRecordByNamePrefix returns the resource record of the specified name prefix.
+func (records Records) LookupRecordByNamePrefix(prefix string) (Record, bool) {
+	re := regexp.MustCompile("^" + regexp.QuoteMeta(prefix))
+	return records.LookupRecordByNameRegex(re)
+}
+
+// LookupRecordByNameSuffix returns the resource record of the specified name suffix.
+func (records Records) LookupRecordByNameSuffix(suffix string) (Record, bool) {
+	re := regexp.MustCompile(regexp.QuoteMeta(suffix) + "$")
+	return records.LookupRecordByNameRegex(re)
+}
+
+// LookupRecordByType returns the resource record of the specified type.
+func (records Records) LookupRecordByType(t Type) (Record, bool) {
+	lookupRecords := records.LookupRecordsByType(t)
 	if len(lookupRecords) == 0 {
 		return nil, false
 	}
 	return lookupRecords[0], true
 }
 
-// LookupRecordForType returns the resource record of the specified type.
-func (records Records) LookupRecordForType(t Type) (Record, bool) {
-	lookupRecords := records.LookupRecordsForType(t)
-	if len(lookupRecords) == 0 {
-		return nil, false
-	}
-	return lookupRecords[0], true
-}
-
-// LookupRecordsForNamePrefix returns the resource records of the specified name prefix.
-func (records Records) LookupRecordsForNamePrefix(prefix string) Records {
-	lookupRecords := Records{}
-	for _, record := range records {
-		if record.HasNamePrefix(prefix) {
-			lookupRecords = append(lookupRecords, record)
-		}
-	}
-	return lookupRecords
-}
-
-// LookupRecordsForNameSuffix returns the resource records of the specified name suffix.
-func (records Records) LookupRecordsForNameSuffix(suffix string) Records {
-	lookupRecords := Records{}
-	for _, record := range records {
-		if record.HasNameSuffix(suffix) {
-			lookupRecords = append(lookupRecords, record)
-		}
-	}
-	return lookupRecords
-}
-
-// LookupRecordsForName returns the resource records of the specified name.
-func (records Records) LookupRecordsForName(name string) Records {
+// LookupRecordsByName returns the resource records of the specified name.
+func (records Records) LookupRecordsByName(name string) Records {
 	lookupRecords := Records{}
 	for _, record := range records {
 		if record.IsName(name) {
@@ -98,8 +80,31 @@ func (records Records) LookupRecordsForName(name string) Records {
 	return lookupRecords
 }
 
-// LookupRecordsForType returns the resource records of the specified type.
-func (records Records) LookupRecordsForType(t Type) []Record {
+// LookupRecordsByNameRegex returns the resource records that match the specified name regular expression.
+func (records Records) LookupRecordsByNameRegex(re *regexp.Regexp) Records {
+	lookupRecords := Records{}
+	for _, record := range records {
+		if re.MatchString(record.Name()) {
+			lookupRecords = append(lookupRecords, record)
+		}
+	}
+	return lookupRecords
+}
+
+// LookupRecordsByNamePrefix returns the resource records of the specified name prefix.
+func (records Records) LookupRecordsByNamePrefix(prefix string) Records {
+	re := regexp.MustCompile("^" + regexp.QuoteMeta(prefix))
+	return records.LookupRecordsByNameRegex(re)
+}
+
+// LookupRecordsByNameSuffix returns the resource records of the specified name suffix.
+func (records Records) LookupRecordsByNameSuffix(suffix string) Records {
+	re := regexp.MustCompile(regexp.QuoteMeta(suffix) + "$")
+	return records.LookupRecordsByNameRegex(re)
+}
+
+// LookupRecordsByType returns the resource records of the specified type.
+func (records Records) LookupRecordsByType(t Type) []Record {
 	resRecords := []Record{}
 	for _, record := range records {
 		if record.Type() == t {

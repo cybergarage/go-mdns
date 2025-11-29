@@ -17,6 +17,7 @@ package dns
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 )
 
 // Message represents a protocol message.
@@ -170,24 +171,29 @@ func (msg *Message) ResourceRecords() ResourceRecords {
 	return records
 }
 
-// LookupResourceRecordForName returns the resource record of the specified name.
-func (msg *Message) LookupResourceRecordForName(name string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordForName(name)
+// LookupResourceRecordByName returns the resource record of the specified name.
+func (msg *Message) LookupResourceRecordByName(name string) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupRecordByName(name)
 }
 
-// LookupResourceRecordForNamePrefix returns the resource record of the specified name prefix.
-func (msg *Message) LookupResourceRecordForNamePrefix(prefix string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordForNamePrefix(prefix)
+// LookupResourceRecordByNameRegex returns the resource record of the specified name regex.
+func (msg *Message) LookupResourceRecordByNameRegex(re *regexp.Regexp) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupRecordByNameRegex(re)
 }
 
-// LookupResourceRecordForNameSuffix returns the resource record of the specified name suffix.
-func (msg *Message) LookupResourceRecordForNameSuffix(prefix string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordForNameSuffix(prefix)
+// LookupResourceRecordByNamePrefix returns the resource record of the specified name prefix.
+func (msg *Message) LookupResourceRecordByNamePrefix(prefix string) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupRecordByNamePrefix(prefix)
+}
+
+// LookupResourceRecordByNameSuffix returns the resource record of the specified name suffix.
+func (msg *Message) LookupResourceRecordByNameSuffix(suffix string) (ResourceRecord, bool) {
+	return msg.ResourceRecords().LookupRecordByNameSuffix(suffix)
 }
 
 // HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
 func (msg *Message) HasResourceRecord(name string) bool {
-	_, ok := msg.LookupResourceRecordForName(name)
+	_, ok := msg.LookupResourceRecordByName(name)
 	return ok
 }
 
