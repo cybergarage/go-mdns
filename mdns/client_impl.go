@@ -70,7 +70,7 @@ func (client *clientImpl) Restart() error {
 }
 
 // Query sends a question message to the multicast address.
-func (client *clientImpl) Query(ctx context.Context, q Query) ([]*Service, error) {
+func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error) {
 	client.Lock()
 	defer client.Unlock()
 
@@ -85,7 +85,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]*Service, error
 	msg := NewRequestWithQuery(q)
 	err := client.AnnounceMessage(msg)
 	if err != nil {
-		return []*Service{}, err
+		return []Service{}, err
 	}
 
 	<-ctx.Done()

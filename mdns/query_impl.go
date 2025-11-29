@@ -64,12 +64,12 @@ func (q *queryImp) Domain() string {
 
 // String returns the string representation of the query.
 func (q *queryImp) String() string {
-	var s string
+	var s strings.Builder
 	for i, service := range q.services {
 		if 0 < i {
-			s += ","
+			s.WriteString(",")
 		}
-		s += strings.Join([]string{service, q.domain}, queryNameSep)
+		s.WriteString(strings.Join([]string{service, q.domain}, queryNameSep))
 	}
-	return s
+	return s.String()
 }
