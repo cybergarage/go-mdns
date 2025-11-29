@@ -34,12 +34,14 @@ TEST_PKG=${MODULE_ROOT}/${TEST_PKG_DIR}
 
 BIN_ROOT_DIR=cmd
 BIN_ID=${MODULE_ROOT}/${BIN_ROOT_DIR}
+BIN_CTRL=mdnsctl
+BIN_SERVER=mdnsd
 BIN_SRCS=\
-	${BIN_ROOT_DIR}/mdnsctrl \
-	${BIN_ROOT_DIR}/mdnsd
+	${BIN_ROOT_DIR}/${BIN_CTRL} \
+	${BIN_ROOT_DIR}/${BIN_SERVER}
 BINS=\
-	${BIN_ID}/mdnsctrl \
-	${BIN_ID}/mdnsd
+	${BIN_ID}/${BIN_CTRL} \
+	${BIN_ID}/${BIN_SERVER}
 
 DOCS_ROOT_DIR=doc
 
@@ -67,8 +69,10 @@ test: lint
 
 install:
 	go install ${BINS}
-	${GOBIN}/mdnsctrl doc > ${DOCS_ROOT_DIR}/mdnsctl.md
-	git commit ${DOCS_ROOT_DIR}/mdnsctl.md -m "docs: update mdnsctl command reference"
+	${GOBIN}/${BIN_CTRL} doc > ${DOCS_ROOT_DIR}/${BIN_CTRL}.md
+	git commit ${DOCS_ROOT_DIR}/${BIN_CTRL}.md -m "docs: update ${BIN_CTRL} command reference"
+	${GOBIN}/${BIN_DAEMON} doc > ${DOCS_ROOT_DIR}/${BIN_DAEMON}.md
+	git commit ${DOCS_ROOT_DIR}/${BIN_DAEMON}.md -m "docs: update ${BIN_DAEMON} command reference"
 
 clean:
 	go clean -i ${PKG} ${TEST_PKG} ${BINS}
