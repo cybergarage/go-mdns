@@ -124,7 +124,9 @@ func TestResponseMessages(t *testing.T) {
 
 			t.Log("\n" + msg.String())
 
-			srv, err := mdns.NewServiceWithMessage(msg)
+			srv, err := mdns.NewService(
+				mdns.WithServiceMessage(msg),
+			)
 			if err != nil {
 				t.Error(err)
 				return

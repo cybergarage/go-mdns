@@ -105,7 +105,9 @@ func (client *clientImpl) MessageReceived(msg *dns.Message) (*dns.Message, error
 		return nil, nil
 	}
 
-	newService, err := NewServiceWithMessage(msg)
+	newService, err := NewService(
+		WithServiceMessage(msg),
+	)
 	if err != nil {
 		return nil, err
 	}

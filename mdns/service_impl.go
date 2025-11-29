@@ -33,29 +33,68 @@ type serviceImpl struct {
 	attrs  dns.Attributes
 }
 
-// NewService returns a new service instance.
-func NewService(name, domain string, port int) Service {
-	return newService(name, domain, port)
-}
+// ServiceOptions represents a service option.
+type ServiceOptions func(*serviceImpl) error
 
-func newService(name, domain string, port int) *serviceImpl {
-	return &serviceImpl{
-		Message: nil,
-		name:    name,
-		domain:  domain,
-		host:    "",
-		addrs:   []net.IP{},
-		port:    port,
-		attrs:   dns.Attributes{},
+// WithServiceName returns a service option with the specified name.
+func WithServiceName(name string) ServiceOptions {
+	return func(srv *serviceImpl) error {
+		srv.name = name
+		return nil
 	}
 }
 
-// NewServiceWithMessage returns a new service instance.
-func NewServiceWithMessage(msg *Message) (Service, error) {
-	srv := newService("", "", 0)
-	err := srv.parseMessage(msg)
-	if err != nil {
-		return nil, err
+// WithServiceDomain returns a service option with the specified domain.
+func WithServiceDomain(domain string) ServiceOptions {
+	return func(srv *serviceImpl) error {
+		srv.domain = domain
+		return nil
+	}
+}
+
+// WithServiceHost returns a service option with the specified host.
+func WithServiceHost(host string) ServiceOptions {
+	return func(srv *serviceImpl) error {
+		srv.host = host
+		return nil
+	}
+}
+
+// WithServicePort returns a service option with the specified port.
+func WithServicePort(port int) ServiceOptions {
+	return func(srv *serviceImpl) error {
+		srv.port = port
+		return nil
+	}
+}
+
+// WithServiceMessage returns a service option with the specified message.
+func WithServiceMessage(msg *Message) ServiceOptions {
+	return func(srv *serviceImpl) error {
+		return srv.parseMessage(msg)
+	}
+}
+
+// NewService returns a new service instance.
+func NewService(opts ...ServiceOptions) (Service, error) {
+	return newService(opts...)
+}
+
+func newService(opts ...ServiceOptions) (*serviceImpl, error) {
+	srv := &serviceImpl{
+		Message: nil,
+		name:    "",
+		domain:  "",
+		host:    "",
+		addrs:   []net.IP{},
+		port:    0,
+		attrs:   dns.Attributes{},
+	}
+	for _, opt := range opts {
+		err := opt(srv)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return srv, nil
 }
