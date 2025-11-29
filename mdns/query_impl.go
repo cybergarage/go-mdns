@@ -18,6 +18,10 @@ import (
 	"strings"
 )
 
+const (
+	queryNameSep = "."
+)
+
 type queryImp struct {
 	services []string
 	domain   string
@@ -43,7 +47,7 @@ func WithQueryDomain(domain string) QueryOption {
 // NewQuery returns a new query instance with the specified options.
 func NewQuery(opts ...QueryOption) Query {
 	q := &queryImp{
-		services: []string{DefaultBrowsingService},
+		services: []string{DefaultQueryService},
 		domain:   DefaultQueryDomain,
 	}
 	for _, opt := range opts {

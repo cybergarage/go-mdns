@@ -46,13 +46,8 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 		defer client.Stop()
 
 		query := mdns.NewQuery(
-			mdns.WithQueryServices(
-				"_services._dns-sd._udp",
-				"_rdlink._tcp",
-				"_companion - link._tcp",
-				"_services._dns-sd._udp",
-				"_matter._tcp",
-			),
+			mdns.WithQueryServices(mdns.DefaultQueryService),
+			mdns.WithQueryDomain(mdns.DefaultQueryDomain),
 		)
 
 		services, err := client.Query(context.Background(), query)

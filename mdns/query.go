@@ -14,6 +14,13 @@
 
 package mdns
 
+import "time"
+
+// RFC 6763: 7.2. Browsing for Services.
+const (
+	ServiceTypeEnumerationName = "_services._dns-sd._udp"
+)
+
 // RFC 6765: 11. Discovery of Browsing and Registration Domains (Domain Enumeration).
 const (
 	// A list of domains recommended for browsing.
@@ -26,6 +33,15 @@ const (
 	DefaultRegisteringService = "dr._dns-sd._udp"
 	// The "legacy browsing" or "automatic browsing" domain(s).
 	AutomaticBrowsingService = "lb._dns-sd._udp"
+)
+
+const (
+	// DefaultQueryService is the default service for mDNS queries.
+	DefaultQueryService = ServiceTypeEnumerationName
+	// DefaultQueryDomain is the default domain for mDNS queries.
+	DefaultQueryDomain = "local"
+	// DefaultQueryTimeout is the default timeout duration for mDNS queries.
+	DefaultQueryTimeout = time.Duration(5) * time.Second
 )
 
 // Query represents a question query.
