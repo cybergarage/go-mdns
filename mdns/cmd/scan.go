@@ -32,11 +32,13 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 	Short: "Scan for mDNS devices.",
 	Long:  "Scan for mDNS devices.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		verbose := viper.GetBool(VerboseParamStr)
 
 		client := NewClient()
+
+		verbose := viper.GetBool(VerboseParamStr)
 		if verbose {
-			enableStdoutVerbose(true)
+			debug := viper.GetBool(DebugParamStr)
+			enableStdoutVerbose(verbose, debug)
 			client.SetListener(client)
 		}
 

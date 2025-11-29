@@ -25,6 +25,7 @@ import (
 
 var (
 	VerboseParamStr = "verbose"
+	DebugParamStr   = "debug"
 )
 
 var rootCmd = &cobra.Command{ // nolint:exhaustruct
@@ -55,4 +56,9 @@ func init() {
 	rootCmd.PersistentFlags().Bool((VerboseParamStr), false, "enable verbose output")
 	viper.BindPFlag(VerboseParamStr, rootCmd.PersistentFlags().Lookup(VerboseParamStr))
 	viper.BindEnv(VerboseParamStr) // MDNSCTL_VERBOSE
+
+	viper.SetDefault(DebugParamStr, false)
+	rootCmd.PersistentFlags().Bool((DebugParamStr), false, "enable debug output")
+	viper.BindPFlag(DebugParamStr, rootCmd.PersistentFlags().Lookup(DebugParamStr))
+	viper.BindEnv(DebugParamStr) // MDNSCTL_DEBUG
 }
