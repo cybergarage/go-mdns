@@ -5,6 +5,7 @@
 ### Options
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
   -h, --help            help for mdnsctl
       --verbose         enable verbose output
@@ -33,6 +34,7 @@ See each sub-command's help for details on how to use the generated script.
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -84,6 +86,7 @@ mdnsctl completion bash
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -122,6 +125,7 @@ mdnsctl completion fish [flags]
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -149,6 +153,7 @@ mdnsctl completion help [command] [flags]
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -184,6 +189,7 @@ mdnsctl completion powershell [flags]
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -233,6 +239,7 @@ mdnsctl completion zsh [flags]
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -255,6 +262,7 @@ mdnsctl doc [flags]
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -281,6 +289,7 @@ mdnsctl dump [flags]
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -308,6 +317,7 @@ mdnsctl help [command] [flags]
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
@@ -334,6 +344,7 @@ mdnsctl scan [flags]
 ### Options inherited from parent commands
 
 ```
+      --debug           enable debug output
       --format string   output format: table|json|csv (default "table")
       --verbose         enable verbose output
 ```
