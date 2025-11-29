@@ -24,48 +24,18 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
-//go:embed log/service01.log
-var service01 string
-
-//go:embed log/service02.log
-var service02 string
-
-//go:embed log/googlecast01.log
-var googlecast01 string
-
-//go:embed log/googlecast02.log
-var googlecast02 string
-
-//go:embed log/googlecast03.log
-var googlecast03 string
-
-// 4.3.1.13. Examples
-// dns-sd -R DD200C20D25AE5F7 _matterc._udp,_S3,_L840,_CM . 11111 D=840 CM=2
-//
-//go:embed log/matter-spec-120-4.3.1.13-dns-sd.log
-var matterSpec12043113DNSSD string
-
-// 4.3.1.13. Examples
-// avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=840 CM=2
-//
-//go:embed log/matter-spec-120-4.3.1.13-avahi01.log
-var matterSpec12043113Avahi01 string
-
-//go:embed log/matter-spec-120-4.3.1.13-avahi02.log
-var matterSpec12043113Avahi02 string
-
 func TestResponseMessages(t *testing.T) {
 	type answer struct {
 		name string
 	}
 	tests := []struct {
 		name       string
-		msgLogs    string
+		msgLog     string
 		answers    []answer
 		attributes map[string]string
 	}{
 		{
-			"service01",
+			"service-01",
 			service01,
 			[]answer{
 				{"_services._dns-sd._udp.local"},
@@ -81,7 +51,7 @@ func TestResponseMessages(t *testing.T) {
 		// 	map[string]string{},
 		// },
 		{
-			"googlecast01",
+			"google-cast-01",
 			googlecast01,
 			[]answer{
 				{"_services._dns-sd._udp.local"},
@@ -89,7 +59,7 @@ func TestResponseMessages(t *testing.T) {
 			map[string]string{},
 		},
 		{
-			"googlecast02",
+			"google-cast-02",
 			googlecast02,
 			[]answer{
 				{"_googlecast._tcp.local"},
@@ -97,7 +67,7 @@ func TestResponseMessages(t *testing.T) {
 			map[string]string{},
 		},
 		{
-			"googlecast03",
+			"google-cast-03",
 			googlecast03,
 			[]answer{
 				{"_googlezone._tcp.local"},
@@ -140,7 +110,7 @@ func TestResponseMessages(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.msgLogs, "\n"))
+			msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.msgLog, "\n"))
 			if err != nil {
 				t.Error(err)
 				return
