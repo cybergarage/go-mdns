@@ -71,8 +71,8 @@ install:
 	go install ${BINS}
 	${GOBIN}/${BIN_CTRL} doc > ${DOCS_ROOT_DIR}/${BIN_CTRL}.md
 	-git commit ${DOCS_ROOT_DIR}/${BIN_CTRL}.md -m "docs: update ${BIN_CTRL} command reference"
-	${GOBIN}/${BIN_DAEMON} doc > ${DOCS_ROOT_DIR}/${BIN_DAEMON}.md
-	-git commit ${DOCS_ROOT_DIR}/${BIN_DAEMON}.md -m "docs: update ${BIN_DAEMON} command reference"
+	${GOBIN}/${BIN_SERVER} doc > ${DOCS_ROOT_DIR}/${BIN_SERVER}.md
+	-git commit ${DOCS_ROOT_DIR}/${BIN_SERVER}.md -m "docs: update ${BIN_SERVER} command reference"
 
 clean:
 	go clean -i ${PKG} ${TEST_PKG} ${BINS}
