@@ -48,3 +48,8 @@ func (services *services) AddService(service *Service) bool {
 	services.services = append(services.services, service)
 	return true
 }
+
+// Clear removes all services from the service array.
+func (services *services) Clear() {
+	services.services = []*Service{}
+}

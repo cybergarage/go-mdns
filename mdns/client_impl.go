@@ -71,6 +71,11 @@ func (client *clientImpl) Restart() error {
 
 // Query sends a question message to the multicast address.
 func (client *clientImpl) Query(ctx context.Context, q Query) ([]*Service, error) {
+	client.Lock()
+	defer client.Unlock()
+
+	client.services.Clear()
+
 	if _, ok := ctx.Deadline(); !ok {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, DefaultQueryTimeout)

@@ -45,25 +45,23 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 
 		defer client.Stop()
 
-		services := []string{
-			"_services._dns-sd._udp",
-			"_rdlink._tcp",
-			"_companion - link._tcp",
-			"_services._dns-sd._udp",
-		}
-
 		query := mdns.NewQuery(
-			mdns.WithQueryServices(services...),
+			mdns.WithQueryServices(
+				"_services._dns-sd._udp",
+				"_rdlink._tcp",
+				"_companion - link._tcp",
+				"_services._dns-sd._udp",
+			),
 		)
 
-		err = client.Query(context.Background(), query)
+		services, err := client.Query(context.Background(), query)
 		if err != nil {
 			return err
 		}
 
 		// Output all found nodes
 
-		for n, srv := range client.Services() {
+		for n, srv := range services {
 			fmt.Printf("[%d] %s\n", n, srv.String())
 			fmt.Printf("%s\n", srv.Records().String())
 		}

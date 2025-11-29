@@ -29,5 +29,5 @@ type Client interface {
 	// SetListener sets a message listener to listen raw protocol messages.
 	SetListener(l MessageListener)
 	// Query sends a question message to the multicast address.
-	Query(ctx context.Context, query Query) error
+	Query(ctx context.Context, query Query) ([]*Service, error)
 }
