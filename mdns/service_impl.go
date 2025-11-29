@@ -100,8 +100,29 @@ func (srv *serviceImpl) parseMessage(msg *Message) error {
 }
 
 func (srv *serviceImpl) parseRecord(record dns.Record) error {
+	parseNameDomain := func(fullname string) (string, string, error) {
+		if fullname == "" {
+			return "", "", nil
+		}
+		idx := strings.LastIndex(fullname, ".")
+		if idx == -1 {
+			return "", "", fmt.Errorf("invalid record name: %s", fullname)
+		}
+		parts := []string{fullname[:idx], fullname[idx+1:]}
+		if len(parts) != 2 {
+			return "", "", fmt.Errorf("invalid record name: %s", fullname)
+		}
+		return parts[0], parts[1], nil
+	}
+
 	switch rr := record.(type) {
 	case *dns.SRVRecord:
+		name, domain, err := parseNameDomain(rr.Name())
+		if err != nil {
+			return err
+		}
+		srv.name = name
+		srv.domain = domain
 		host := rr.Target()
 		if 0 < len(host) {
 			srv.host = host
@@ -111,7 +132,12 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 			srv.port = int(port)
 		}
 	case *dns.TXTRecord:
-		srv.name = rr.Name()
+		name, domain, err := parseNameDomain(rr.Name())
+		if err != nil {
+			return err
+		}
+		srv.name = name
+		srv.domain = domain
 		attrs, err := rr.Attributes()
 		if err == nil {
 			srv.attrs = append(srv.attrs, attrs...)
