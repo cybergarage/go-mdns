@@ -11,6 +11,11 @@ go-mdns is a Go library for Multicast DNS (mDNS) and DNS Service Discovery (DNS-
 
 **Note:** 🌱 This is a spare-time hobby project, so progress may be slow and changes may appear irregular. Thank you for your patience 🙂
 
+# User Guides
+
+- Operation
+  - [mdnsctl](doc/mdnsctl.md)
+
 ## References
 
 ### DNS
