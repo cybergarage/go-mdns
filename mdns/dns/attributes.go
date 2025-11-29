@@ -18,7 +18,7 @@ import (
 	"strings"
 )
 
-type Attributes []*Attribute
+type Attributes []Attribute
 
 // NewAttributes returns a new attributes instance.
 func NewAttributes() Attributes {
@@ -39,7 +39,7 @@ func NewAttributesFromStrings(strs []string) (Attributes, error) {
 }
 
 // LookupAttribute returns the attribute with the specified name.
-func (attrs Attributes) LookupAttribute(name string) (*Attribute, bool) {
+func (attrs Attributes) LookupAttribute(name string) (Attribute, bool) {
 	for _, attr := range attrs {
 		if attr.Name() == name {
 			return attr, true

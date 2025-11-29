@@ -136,7 +136,7 @@ func (srv *serviceImpl) Attributes() dns.Attributes {
 }
 
 // LookupAttribute returns the attribute with the specified name.
-func (srv *serviceImpl) LookupAttribute(name string) (*Attribute, bool) {
+func (srv *serviceImpl) LookupAttribute(name string) (Attribute, bool) {
 	return srv.attrs.LookupAttribute(name)
 }
 

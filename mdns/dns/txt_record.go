@@ -62,7 +62,7 @@ func (txt *TXTRecord) Attributes() (Attributes, error) {
 }
 
 // LookupAttribute returns the attribute with the specified name.
-func (txt *TXTRecord) LookupAttribute(name string) (*Attribute, bool) {
+func (txt *TXTRecord) LookupAttribute(name string) (Attribute, bool) {
 	attrs, err := txt.Attributes()
 	if err != nil {
 		return nil, false

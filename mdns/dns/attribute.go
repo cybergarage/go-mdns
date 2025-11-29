@@ -14,56 +14,15 @@
 
 package dns
 
-import (
-	"fmt"
-	"strings"
-)
-
 // RFC1464: Using the Domain Name System To Store Arbitrary String Attributes
 // https://datatracker.ietf.org/doc/html/rfc1464
 
 // Attribute represents a DNS attribute.
-type Attribute struct {
-	name  string
-	value string
-}
-
-// NewAttribute returns a new attribute instance.
-func NewAttribute() *Attribute {
-	return &Attribute{
-		name:  "",
-		value: "",
-	}
-}
-
-// NewAttributeFromString returns a new attribute instance from the specified string.
-func NewAttributeFromString(str string) (*Attribute, error) {
-	attr := NewAttribute()
-	return attr, attr.parse(str)
-}
-
-// Parse parses the attribute string.
-func (attr *Attribute) parse(str string) error {
-	vars := strings.Split(str, "=")
-	if len(vars) != 2 {
-		return fmt.Errorf("attribute (%s) is %w", str, ErrInvalid)
-	}
-	attr.name = vars[0]
-	attr.value = vars[1]
-	return nil
-}
-
-// Name returns the attribute name.
-func (attr *Attribute) Name() string {
-	return attr.name
-}
-
-// Value returns the attribute value.
-func (attr *Attribute) Value() string {
-	return attr.value
-}
-
-// String returns the attribute string.
-func (attr *Attribute) String() string {
-	return attr.name + "=" + attr.value
+type Attribute interface {
+	// Name returns the attribute name.
+	Name() string
+	// Value returns the attribute value.
+	Value() string
+	// String returns the attribute string.
+	String() string
 }

@@ -46,7 +46,7 @@ type Service interface {
 	// Attributes returns the service TXT attributes.
 	Attributes() Attributes
 	// LookupAttribute returns the attribute with the specified name.
-	LookupAttribute(name string) (*Attribute, bool)
+	LookupAttribute(name string) (Attribute, bool)
 	// Equal returns true if the header is same as the specified header, otherwise false.
 	Equal(other Service) bool
 	// String returns the string representation.
