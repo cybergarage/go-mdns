@@ -15,6 +15,7 @@
 package mdnstest
 
 import (
+	"context"
 	"testing"
 
 	"github.com/cybergarage/go-logger/log"
@@ -37,7 +38,7 @@ func TestClient(t *testing.T) {
 		mdns.WithQueryServices(mdns.AutomaticBrowsingService),
 	)
 
-	err = client.Query(query)
+	_, err = client.Query(context.Background(), query)
 	if err != nil {
 		t.Error(err)
 		return

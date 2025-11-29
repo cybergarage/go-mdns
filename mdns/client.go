@@ -15,85 +15,19 @@
 package mdns
 
 import (
-	"sync"
-
-	"github.com/cybergarage/go-logger/log"
-	"github.com/cybergarage/go-mdns/mdns/dns"
-	"github.com/cybergarage/go-mdns/mdns/transport"
+	"context"
 )
 
 // Client represents a client node instance.
-type Client struct {
-	sync.Mutex
-	*transport.MessageManager
-	*services
-	userListener MessageListener
-}
-
-// NewClient returns a new client instance.
-func NewClient() *Client {
-	client := &Client{
-		Mutex:          sync.Mutex{},
-		MessageManager: transport.NewMessageManager(),
-		services:       newServices(),
-		userListener:   nil,
-	}
-	client.SetMessageHandler(client)
-	return client
-}
-
-// SetListener sets a message listner to listen raw protocol messages.
-func (client *Client) SetListener(l MessageListener) {
-	client.userListener = l
-}
-
-// Start starts the client instance.
-func (client *Client) Start() error {
-	if err := client.Stop(); err != nil {
-		return err
-	}
-	return client.MessageManager.Start()
-}
-
-// Stop stops the client instance.
-func (client *Client) Stop() error {
-	return client.MessageManager.Stop()
-}
-
-// Restart restarts the client instance.
-func (client *Client) Restart() error {
-	if err := client.Stop(); err != nil {
-		return err
-	}
-	return client.Start()
-}
-
-// Query sends a question message to the multicast address.
-func (client *Client) Query(q Query) error {
-	msg := NewRequestWithQuery(q)
-	return client.AnnounceMessage(msg)
-}
-
-func (client *Client) MessageReceived(msg *dns.Message) (*dns.Message, error) {
-	client.Lock()
-	defer client.Unlock()
-
-	if client.userListener != nil {
-		client.userListener.MessageReceived(msg)
-	}
-
-	if !msg.IsResponse() {
-		return nil, nil
-	}
-
-	newService, err := NewServiceWithMessage(msg)
-	if err != nil {
-		return nil, err
-	}
-
-	ok := client.AddService(newService)
-
-	log.Debugf("Add new service (%s): %t", newService.String(), ok)
-
-	return nil, nil
+type Client interface {
+	// Start starts the client.
+	Start() error
+	// Stop stops the client.
+	Stop() error
+	// Restart restarts the client.
+	Restart() error
+	// SetListener sets a message listener to listen raw protocol messages.
+	SetListener(l MessageListener)
+	// Query sends a question message to the multicast address.
+	Query(ctx context.Context, query Query) error
 }

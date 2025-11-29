@@ -26,11 +26,13 @@ import (
 func TestQuery(t *testing.T) {
 	tests := []struct {
 		name  string
-		query *Query
+		query Query
 	}{
 		{
-			name:  AutomaticBrowsingService,
-			query: NewQueryWithService(AutomaticBrowsingService),
+			name: AutomaticBrowsingService,
+			query: NewQuery(
+				WithQueryServices(AutomaticBrowsingService),
+			),
 		},
 	}
 	for _, test := range tests {

@@ -21,7 +21,7 @@ import (
 )
 
 type Client struct {
-	*mdns.Client
+	mdns.Client
 }
 
 func NewClient() *Client {

@@ -15,8 +15,8 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
-	"time"
 
 	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/spf13/cobra"
@@ -56,14 +56,10 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 			mdns.WithQueryServices(services...),
 		)
 
-		err = client.Query(query)
+		err = client.Query(context.Background(), query)
 		if err != nil {
 			return err
 		}
-
-		// Wait node responses in the local network
-
-		time.Sleep(time.Second * 10)
 
 		// Output all found nodes
 
