@@ -23,7 +23,7 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-var docCmd = &cobra.Command{
+var docCmd = &cobra.Command{ // nolint:exhaustruct
 	Use:   "doc",
 	Short: "Generate markdown documentation to stdout",
 	RunE: func(cmd *cobra.Command, args []string) error {
