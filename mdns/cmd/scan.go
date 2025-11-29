@@ -51,6 +51,7 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 				"_rdlink._tcp",
 				"_companion - link._tcp",
 				"_services._dns-sd._udp",
+				"_matter._tcp",
 			),
 		)
 
