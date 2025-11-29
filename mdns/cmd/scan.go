@@ -57,8 +57,6 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 			return err
 		}
 
-		// Output all found nodes
-
 		for n, srv := range services {
 			fmt.Printf("[%d] %s\n", n, srv.String())
 			fmt.Printf("%s\n", srv.Records().String())
