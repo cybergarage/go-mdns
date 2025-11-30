@@ -135,20 +135,19 @@ func (reader *Reader) ReadName() (string, error) {
 	for err == nil {
 		if nameLenIsCompressed(nextNameLen) {
 			// RFC1035: 4.1.4. Message compression
-			remainNameOffset, err := reader.ReadUint8()
+			cmpOffsetByte1 := int(nextNameLen)
+			cmpOffsetByte2, err := reader.ReadUint8()
 			if err != nil {
 				return "", err
 			}
-			nameOffset := (int(nextNameLen & ^nameIsCompressionMask) << 8) + int(remainNameOffset)
-
+			cmpOffset := ((cmpOffsetByte1 & int(nameLenMask)) << 8) | int(cmpOffsetByte2)
 			cmpBytes := reader.CompressionBytes()
-			if len(cmpBytes) <= nameOffset {
-				return "", fmt.Errorf("invalid compression offset : %d", nameOffset)
+			if cmpOffset < 0 || len(cmpBytes) <= cmpOffset {
+				return "", fmt.Errorf("invalid compression offset : %d", cmpOffset)
 			}
-
-			nextCompReader := NewReaderWithBytes(cmpBytes[nameOffset:])
-			nextCompReader.SetCompressionBytes(cmpBytes)
-			return nextCompReader.ReadName()
+			cmpReader := NewReaderWithBytes(cmpBytes[cmpOffset:])
+			cmpReader.SetCompressionBytes(cmpBytes)
+			return cmpReader.ReadName()
 		}
 		if nextNameLen == 0 {
 			break
