@@ -46,7 +46,7 @@ func TestServiceMessages(t *testing.T) {
 
 				msg, err := dns.NewMessageWithBytes(msgBytes)
 				if err != nil {
-					t.Skip(err)
+					t.Error(err)
 					return
 				}
 
