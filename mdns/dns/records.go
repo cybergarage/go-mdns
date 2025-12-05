@@ -39,7 +39,7 @@ func (records Records) LookupRecordByName(name string) (Record, bool) {
 	return lookupRecords[0], true
 }
 
-// LookupRecordByName returns the resource record of the specified name.
+// LookupRecordByNameRegex returns the resource record of the specified name.
 func (records Records) LookupRecordByNameRegex(re *regexp.Regexp) (Record, bool) {
 	lookupRecords := records.LookupRecordsByNameRegex(re)
 	if len(lookupRecords) == 0 {
