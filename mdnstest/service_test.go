@@ -25,43 +25,71 @@ import (
 )
 
 func TestServiceMessages(t *testing.T) {
-	t.Run("matter", func(t *testing.T) {
-		tests := []struct {
-			name   string
-			msgLog string
-		}{
-			{
-				"matter-service-01",
-				matterService01,
+	type expected struct {
+		name   string
+		domain string
+	}
+	tests := []struct {
+		name string
+		dump string
+		exp  expected
+	}{
+		{
+			"matter 120 4.3.1.13/dns-sd",
+			matterSpec12043113DNSSD,
+			expected{
+				name:   "DD200C20D25AE5F7._matterc._udp",
+				domain: "local",
 			},
-			{
-				"matter-service-02",
-				matterService02,
+		},
+		// {
+		// 	"matter 120 4.3.1.13/avahi#01",
+		// 	matterSpec12043113Avahi01,
+		// 	expected{
+		// 		name:   "DD200C20D25AE5F7._matterc._udp.local",
+		// 		domain: "local",
+		// 	},
+		// },
+		{
+			"matter 120 4.3.1.13/avahi#02",
+			matterSpec12043113Avahi02,
+			expected{
+				name:   "DD200C20D25AE5F7._matterc._udp",
+				domain: "local",
 			},
-		}
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.dump, "\n"))
+			if err != nil {
+				t.Error(err)
+				return
+			}
 
-		for _, test := range tests {
-			t.Run(test.name, func(t *testing.T) {
-				msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.msgLog, "\n"))
-				if err != nil {
-					t.Error(err)
-					return
-				}
+			msg, err := dns.NewMessageWithBytes(msgBytes)
+			if err != nil {
+				t.Error(err)
+				return
+			}
 
-				msg, err := dns.NewMessageWithBytes(msgBytes)
-				if err != nil {
-					t.Error(err)
-					return
-				}
+			service, err := mdns.NewService(
+				mdns.WithServiceMessage(msg),
+			)
+			if err != nil {
+				t.Error(err)
+				return
+			}
 
-				_, err = mdns.NewService(
-					mdns.WithServiceMessage(msg),
-				)
-				if err != nil {
-					t.Error(err)
-					return
-				}
-			})
-		}
-	})
+			name := service.Name()
+			if name != test.exp.name {
+				t.Errorf("service name mismatch: expected %s, got %s", test.exp.name, name)
+			}
+
+			domain := service.Domain()
+			if domain != test.exp.domain {
+				t.Errorf("service domain mismatch: expected %s, got %s", test.exp.domain, domain)
+			}
+		})
+	}
 }
