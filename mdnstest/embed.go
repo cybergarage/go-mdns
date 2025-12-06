@@ -18,35 +18,38 @@ import (
 	_ "embed"
 )
 
-//go:embed log/service-01.log
+//go:embed dumps/service-01.dump
 var service01 string
 
-//go:embed log/service-02.log
+//go:embed dumps/service-02.dump
 var service02 string
 
-//go:embed log/google-cast-01.log
+//go:embed dumps/google-cast-01.dump
 var googlecast01 string
 
-//go:embed log/google-cast-02.log
+//go:embed dumps/google-cast-02.dump
 var googlecast02 string
 
-//go:embed log/google-cast-03.log
+//go:embed dumps/google-cast-03.dump
 var googlecast03 string
 
 // 4.3.1.13. Examples
 // dns-sd -R DD200C20D25AE5F7 _matterc._udp,_S3,_L840,_CM . 11111 D=840 CM=2
 //
-//go:embed log/matter-spec-120-4.3.1.13-dns-sd-01.log
+//go:embed dumps/matter-spec-120-4.3.1.13-dns-sd-01.dump
 var matterSpec12043113DNSSD string
 
 // 4.3.1.13. Examples
 // avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=840 CM=2
 //
-//go:embed log/matter-spec-120-4.3.1.13-avahi-01.log
+//go:embed dumps/matter-spec-120-4.3.1.13-avahi-01.dump
 var matterSpec12043113Avahi01 string
 
-//go:embed log/matter-spec-120-4.3.1.13-avahi-02.log
+//go:embed dumps/matter-spec-120-4.3.1.13-avahi-02.dump
 var matterSpec12043113Avahi02 string
 
-//go:embed log/matter-service-01.log
+//go:embed dumps/matter-service-01.dump
 var matterService01 string
+
+//go:embed dumps/matter-service-02.dump
+var matterService02 string

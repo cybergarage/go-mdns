@@ -34,6 +34,10 @@ func TestServiceMessages(t *testing.T) {
 				"matter-service-01",
 				matterService01,
 			},
+			{
+				"matter-service-02",
+				matterService02,
+			},
 		}
 
 		for _, test := range tests {
