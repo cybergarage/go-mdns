@@ -18,12 +18,6 @@ import (
 	_ "embed"
 )
 
-//go:embed dumps/service-01.dump
-var service01 string
-
-//go:embed dumps/service-02.dump
-var service02 string
-
 //go:embed dumps/google-cast-01.dump
 var googlecast01 string
 

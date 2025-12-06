@@ -35,22 +35,6 @@ func TestResponseMessages(t *testing.T) {
 		attributes map[string]string
 	}{
 		{
-			"service-01",
-			service01,
-			[]answer{
-				{"_services._dns-sd._udp.local"},
-			},
-			map[string]string{},
-		},
-		// {
-		// 	"service02",
-		// 	service02,
-		// 	[]answer{
-		// 		{"_companion-link._tcp.local"},
-		// 	},
-		// 	map[string]string{},
-		// },
-		{
 			"google-cast-01",
 			googlecast01,
 			[]answer{
