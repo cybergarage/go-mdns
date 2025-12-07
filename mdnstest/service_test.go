@@ -73,6 +73,8 @@ func TestServiceMessages(t *testing.T) {
 				return
 			}
 
+			t.Logf("\n%s", msg.String())
+
 			service, err := mdns.NewService(
 				mdns.WithServiceMessage(msg),
 			)
@@ -80,6 +82,8 @@ func TestServiceMessages(t *testing.T) {
 				t.Error(err)
 				return
 			}
+
+			t.Logf("\n%s", service.String())
 
 			name := service.Name()
 			if name != test.exp.name {

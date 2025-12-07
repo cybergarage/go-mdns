@@ -17,6 +17,7 @@ package mdns
 import (
 	"fmt"
 	"net"
+	"regexp"
 	"strings"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
@@ -136,6 +137,41 @@ func (srv *serviceImpl) parseMessage(msg *Message) error {
 	}
 
 	return nil
+}
+
+// ResourceRecords returns the service resource records.
+func (srv *serviceImpl) ResourceRecords() ResourceRecords {
+	return srv.Message.ResourceRecords()
+}
+
+// ResourceAttributes returns the service TXT attributes.
+func (srv *serviceImpl) ResourceAttributes() dns.Attributes {
+	return srv.attrs
+}
+
+// LookupResourceAttribute returns the attribute with the specified name.
+func (srv *serviceImpl) LookupResourceAttribute(name string) (Attribute, bool) {
+	return srv.attrs.LookupAttribute(name)
+}
+
+// LookupResourceByName returns the resource record of the specified name.
+func (srv *serviceImpl) LookupResourceByName(name string) (ResourceRecord, bool) {
+	return srv.Message.LookupResourceRecordByName(name)
+}
+
+// LookupResourceByNameRegex returns the resource record of the specified name regex.
+func (srv *serviceImpl) LookupResourceByNameRegex(re *regexp.Regexp) (ResourceRecord, bool) {
+	return srv.Message.LookupResourceRecordByNameRegex(re)
+}
+
+// LookupResourceByNamePrefix returns the resource record of the specified name prefix.
+func (srv *serviceImpl) LookupResourceByNamePrefix(prefix string) (ResourceRecord, bool) {
+	return srv.Message.LookupResourceRecordByNamePrefix(prefix)
+}
+
+// LookupResourceByNameSuffix returns the resource record of the specified name suffix.
+func (srv *serviceImpl) LookupResourceByNameSuffix(suffix string) (ResourceRecord, bool) {
+	return srv.Message.LookupResourceRecordByNameSuffix(suffix)
 }
 
 func (srv *serviceImpl) parseRecord(record dns.Record) error {

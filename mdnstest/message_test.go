@@ -131,7 +131,7 @@ func TestResponseMessages(t *testing.T) {
 			}
 
 			for name, value := range test.attributes {
-				attr, ok := srv.LookupAttribute(name)
+				attr, ok := srv.LookupResourceAttribute(name)
 				if !ok {
 					t.Errorf("attribute (%s) not found", name)
 					continue

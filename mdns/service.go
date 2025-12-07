@@ -27,8 +27,8 @@ type Attribute = dns.Attribute
 // Attributes represents a TXT record attributes map.
 type Attributes = dns.Attributes
 
-// Records represents a TXT record attributes array.
-type Records = dns.Records
+// ResourceRecords represents a resource record array.
+type ResourceRecords = dns.ResourceRecords
 
 // ResourceRecord represents a resource record.
 type ResourceRecord = dns.ResourceRecord
@@ -45,16 +45,16 @@ type Service interface {
 	Port() int
 	// Addresses returns the service addresses.
 	Addresses() []net.IP
-	// Records returns the service TXT records.
-	Records() Records
-	// Attributes returns the service TXT attributes.
-	Attributes() Attributes
-	// LookupAttribute returns the attribute with the specified name.
-	LookupAttribute(name string) (Attribute, bool)
-	// LookupResourceRecordByName returns the resource record of the specified name.
-	LookupResourceRecordByName(name string) (ResourceRecord, bool)
+	// ResourceRecords returns the service resource records.
+	ResourceRecords() ResourceRecords
+	// ResourceAttributes returns the service TXT attributes.
+	ResourceAttributes() Attributes
+	// LookupResourceAttribute returns the attribute with the specified name.
+	LookupResourceAttribute(name string) (Attribute, bool)
+	// LookupRecordByName returns the resource record of the specified name.
+	LookupResourceByName(name string) (ResourceRecord, bool)
 	// LookupResourceRecordByNameRegex returns the resource record of the specified name regex.
-	LookupResourceRecordByNameRegex(re *regexp.Regexp) (ResourceRecord, bool)
+	LookupResourceByNameRegex(re *regexp.Regexp) (ResourceRecord, bool)
 	// Equal returns true if the header is same as the specified header, otherwise false.
 	Equal(other Service) bool
 	// String returns the string representation.
@@ -64,8 +64,8 @@ type Service interface {
 
 // ServiceHelper represents a service helper interface.
 type ServiceHelper interface {
-	// LookupResourceRecordByNamePrefix returns the resource record of the specified name prefix.
-	LookupResourceRecordByNamePrefix(prefix string) (ResourceRecord, bool)
-	// LookupResourceRecordByNameSuffix returns the resource record of the specified name suffix.
-	LookupResourceRecordByNameSuffix(suffix string) (ResourceRecord, bool)
+	// LookupResourceByNamePrefix returns the resource record of the specified name prefix.
+	LookupResourceByNamePrefix(prefix string) (ResourceRecord, bool)
+	// LookupResourceByNameSuffix returns the resource record of the specified name suffix.
+	LookupResourceByNameSuffix(suffix string) (ResourceRecord, bool)
 }
