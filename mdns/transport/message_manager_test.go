@@ -20,15 +20,15 @@ import (
 
 type testMessageManager struct {
 	*MessageManager
-	lastNotificationMessage *dns.Message
+	lastNotificationMessage dns.Message
 }
 
-func newTestMessage(tid uint) (*dns.Message, error) {
+func newTestMessage(tid uint) (dns.Message, error) {
 	msg := dns.NewRequestMessage()
 	return msg, nil
 }
 
-func isTestMessage(msg *dns.Message) bool {
+func isTestMessage(msg dns.Message) bool {
 	return msg.ID() == 0x02
 }
 
@@ -41,7 +41,7 @@ func newTestMessageManager() *testMessageManager {
 	return mgr
 }
 
-func (mgr *testMessageManager) MessageReceived(msg *dns.Message) (*dns.Message, error) {
+func (mgr *testMessageManager) MessageReceived(msg dns.Message) (dns.Message, error) {
 	if isTestMessage(msg) {
 		mgr.lastNotificationMessage = msg.Copy()
 	}

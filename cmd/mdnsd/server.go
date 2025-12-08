@@ -29,5 +29,6 @@ func NewServer() *Server {
 	}
 	return server
 }
-func (server *Server) MessageReceived(msg *dns.Message) {
+
+func (server *Server) MessageReceived(msg dns.Message) {
 }

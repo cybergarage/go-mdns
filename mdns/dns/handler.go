@@ -16,5 +16,5 @@ package dns
 
 // MessageHandler represents a protocol message handler interface.
 type MessageHandler interface {
-	MessageReceived(*Message) (*Message, error)
+	MessageReceived(Message) (Message, error)
 }

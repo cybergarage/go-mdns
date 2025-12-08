@@ -63,7 +63,7 @@ func (server *Server) Restart() error {
 	return server.Start()
 }
 
-func (server *Server) MessageReceived(msg *dns.Message) (*dns.Message, error) {
+func (server *Server) MessageReceived(msg dns.Message) (dns.Message, error) {
 	if server.userListener != nil {
 		server.userListener.MessageReceived(msg)
 	}

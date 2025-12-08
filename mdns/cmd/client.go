@@ -41,7 +41,7 @@ func NewClient() *Client {
 	return client
 }
 
-func (client *Client) MessageReceived(msg *dns.Message) {
+func (client *Client) MessageReceived(msg dns.Message) {
 	if msg.IsQuery() {
 		return
 	}

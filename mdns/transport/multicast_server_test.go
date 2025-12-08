@@ -25,7 +25,7 @@ import (
 
 type testMulticastServer struct {
 	*MulticastServer
-	lastMessage *dns.Message
+	lastMessage dns.Message
 }
 
 // NewMessageManager returns a new message manager.
@@ -38,7 +38,7 @@ func newTestMulticastServer() *testMulticastServer {
 	return server
 }
 
-func (server *testMulticastServer) MessageReceived(msg *dns.Message) (*dns.Message, error) {
+func (server *testMulticastServer) MessageReceived(msg dns.Message) (dns.Message, error) {
 	if isTestMessage(msg) {
 		server.lastMessage = msg.Copy()
 	}

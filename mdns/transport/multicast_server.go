@@ -66,7 +66,7 @@ func (server *MulticastServer) Stop() error {
 	return nil
 }
 
-func handleMulticastRequestMessage(server *MulticastServer, reqMsg *dns.Message) {
+func handleMulticastRequestMessage(server *MulticastServer, reqMsg dns.Message) {
 	if server.Handler == nil {
 		return
 	}

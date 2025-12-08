@@ -25,7 +25,7 @@ import (
 
 // serviceImpl represents a SRV record.
 type serviceImpl struct {
-	*Message
+	Message
 	name   string
 	domain string
 	host   string
@@ -70,7 +70,7 @@ func WithServicePort(port int) ServiceOptions {
 }
 
 // WithServiceMessage returns a service option with the specified message.
-func WithServiceMessage(msg *Message) ServiceOptions {
+func WithServiceMessage(msg Message) ServiceOptions {
 	return func(srv *serviceImpl) error {
 		return srv.parseMessage(msg)
 	}
@@ -126,16 +126,14 @@ func (srv *serviceImpl) Addresses() []net.IP {
 }
 
 // parseMessage updates the service data by the specified message.
-func (srv *serviceImpl) parseMessage(msg *Message) error {
+func (srv *serviceImpl) parseMessage(msg Message) error {
 	srv.Message = msg
-
 	for _, record := range msg.ResourceRecords() {
 		err := srv.parseRecord(record)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 

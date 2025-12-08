@@ -24,7 +24,7 @@ import (
 type Message = dns.Message
 
 // NewRequestWithQuery returns a nil message instance.
-func NewRequestWithQuery(query Query) *Message {
+func NewRequestWithQuery(query Query) Message {
 	msg := dns.NewRequestMessage()
 	for _, service := range query.Services() {
 		q := dns.NewQuestion()

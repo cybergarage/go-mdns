@@ -14,216 +14,98 @@
 
 package dns
 
-import (
-	"bytes"
-	"fmt"
-	"regexp"
-)
+import "regexp"
 
-// Message represents a protocol message.
-type Message struct {
-	*Header
-	Questions
-	Answers
-	NameServers
-	Additions
+type Message interface {
+	// Flags returns the flags.
+	Flags() []byte
+	// ID returns the query identifier.
+	// RFC 6762: 18.1. ID (Query Identifier)
+	// In multicast query messages, the Query Identifier SHOULD be set to zero on transmission.
+	// In multicast responses, including unsolicited multicast responses, the Query Identifier MUST be set to zero on transmission, and MUST be ignored on reception.
+	ID() uint
+	// QR returns the query type.
+	// RFC 6762: 18.2. QR (Query/Response) Bit
+	// In query messages the QR bit MUST be zero. In response messages the QR bit MUST be one.
+	QR() QR
+	// Opcode returns the kind of query.
+	// RFC 6762: 18.3. OPCODE
+	// In both multicast query and multicast response messages, the OPCODE MUST be zero on transmission (only standard queries are currently supported over multicast).
+	Opcode() Opcode
+	// AA returns the authoritative answer bit.
+	// RFC 6762: 18.4. AA (Authoritative Answer) Bit
+	// In query messages, the Authoritative Answer bit MUST be zero on transmission, and MUST be ignored on reception.
+	// In response messages for Multicast domains, the Authoritative Answer bit MUST be set to one (not setting this bit would imply there's some other place where "better" information may be found) and MUST be ignored on reception.
+	AA() bool
+	// TC returns the truncated bit.
+	// RFC 6762: 18.5. TC (Truncated) Bit
+	// In query messages, if the TC bit is set, it means that additional Known-Answer records may be following shortly. A responder SHOULD record this fact, and wait for those additional Known-Answer records, before deciding whether to respond. If the TC bit is clear, it means that the querying host has no additional Known Answers.
+	// In multicast response messages, the TC bit MUST be zero on transmission, and MUST be ignored on reception.
+	TC() bool
+	// RD returns the recursion desired bit.
+	// RFC 6762: 18.6. RD (Recursion Desired) Bit
+	// In both multicast query and multicast response messages, the Recursion Desired bit SHOULD be zero on transmission, and MUST be ignored on reception.
+	RD() bool
+	// RA returns the recursion available bit.
+	// RFC 6762: 18.7. RA (Recursion Available) Bit
+	// In both multicast query and multicast response messages, the Recursion Available bit MUST be zero on transmission, and MUST be ignored on reception.
+	RA() bool
+	// Z returns the zero bit.
+	// RFC 6762: 18.8. Z (Zero) Bit
+	// In both query and response messages, the Zero bit MUST be zero on transmission, and MUST be ignored on reception.
+	Z() bool
+	// AD returns the authentic data bit.
+	// RFC 6762: 18.9. AD (Authentic Data) Bit
+	// In both multicast query and multicast response messages, the Authentic Data bit [RFC2535] MUST be zero on transmission, and MUST be ignored on reception.
+	AD() bool
+	// CD returns the checking disabled bit.
+	// RFC 6762: 18.10. CD (Checking Disabled) Bit
+	// In both multicast query and multicast response messages, the Checking Disabled bit [RFC2535] MUST be zero on transmission, and MUST be ignored on reception.
+	CD() bool
+	// ResponseCode returns the checking disabled bit.
+	// RFC 6762: 18.11. RCODE (Response Code)
+	// In both multicast query and multicast response messages, the Response Code MUST be zero on transmission. Multicast DNS messages received with non-zero Response Codes MUST be silently ignored.
+	ResponseCode() ResponseCode
+	// QD returns the number of entries in the question section.
+	QD() uint
+	// AN returns the number of entries in the answer section.
+	AN() uint
+	// NS returns the number of name server resource records in the authority records section.
+	NS() uint
+	// AR returns the number of resource records in the additional records section.
+	AR() uint
+	// IsQuery returns true the QR bit is zero, otherwise false.
+	IsQuery() bool
+	// IsResponse returns true the QR bit is one, otherwise false.
+	IsResponse() bool
+	// Questions returns all questions in the message.
+	Questions() Questions
+	// Answers returns all answers in the message.
+	Answers() ResourceRecords
+	// NameServers returns all name servers in the message.
+	NameServers() ResourceRecords
+	// Additions returns all additional records in the message.
+	Additions() ResourceRecords
+	// Records returns all records which includes questions, answers, name servers, and additions.
+	Records() Records
+	// ResourceRecords returns only all resource records in the message without questions.
+	ResourceRecords() ResourceRecords
+	// LookupResourceRecordByName returns the resource record of the specified name.
+	LookupResourceRecordByName(name string) (ResourceRecord, bool)
+	// LookupResourceRecordByNameRegex returns the resource record of the specified name regex.
+	LookupResourceRecordByNameRegex(re *regexp.Regexp) (ResourceRecord, bool)
+	// Copy returns the copy message instance.
+	Copy() Message
+	// Bytes returns the byte representation of the message.
+	Bytes() []byte
+	// String returns the string representation of the message.
+	String() string
+	MessageHelper
 }
 
-// NewMessage returns a nil message instance.
-func NewMessage() *Message {
-	msg := &Message{
-		Header:      NewHeader(),
-		Questions:   Questions{},
-		Answers:     Answers{},
-		NameServers: NameServers{},
-		Additions:   Additions{},
-	}
-	return msg
-}
-
-// NewRequestMessage returns a request message instance.
-func NewRequestMessage() *Message {
-	msg := NewMessage()
-	msg.Header = NewRequestHeader()
-	return msg
-}
-
-// NewResponseMessage returns a response message instance.
-func NewResponseMessage() *Message {
-	msg := NewMessage()
-	msg.Header = NewResponseHeader()
-	return msg
-}
-
-// NewMessageWithBytes returns a message instance with the specified bytes.
-func NewMessageWithBytes(msgBytes []byte) (*Message, error) {
-	msg := NewMessage()
-	if err := msg.Parse(msgBytes); err != nil {
-		return nil, err
-	}
-	return msg, nil
-}
-
-// AddQuestion adds the specified question into the message.
-func (msg *Message) AddQuestion(q *Question) {
-	msg.Questions = append(msg.Questions, q)
-	msg.setQD(uint(len(msg.Questions)))
-}
-
-// AddAnswer adds the specified answer into the message.
-func (msg *Message) AddAnswer(a Answer) {
-	msg.Answers = append(msg.Answers, a)
-	msg.setAN(uint(len(msg.Answers)))
-}
-
-// AddNameServer adds the specified name server into the message.
-func (msg *Message) AddNameServer(ns NameServer) {
-	msg.NameServers = append(msg.NameServers, ns)
-	msg.setNS(uint(len(msg.NameServers)))
-}
-
-// AddAddition adds the specified additional record into the message.
-func (msg *Message) AddAddition(a Addition) {
-	msg.Additions = append(msg.Additions, a)
-	msg.setAR(uint(len(msg.Additions)))
-}
-
-// Parse parses the specified reader.
-func (msg *Message) Parse(msgBytes []byte) error {
-	reader := NewReaderWithBytes(msgBytes)
-	if err := msg.Header.Parse(reader); err != nil {
-		return fmt.Errorf("header : %w", err)
-	}
-
-	// Parses questions.
-	for n := range int(msg.QD()) {
-		r, err := NewRequestRecordWithReader(reader)
-		if err != nil {
-			return fmt.Errorf("question[%d] : %w", n, err)
-		}
-		msg.Questions = append(msg.Questions, NewQuestionWithRecord(r))
-	}
-	// Parses answers.
-	for n := range int(msg.AN()) {
-		a, err := NewResourceRecordWithReader(reader)
-		if err != nil {
-			return fmt.Errorf("answer[%d] : %w", n, err)
-		}
-		msg.Answers = append(msg.Answers, a)
-	}
-	// Parses authorities.
-	for n := range int(msg.NS()) {
-		ns, err := NewResourceRecordWithReader(reader)
-		if err != nil {
-			return fmt.Errorf("authority[%d] : %w", n, err)
-		}
-		msg.NameServers = append(msg.NameServers, ns)
-	}
-	// Parses additional records.
-	for n := range int(msg.AR()) {
-		a, err := NewResourceRecordWithReader(reader)
-		if err != nil {
-			return fmt.Errorf("additional[%d] : %w", n, err)
-		}
-		msg.Additions = append(msg.Additions, a)
-	}
-	return nil
-}
-
-// Equal returns true if the message is same as the specified message, otherwise false.
-func (msg *Message) Equal(other *Message) bool {
-	if other == nil {
-		return false
-	}
-	return bytes.Equal(msg.Bytes(), other.Bytes())
-}
-
-// Copy returns the copy message instance.
-func (msg *Message) Copy() *Message {
-	return &Message{
-		Header:      NewHeaderWithBytes(msg.Header.bytes),
-		Questions:   msg.Questions,
-		Answers:     msg.Answers,
-		NameServers: msg.NameServers,
-		Additions:   msg.Additions,
-	}
-}
-
-// Records returns all resource records.
-func (msg *Message) Records() Records {
-	records := Records{}
-	for _, r := range msg.Questions {
-		records = append(records, r)
-	}
-	records = append(records, msg.Answers...)
-	records = append(records, msg.Answers...)
-	records = append(records, msg.NameServers...)
-	records = append(records, msg.Additions...)
-	return records
-}
-
-// ResourceRecords returns all resource records.
-func (msg *Message) ResourceRecords() ResourceRecords {
-	records := ResourceRecords{}
-	records = append(records, msg.Answers...)
-	records = append(records, msg.NameServers...)
-	records = append(records, msg.Additions...)
-	return records
-}
-
-// LookupResourceRecordByName returns the resource record of the specified name.
-func (msg *Message) LookupResourceRecordByName(name string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordByName(name)
-}
-
-// LookupResourceRecordByNameRegex returns the resource record of the specified name regex.
-func (msg *Message) LookupResourceRecordByNameRegex(re *regexp.Regexp) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordByNameRegex(re)
-}
-
-// LookupResourceRecordByNamePrefix returns the resource record of the specified name prefix.
-func (msg *Message) LookupResourceRecordByNamePrefix(prefix string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordByNamePrefix(prefix)
-}
-
-// LookupResourceRecordByNameSuffix returns the resource record of the specified name suffix.
-func (msg *Message) LookupResourceRecordByNameSuffix(suffix string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordByNameSuffix(suffix)
-}
-
-// HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
-func (msg *Message) HasResourceRecord(name string) bool {
-	_, ok := msg.LookupResourceRecordByName(name)
-	return ok
-}
-
-// String returns the string representation.
-func (msg *Message) String() string {
-	return msg.Records().String()
-}
-
-// Bytes returns the binary representation.
-func (msg *Message) Bytes() []byte {
-	bytes := msg.Header.Bytes()
-	for _, q := range msg.Questions {
-		if b, err := q.RequestBytes(); err == nil {
-			bytes = append(bytes, b...)
-		}
-	}
-	for _, an := range msg.Answers {
-		if b, err := an.ResponseBytes(); err == nil {
-			bytes = append(bytes, b...)
-		}
-	}
-	for _, ns := range msg.NameServers {
-		if b, err := ns.ResponseBytes(); err == nil {
-			bytes = append(bytes, b...)
-		}
-	}
-	for _, a := range msg.Additions {
-		if b, err := a.ResponseBytes(); err == nil {
-			bytes = append(bytes, b...)
-		}
-	}
-	return bytes
+type MessageHelper interface {
+	// LookupResourceRecordByNamePrefix returns the resource record of the specified name prefix.
+	LookupResourceRecordByNamePrefix(prefix string) (ResourceRecord, bool)
+	// LookupResourceRecordByNameSuffix returns the resource record of the specified name suffix.
+	LookupResourceRecordByNameSuffix(suffix string) (ResourceRecord, bool)
 }

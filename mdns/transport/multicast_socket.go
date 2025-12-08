@@ -80,7 +80,7 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface, ifaddr string) error {
 }
 
 // AnnounceMessage announces the message to the bound multicast address.
-func (sock *MulticastSocket) AnnounceMessage(msg *dns.Message) error {
+func (sock *MulticastSocket) AnnounceMessage(msg dns.Message) error {
 	addr, err := sock.GetBoundAddr()
 	if err != nil {
 		return err

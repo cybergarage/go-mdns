@@ -78,7 +78,7 @@ func (sock *UDPSocket) Close() error {
 }
 
 // SendMessage sends the message to the destination address.
-func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg *dns.Message) (int, error) {
+func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (int, error) {
 	toUDPAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 	if err != nil {
 		return 0, err
@@ -92,7 +92,7 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg *dns.Message) 
 }
 
 // ReadMessage reads a message from the current opened socket.
-func (sock *UDPSocket) ReadMessage() (*dns.Message, error) {
+func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 	if sock.Conn == nil {
 		return nil, fmt.Errorf("%w: %s", io.EOF, errorSocketClosed)
 	}

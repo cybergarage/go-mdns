@@ -93,7 +93,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 	return client.Services(), nil
 }
 
-func (client *clientImpl) MessageReceived(msg *dns.Message) (*dns.Message, error) {
+func (client *clientImpl) MessageReceived(msg dns.Message) (dns.Message, error) {
 	client.Lock()
 	defer client.Unlock()
 
