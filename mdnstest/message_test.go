@@ -24,13 +24,53 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
+func TestRequestMessages(t *testing.T) {
+	type query struct {
+		name   string
+		domain string
+	}
+
+	tests := []struct {
+		name  string
+		dump  string
+		query query
+	}{
+		{
+			"chip-tool-query-01",
+			chipToolQuery01,
+			query{
+				name:   "S9._sub._matterc._udp",
+				domain: "local",
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.dump, "\n"))
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			msg, err := dns.NewMessageWithBytes(msgBytes)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+
+			t.Log("\n" + msg.String())
+		})
+	}
+}
+
 func TestResponseMessages(t *testing.T) {
 	type answer struct {
 		name string
 	}
 	tests := []struct {
 		name       string
-		msgLog     string
+		dump       string
 		answers    []answer
 		attributes map[string]string
 	}{
@@ -94,7 +134,7 @@ func TestResponseMessages(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.msgLog, "\n"))
+			msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.dump, "\n"))
 			if err != nil {
 				t.Error(err)
 				return
