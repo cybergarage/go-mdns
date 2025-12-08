@@ -42,5 +42,14 @@ var matterSpec12043113Avahi01 string
 //go:embed dumps/matter-spec-120-4.3.1.13-avahi-02.dump
 var matterSpec12043113Avahi02 string
 
+//go:embed dumps/matter-service-01.dump
+var matterService01 string
+
+//go:embed dumps/matter-service-02.dump
+var matterService02 string
+
+//go:embed dumps/matter-service-03.dump
+var matterService03 string
+
 //go:embed dumps/chip-tool-query-01.dump
 var chipToolQuery01 string
