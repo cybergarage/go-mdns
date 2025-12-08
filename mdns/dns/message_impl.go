@@ -29,12 +29,7 @@ type message struct {
 	additions   Additions
 }
 
-// NewMessage returns a nil message instance.
-func NewMessage() Message {
-	return newMessage()
-}
-
-func newMessage() *message {
+func newMessage(opts ...MessageOption) *message {
 	msg := &message{
 		Header:      NewHeader(),
 		questions:   Questions{},
@@ -42,20 +37,44 @@ func newMessage() *message {
 		nameServers: NameServers{},
 		additions:   Additions{},
 	}
+	for _, opt := range opts {
+		opt(msg)
+	}
 	return msg
 }
 
+// WithMessageQuestions returns a message option with the specified questions.
+func WithMessageQuestions(questions ...*Question) MessageOption {
+	return func(msg *message) error {
+		for _, q := range questions {
+			msg.AddQuestion(q)
+		}
+		return nil
+	}
+}
+
+// NewMessage returns a nil message instance.
+func NewMessage(opts ...MessageOption) Message {
+	return newMessage(opts...)
+}
+
 // NewRequestMessage returns a request message instance.
-func NewRequestMessage() Message {
+func NewRequestMessage(opts ...MessageOption) Message {
 	msg := newMessage()
 	msg.Header = NewRequestHeader()
+	for _, opt := range opts {
+		opt(msg)
+	}
 	return msg
 }
 
 // NewResponseMessage returns a response message instance.
-func NewResponseMessage() Message {
+func NewResponseMessage(opts ...MessageOption) Message {
 	msg := newMessage()
 	msg.Header = NewResponseHeader()
+	for _, opt := range opts {
+		opt(msg)
+	}
 	return msg
 }
 
@@ -212,12 +231,6 @@ func (msg *message) LookupResourceRecordByNamePrefix(prefix string) (ResourceRec
 // LookupResourceRecordByNameSuffix returns the resource record of the specified name suffix.
 func (msg *message) LookupResourceRecordByNameSuffix(suffix string) (ResourceRecord, bool) {
 	return msg.ResourceRecords().LookupRecordByNameSuffix(suffix)
-}
-
-// HasResourceRecord returns true if the resource record of the specified name is included in the message. otherwise false.
-func (msg *message) HasResourceRecord(name string) bool {
-	_, ok := msg.LookupResourceRecordByName(name)
-	return ok
 }
 
 // String returns the string representation.

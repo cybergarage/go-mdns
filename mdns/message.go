@@ -25,13 +25,13 @@ type Message = dns.Message
 
 // NewRequestWithQuery returns a nil message instance.
 func NewRequestWithQuery(query Query) Message {
-	msg := dns.NewRequestMessage()
+	questions := []*dns.Question{}
 	for _, service := range query.Services() {
 		q := dns.NewQuestion()
 		q.SetName(strings.Join([]string{service, query.Domain()}, queryNameSep))
 		q.SetType(dns.PTR)
 		q.SetClass(dns.IN)
-		msg.AddQuestion(q)
+		questions = append(questions, q)
 	}
-	return msg
+	return dns.NewRequestMessage(dns.WithMessageQuestions(questions...))
 }

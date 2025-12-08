@@ -16,6 +16,9 @@ package dns
 
 import "regexp"
 
+// MessageOption represents a message option.
+type MessageOption func(*message) error
+
 type Message interface {
 	// Flags returns the flags.
 	Flags() []byte

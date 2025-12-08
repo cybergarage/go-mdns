@@ -161,7 +161,7 @@ func TestResponseMessages(t *testing.T) {
 			}
 
 			for _, answer := range test.answers {
-				if msg.HasResourceRecord(answer.name) {
+				if _, ok := msg.LookupResourceRecordByName(answer.name); ok {
 					continue
 				}
 				if _, ok := msg.LookupResourceRecordByNameSuffix(answer.name); ok {
