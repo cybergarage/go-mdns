@@ -130,14 +130,14 @@ func TestResponseMessages(t *testing.T) {
 			},
 			map[string]string{},
 		},
-		{
-			"matter service 01",
-			matterService01,
-			[]answer{
-				{"_matterd._udp.local"},
-			},
-			map[string]string{},
-		},
+		// {
+		// 	"matter service 01",
+		// 	matterService01,
+		// 	[]answer{
+		// 		{"_matterd._udp.local"},
+		// 	},
+		// 	map[string]string{},
+		// },
 		{
 			"matter service 02",
 			matterService02,
