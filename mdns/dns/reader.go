@@ -158,7 +158,7 @@ func (reader *Reader) ReadName() (string, error) {
 			return "", err
 		}
 		if 0 < len(name) {
-			name += nameSep
+			name += LabelSeparator
 		}
 		name += string(nextName)
 		nextNameLen, err = reader.ReadUint8()

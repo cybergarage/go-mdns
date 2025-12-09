@@ -16,10 +16,8 @@ package mdns
 
 import (
 	"strings"
-)
 
-const (
-	queryNameSep = "."
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 type queryImp struct {
@@ -73,7 +71,7 @@ func (q *queryImp) String() string {
 		if 0 < i {
 			s.WriteString(",")
 		}
-		s.WriteString(strings.Join([]string{service, q.domain}, queryNameSep))
+		s.WriteString(dns.NameWithStrings(service, q.domain))
 	}
 	return s.String()
 }

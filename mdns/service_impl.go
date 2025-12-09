@@ -177,7 +177,7 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 		if len(fullname) == 0 {
 			return nil
 		}
-		idx := strings.LastIndex(fullname, ".")
+		idx := strings.LastIndex(fullname, dns.LabelSeparator)
 		if idx == -1 {
 			return fmt.Errorf("invalid record name: %s", fullname)
 		}
@@ -280,7 +280,7 @@ func (srv *serviceImpl) Equal(other Service) bool {
 func (srv *serviceImpl) String() string {
 	return fmt.Sprintf(
 		"%s (%s:%d)",
-		strings.Join([]string{srv.name, srv.host, srv.domain}, queryNameSep),
+		dns.NameWithStrings(srv.name, srv.host, srv.domain),
 		srv.host,
 		srv.port,
 	)

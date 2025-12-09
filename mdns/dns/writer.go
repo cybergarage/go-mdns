@@ -91,7 +91,7 @@ func (writer *Writer) WriteString(v string) error {
 
 // WriteName writes a name.
 func (writer *Writer) WriteName(name string) error {
-	labels := strings.SplitSeq(name, ".")
+	labels := strings.SplitSeq(name, LabelSeparator)
 	for label := range labels {
 		if err := writer.WriteString(label); err != nil {
 			return err

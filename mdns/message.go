@@ -15,8 +15,6 @@
 package mdns
 
 import (
-	"strings"
-
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
@@ -28,7 +26,7 @@ func NewRequestWithQuery(query Query) Message {
 	questions := []dns.Question{}
 	for _, service := range query.Services() {
 		q := dns.NewQuestion(
-			dns.WithQuestionName(strings.Join([]string{service, query.Domain()}, queryNameSep)),
+			dns.WithQuestionName(dns.NameWithStrings(service, query.Domain())),
 			dns.WithQuestionType(dns.PTR),
 			dns.WithQuestionClass(dns.IN),
 		)

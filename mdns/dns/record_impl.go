@@ -187,7 +187,7 @@ func (r *record) Content() string {
 		if unicode.IsPrint(rb) {
 			c.WriteString(fmt.Sprintf("%c", rb))
 		} else {
-			c.WriteString(".")
+			c.WriteString(LabelSeparator)
 		}
 	}
 	return c.String()

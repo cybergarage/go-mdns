@@ -19,14 +19,19 @@ import (
 )
 
 const (
-	nameSep               = "."
+	LabelSeparator        = "."
 	nameIsCompressionMask = uint8(0xC0)
 	nameLenMask           = uint8(0x3F)
 )
 
+// NameWithStrings returns a DNS name constructed by joining the given strings with dots.
+func NameWithStrings(s ...string) string {
+	return strings.Join(s, LabelSeparator)
+}
+
 func nameToBytes(name string) []byte {
 	bytes := []byte{}
-	tokens := strings.SplitSeq(name, nameSep)
+	tokens := strings.SplitSeq(name, LabelSeparator)
 	for token := range tokens {
 		if len(token) == 0 {
 			continue
