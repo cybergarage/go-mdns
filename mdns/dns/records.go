@@ -137,10 +137,10 @@ func (records Records) LookupAAAARecords() []AAAARecord {
 }
 
 // LookupPTRRecords returns the PTR records.
-func (records Records) LookupPTRRecords() []*PTRRecord {
-	resRecords := []*PTRRecord{}
+func (records Records) LookupPTRRecords() []PTRRecord {
+	resRecords := []PTRRecord{}
 	for _, record := range records {
-		if ptrRecord, ok := record.(*PTRRecord); ok {
+		if ptrRecord, ok := record.(PTRRecord); ok {
 			resRecords = append(resRecords, ptrRecord)
 		}
 	}

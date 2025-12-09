@@ -44,7 +44,7 @@ func TestResourceRecord(t *testing.T) {
 					t.Error(err)
 					return
 				}
-				ptr, ok := q.(*PTRRecord)
+				ptr, ok := q.(PTRRecord)
 				if !ok {
 					t.Errorf("%v", q)
 					return

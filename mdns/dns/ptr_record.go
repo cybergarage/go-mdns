@@ -14,46 +14,10 @@
 
 package dns
 
-// PTRRecord represents a PTR record.
-type PTRRecord struct {
-	*record
-	domainName string
-}
-
-// NewPTRRecord returns a new PTR record instance.
-func NewPTRRecord() *PTRRecord {
-	return &PTRRecord{
-		record:     newResourceRecord(),
-		domainName: "",
-	}
-}
-
-// newPTRRecordWithResourceRecord returns a new PTR record instance.
-func newPTRRecordWithResourceRecord(res *record) (*PTRRecord, error) {
-	ptr := &PTRRecord{
-		record:     res,
-		domainName: "",
-	}
-	return ptr, ptr.parseResourceRecord()
-}
-
-func (ptr *PTRRecord) parseResourceRecord() error {
-	if len(ptr.data) == 0 {
-		return nil
-	}
-	var err error
-	reader := NewReaderWithBytes(ptr.data)
-	reader.SetCompressionBytes(ptr.CompressionBytes())
-	ptr.domainName, err = reader.ReadName()
-	return err
-}
-
-// DomainName returns the resource domain name.
-func (ptr *PTRRecord) DomainName() string {
-	return ptr.domainName
-}
-
-// Content returns a string representation to the record data.
-func (ptr *PTRRecord) Content() string {
-	return ptr.DomainName()
+type PTRRecord interface {
+	Record
+	// DomainName returns the domain name pointed to by this PTR record.
+	DomainName() string
+	// Content returns a string representation to the record data.
+	Content() string
 }
