@@ -172,9 +172,7 @@ func TestResponseMessages(t *testing.T) {
 				return
 			}
 
-			if !srv.Equal(srv) {
-				t.Error("service not equal")
-			}
+			t.Log("\n" + srv.String())
 
 			for _, answer := range test.answers {
 				if _, ok := msg.LookupResourceRecordByName(answer.name); ok {

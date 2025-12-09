@@ -27,10 +27,11 @@ type Message = dns.Message
 func NewRequestWithQuery(query Query) Message {
 	questions := []dns.Question{}
 	for _, service := range query.Services() {
-		q := dns.NewQuestion()
-		q.SetName(strings.Join([]string{service, query.Domain()}, queryNameSep))
-		q.SetType(dns.PTR)
-		q.SetClass(dns.IN)
+		q := dns.NewQuestion(
+			dns.WithQuestionName(strings.Join([]string{service, query.Domain()}, queryNameSep)),
+			dns.WithQuestionType(dns.PTR),
+			dns.WithQuestionClass(dns.IN),
+		)
 		questions = append(questions, q)
 	}
 	return dns.NewRequestMessage(dns.WithMessageQuestions(questions...))

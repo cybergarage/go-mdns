@@ -19,14 +19,42 @@ type question struct {
 	*record
 }
 
+// QuestionOption represents a question option.
+type QuestionOption func(*question)
+
 // Questions represents a question array.
 type Questions []Question
 
+// WithQuestionName sets the question name.
+func WithQuestionName(name string) QuestionOption {
+	return func(q *question) {
+		q.SetName(name)
+	}
+}
+
+// WithQuestionType sets the question type.
+func WithQuestionType(t Type) QuestionOption {
+	return func(q *question) {
+		q.SetType(t)
+	}
+}
+
+// WithQuestionTTL sets the question TTL.
+func WithQuestionClass(cls Class) QuestionOption {
+	return func(q *question) {
+		q.SetClass(cls)
+	}
+}
+
 // NewQuestion returns a new question instance.
-func NewQuestion() Question {
-	return &question{
+func NewQuestion(opts ...QuestionOption) Question {
+	q := &question{
 		record: newResourceRecord(),
 	}
+	for _, opt := range opts {
+		opt(q)
+	}
+	return q
 }
 
 // NewQuestionWithRecord returns a new question instance with the specified record.
