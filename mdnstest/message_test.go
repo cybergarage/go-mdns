@@ -74,78 +74,78 @@ func TestResponseMessages(t *testing.T) {
 		answers    []answer
 		attributes map[string]string
 	}{
-		// {
-		// 	"google-cast-01",
-		// 	googlecast01,
-		// 	[]answer{
-		// 		{"_services._dns-sd._udp.local"},
-		// 	},
-		// 	map[string]string{},
-		// },
-		// {
-		// 	"google-cast-02",
-		// 	googlecast02,
-		// 	[]answer{
-		// 		{"_googlecast._tcp.local"},
-		// 	},
-		// 	map[string]string{},
-		// },
-		// {
-		// 	"google-cast-03",
-		// 	googlecast03,
-		// 	[]answer{
-		// 		{"_googlezone._tcp.local"},
-		// 	},
-		// 	map[string]string{
-		// 		"id": "4E50AF186C368EE8A98A648BE272AAD5",
-		// 	},
-		// },
-		// {
-		// 	"matter 120 4.3.1.13/dns-sd",
-		// 	matterSpec12043113DNSSD,
-		// 	[]answer{
-		// 		{"_services._dns-sd"},
-		// 	},
-		// 	map[string]string{
-		// 		"D":  "840",
-		// 		"CM": "2",
-		// 	},
-		// },
-		// {
-		// 	"matter 120 4.3.1.13/avahi#01",
-		// 	matterSpec12043113Avahi01,
-		// 	[]answer{
-		// 		{"_matterc._udp.local"},
-		// 	},
-		// 	map[string]string{
-		// 		"D":  "840",
-		// 		"CM": "2",
-		// 	},
-		// },
-		// {
-		// 	"matter 120 4.3.1.13/avahi#02",
-		// 	matterSpec12043113Avahi02,
-		// 	[]answer{
-		// 		{"_matterc._udp.local"},
-		// 	},
-		// 	map[string]string{},
-		// },
+		{
+			"google-cast-01",
+			googlecast01,
+			[]answer{
+				{"_services._dns-sd._udp.local"},
+			},
+			map[string]string{},
+		},
+		{
+			"google-cast-02",
+			googlecast02,
+			[]answer{
+				{"_googlecast._tcp.local"},
+			},
+			map[string]string{},
+		},
+		{
+			"google-cast-03",
+			googlecast03,
+			[]answer{
+				{"_googlezone._tcp.local"},
+			},
+			map[string]string{
+				"id": "4E50AF186C368EE8A98A648BE272AAD5",
+			},
+		},
+		{
+			"matter 120 4.3.1.13/dns-sd",
+			matterSpec12043113DNSSD,
+			[]answer{
+				{"_services._dns-sd"},
+			},
+			map[string]string{
+				"D":  "840",
+				"CM": "2",
+			},
+		},
+		{
+			"matter 120 4.3.1.13/avahi#01",
+			matterSpec12043113Avahi01,
+			[]answer{
+				{"_matterc._udp.local"},
+			},
+			map[string]string{
+				"D":  "840",
+				"CM": "2",
+			},
+		},
+		{
+			"matter 120 4.3.1.13/avahi#02",
+			matterSpec12043113Avahi02,
+			[]answer{
+				{"_matterc._udp.local"},
+			},
+			map[string]string{},
+		},
 		{
 			"matter service 01",
 			matterService01,
 			[]answer{
-				{"_matterd._udp.local"},
+				{"_services._dns-sd._udp.local"},
 			},
 			map[string]string{},
 		},
-		// {
-		// 	"matter service 02",
-		// 	matterService02,
-		// 	[]answer{
-		// 		{"_S9._sub._matterc._udp.local"},
-		// 	},
-		// 	map[string]string{},
-		// },
+		{
+			"matter service 02",
+			matterService02,
+			[]answer{
+				{"_S9._sub._matterc._udp.local"},
+			},
+			map[string]string{},
+		},
 	}
 
 	for _, test := range tests {
