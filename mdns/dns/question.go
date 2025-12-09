@@ -14,30 +14,7 @@
 
 package dns
 
-// Question represents a question.
-type Question struct {
-	*record
-}
-
-// Questions represents a question array.
-type Questions []*Question
-
-// NewQuestion returns a new question instance.
-func NewQuestion() *Question {
-	return &Question{
-		record: newResourceRecord(),
-	}
-}
-
-// NewQuestionWithRecord returns a new question instance with the specified record.
-func NewQuestionWithRecord(record *record) *Question {
-	return &Question{
-		record: record,
-	}
-}
-
-// NewQuestionWithReader returns a new question instance with the specified record.
-func NewQuestionWithReader(reader *Reader) (*Question, error) {
-	r, err := NewRequestRecordWithReader(reader)
-	return NewQuestionWithRecord(r), err
+// Question represents a DNS question record interface.
+type Question interface {
+	Record
 }

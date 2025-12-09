@@ -44,7 +44,7 @@ func newMessage(opts ...MessageOption) *message {
 }
 
 // WithMessageQuestions returns a message option with the specified questions.
-func WithMessageQuestions(questions ...*Question) MessageOption {
+func WithMessageQuestions(questions ...Question) MessageOption {
 	return func(msg *message) error {
 		for _, q := range questions {
 			msg.AddQuestion(q)
@@ -88,7 +88,7 @@ func NewMessageWithBytes(msgBytes []byte) (Message, error) {
 }
 
 // AddQuestion adds the specified question into the message.
-func (msg *message) AddQuestion(q *Question) {
+func (msg *message) AddQuestion(q Question) {
 	msg.questions = append(msg.questions, q)
 	msg.setQD(uint(len(msg.questions)))
 }
