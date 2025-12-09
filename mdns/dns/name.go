@@ -29,6 +29,14 @@ func NameWithStrings(s ...string) string {
 	return strings.Join(s, LabelSeparator)
 }
 
+// AppendName appends the given name to the base name.
+func AppendName(base string, name string) string {
+	if len(base) == 0 {
+		return name
+	}
+	return base + LabelSeparator + name
+}
+
 func nameToBytes(name string) []byte {
 	bytes := []byte{}
 	tokens := strings.SplitSeq(name, LabelSeparator)

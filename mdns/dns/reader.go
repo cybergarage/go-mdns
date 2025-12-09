@@ -155,11 +155,7 @@ func (reader *Reader) ReadName() (string, error) {
 				return "", err
 			}
 			// Per RFC1035, a compression pointer terminates the current name.
-			if 0 < len(name) {
-				name += LabelSeparator
-			}
-			name += nextName
-			return name, nil
+			return AppendName(name, nextName), nil
 		}
 		if nextNameLen == 0 {
 			break
@@ -170,10 +166,7 @@ func (reader *Reader) ReadName() (string, error) {
 			return "", err
 		}
 		nextName := string(nextNameBytes)
-		if 0 < len(name) {
-			name += LabelSeparator
-		}
-		name += nextName
+		name = AppendName(name, nextName)
 		nextNameLen, err = reader.ReadUint8()
 	}
 	if err != nil && !errors.Is(err, io.EOF) {
