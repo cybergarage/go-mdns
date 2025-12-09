@@ -148,10 +148,10 @@ func (records Records) LookupPTRRecords() []*PTRRecord {
 }
 
 // LookupSRVRecords returns the SRV records.
-func (records Records) LookupSRVRecords() []*SRVRecord {
-	resRecords := []*SRVRecord{}
+func (records Records) LookupSRVRecords() []SRVRecord {
+	resRecords := []SRVRecord{}
 	for _, record := range records {
-		if srvRecord, ok := record.(*SRVRecord); ok {
+		if srvRecord, ok := record.(SRVRecord); ok {
 			resRecords = append(resRecords, srvRecord)
 		}
 	}

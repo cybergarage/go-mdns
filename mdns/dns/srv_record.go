@@ -14,122 +14,25 @@
 
 package dns
 
-import "fmt"
-
 // SRVRecord represents a SRV record.
 // RFC 2782: A DNS RR for specifying the location of services (DNS SRV).
 // https://www.rfc-editor.org/rfc/rfc2782
-type SRVRecord struct {
-	*record
-	service  string
-	proto    string
-	name     string
-	priority uint16
-	weight   uint16
-	port     uint16
-	target   string
-}
-
-// NewSRVRecord returns a new SRV record instance.
-func NewSRVRecord() *SRVRecord {
-	return &SRVRecord{
-		record:   newResourceRecord(),
-		service:  "",
-		proto:    "",
-		name:     "",
-		priority: 0,
-		weight:   0,
-		port:     0,
-		target:   "",
-	}
-}
-
-// newSRVRecordWithResourceRecord returns a new SRV record instance.
-func newSRVRecordWithResourceRecord(res *record) (*SRVRecord, error) {
-	srv := &SRVRecord{
-		record:   res,
-		service:  "",
-		proto:    "",
-		name:     "",
-		priority: 0,
-		weight:   0,
-		port:     0,
-		target:   "",
-	}
-	return srv, srv.parseResourceRecord()
-}
-
-func (srv *SRVRecord) parseResourceRecord() error {
-	if len(srv.data) == 0 {
-		return nil
-	}
-
-	var err error
-
-	reader := NewReaderWithBytes(srv.data)
-
-	srv.priority, err = reader.ReadUint16()
-	if err != nil {
-		return err
-	}
-
-	srv.weight, err = reader.ReadUint16()
-	if err != nil {
-		return err
-	}
-
-	srv.port, err = reader.ReadUint16()
-	if err != nil {
-		return err
-	}
-
-	srv.target, err = reader.ReadString()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Service returns the service name.
-func (srv *SRVRecord) Service() string {
-	return srv.service
-}
-
-// Proto returns the protocol name.
-func (srv *SRVRecord) Proto() string {
-	return srv.proto
-}
-
-// Name returns the resource name.
-func (srv *SRVRecord) Name() string {
-	return srv.name
-}
-
-// Priority returns the resource priority.
-func (srv *SRVRecord) Priority() uint {
-	return uint(srv.priority)
-}
-
-// Weight returns the resource weight.
-func (srv *SRVRecord) Weight() uint {
-	return uint(srv.weight)
-}
-
-// Port returns the resource port.
-func (srv *SRVRecord) Port() uint {
-	return uint(srv.port)
-}
-
-// Target returns the resource target.
-func (srv *SRVRecord) Target() string {
-	return srv.target
-}
-
-// Content returns a string representation to the record data.
-func (srv *SRVRecord) Content() string {
-	if len(srv.data) == 0 {
-		return ""
-	}
-	return fmt.Sprintf("%d %d %d %s", srv.priority, srv.weight, srv.port, srv.target)
+type SRVRecord interface {
+	Record
+	// Service returns the service name.
+	Service() string
+	// Proto returns the protocol name.
+	Proto() string
+	// Name returns the domain name.
+	Name() string
+	// Priority returns the priority of the target host.
+	Priority() uint
+	// Weight returns a relative weight for records with the same priority.
+	Weight() uint
+	// Port returns the port on this target host of this service.
+	Port() uint
+	// Target returns the canonical hostname of the machine providing the service.
+	Target() string
+	// Content returns a string representation to the record data.
+	Content() string
 }

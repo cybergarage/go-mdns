@@ -195,7 +195,7 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 	}
 
 	switch rr := record.(type) {
-	case *dns.SRVRecord:
+	case dns.SRVRecord:
 		err := parseNameDomain(rr.Name())
 		if err != nil {
 			return err
