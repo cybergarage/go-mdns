@@ -14,47 +14,12 @@
 
 package dns
 
-import (
-	"fmt"
-	"net"
-	"strings"
-)
+import "net"
 
-// AAAARecord represents a AAAA record.
-type AAAARecord struct {
-	*record
-}
-
-// NewAAAARecord returns a new AAAA record instance.
-func NewAAAARecord() *AAAARecord {
-	return &AAAARecord{
-		record: newResourceRecord(),
-	}
-}
-
-// newAAAARecordWithResourceRecord returns a new AAAA record instance.
-func newAAAARecordWithResourceRecord(res *record) *AAAARecord {
-	return &AAAARecord{
-		record: res,
-	}
-}
-
-// Address returns the resource ip address.
-func (a *AAAARecord) Address() net.IP {
-	if len(a.data) != 16 {
-		return nil
-	}
-	var ipstr strings.Builder
-	for n, b := range a.data {
-		if (n != 0) && ((n % 2) == 0) {
-			ipstr.WriteString(":")
-		}
-		ipstr.WriteString(fmt.Sprintf("%02x", b))
-	}
-	return net.ParseIP(ipstr.String())
-}
-
-// Content returns a string representation to the record data.
-func (a *AAAARecord) Content() string {
-	return a.Address().String()
+type AAAARecord interface {
+	Record
+	// Address returns the resource ip address.
+	Address() net.IP
+	// Content returns a string representation to the record data.
+	Content() string
 }

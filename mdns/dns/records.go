@@ -126,10 +126,10 @@ func (records Records) LookupARecords() []ARecord {
 }
 
 // LookupAAAARecords returns the AAAA records.
-func (records Records) LookupAAAARecords() []*AAAARecord {
-	resRecords := []*AAAARecord{}
+func (records Records) LookupAAAARecords() []AAAARecord {
+	resRecords := []AAAARecord{}
 	for _, record := range records {
-		if aaaaRecord, ok := record.(*AAAARecord); ok {
+		if aaaaRecord, ok := record.(AAAARecord); ok {
 			resRecords = append(resRecords, aaaaRecord)
 		}
 	}

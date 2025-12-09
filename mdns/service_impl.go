@@ -222,7 +222,7 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 		if ip != nil {
 			srv.addrs = append(srv.addrs, ip)
 		}
-	case *dns.AAAARecord:
+	case dns.AAAARecord:
 		ip := rr.Address()
 		if ip != nil {
 			srv.addrs = append(srv.addrs, ip)
