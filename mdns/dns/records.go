@@ -115,10 +115,10 @@ func (records Records) LookupRecordsByType(t Type) []Record {
 }
 
 // LookupARecords returns the A records.
-func (records Records) LookupARecords() []*ARecord {
-	resRecords := []*ARecord{}
+func (records Records) LookupARecords() []ARecord {
+	resRecords := []ARecord{}
 	for _, record := range records {
-		if aRecord, ok := record.(*ARecord); ok {
+		if aRecord, ok := record.(ARecord); ok {
 			resRecords = append(resRecords, aRecord)
 		}
 	}

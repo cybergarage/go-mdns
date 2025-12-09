@@ -14,29 +14,31 @@
 
 package dns
 
-import "net"
+import (
+	"net"
+)
 
-// ARecord represents a A record.
-type ARecord struct {
+// aRecord represents a A record.
+type aRecord struct {
 	*record
 }
 
 // NewARecord returns a new A record instance.
-func NewARecord(res *record) *ARecord {
-	return &ARecord{
+func NewARecord(res *record) ARecord {
+	return &aRecord{
 		record: newResourceRecord(),
 	}
 }
 
 // newARecordWithResourceRecord returns a new A record instance.
-func newARecordWithResourceRecord(res *record) *ARecord {
-	return &ARecord{
+func newARecordWithResourceRecord(res *record) ARecord {
+	return &aRecord{
 		record: res,
 	}
 }
 
 // Address returns the resource ip address.
-func (a *ARecord) Address() net.IP {
+func (a *aRecord) Address() net.IP {
 	if len(a.data) < 4 {
 		return nil
 	}
@@ -44,6 +46,6 @@ func (a *ARecord) Address() net.IP {
 }
 
 // Content returns a string representation to the record data.
-func (a *ARecord) Content() string {
+func (a *aRecord) Content() string {
 	return a.Address().String()
 }

@@ -175,7 +175,7 @@ func TestResourceRecord(t *testing.T) {
 				if err != nil {
 					t.Error(err)
 				}
-				a, ok := q.(*ARecord)
+				a, ok := q.(ARecord)
 				if !ok {
 					t.Errorf("%v", a)
 					return
