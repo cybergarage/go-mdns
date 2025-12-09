@@ -194,6 +194,14 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 		return nil
 	}
 
+	// Handle address records (A/AAAA) via shared Address() method.
+	if ar, ok := record.(interface{ Address() net.IP }); ok {
+		ip := ar.Address()
+		if ip != nil {
+			srv.addrs = append(srv.addrs, ip)
+		}
+	}
+
 	switch rr := record.(type) {
 	case dns.SRVRecord:
 		err := parseNameDomain(rr.Name())
@@ -217,17 +225,8 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 		if err == nil {
 			srv.attrs = append(srv.attrs, attrs...)
 		}
-	case dns.ARecord:
-		ip := rr.Address()
-		if ip != nil {
-			srv.addrs = append(srv.addrs, ip)
-		}
-	case dns.AAAARecord:
-		ip := rr.Address()
-		if ip != nil {
-			srv.addrs = append(srv.addrs, ip)
-		}
 	}
+
 	return nil
 }
 
