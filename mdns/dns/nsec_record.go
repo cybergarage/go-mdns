@@ -17,41 +17,8 @@ package dns
 // NSECRecord represents a NSEC record.
 // RFC 4034: Resource Records for the DNS Security Extensions.
 // https://www.rfc-editor.org/rfc/rfc4034
-type NSECRecord struct {
-	*record
-}
-
-// NewNSECRecord returns a new NSEC record instance.
-func NewNSECRecord() *NSECRecord {
-	return &NSECRecord{
-		record: newResourceRecord(),
-	}
-}
-
-// newNSECRecordWithResourceRecord returns a new NSEC record instance.
-func newNSECRecordWithResourceRecord(res *record) (*NSECRecord, error) {
-	nsec := &NSECRecord{
-		record: res,
-	}
-	return nsec, nsec.parseResourceRecord()
-}
-
-func (nsec *NSECRecord) parseResourceRecord() error {
-	if len(nsec.data) == 0 {
-		return nil
-	}
-
-	// var err error
-
-	// reader := NewReaderWithBytes(nsec.data)
-
-	return nil
-}
-
-// Content returns a string representation to the record data.
-func (nsec *NSECRecord) Content() string {
-	if len(nsec.data) == 0 {
-		return ""
-	}
-	return ""
+type NSECRecord interface {
+	Record
+	// Content returns a string representation to the record data.
+	Content() string
 }
