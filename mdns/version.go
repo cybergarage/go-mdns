@@ -15,5 +15,5 @@
 package mdns
 
 const (
-	Version = ".."
+	Version = "v0.8.1"
 )
