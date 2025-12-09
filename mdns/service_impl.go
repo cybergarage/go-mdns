@@ -208,7 +208,7 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 		if 0 < port {
 			srv.port = int(port)
 		}
-	case *dns.TXTRecord:
+	case dns.TXTRecord:
 		err := parseNameDomain(rr.Name())
 		if err != nil {
 			return err
