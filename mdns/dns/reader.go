@@ -35,7 +35,7 @@ func NewReaderWithBytes(b []byte) *Reader {
 	return &Reader{
 		cmpBytes:   b,
 		buffer:     b,
-		bufferSize: int(len(b)),
+		bufferSize: len(b),
 		offset:     0,
 	}
 }
@@ -52,12 +52,15 @@ func (reader *Reader) CompressionBytes() []byte {
 
 // Read overwrites the io.Reader interface.
 func (reader *Reader) Read(p []byte) (int, error) {
-	if reader.bufferSize < (reader.offset + len(p)) {
+	if reader.bufferSize <= reader.offset {
 		return 0, io.EOF
 	}
-	copy(p, reader.buffer[reader.offset:])
-	reader.offset += len(p)
-	return len(p), nil
+	n := copy(p, reader.buffer[reader.offset:])
+	reader.offset += n
+	if n == 0 {
+		return 0, io.EOF
+	}
+	return n, nil
 }
 
 // ReadUint8 returns a uint8 from the reader.
@@ -133,7 +136,6 @@ func (reader *Reader) ReadName() (string, error) {
 	name := ""
 	nextNameLen, err := reader.ReadUint8()
 	for err == nil {
-		var nextName string
 		if nameLenIsCompressed(nextNameLen) {
 			// RFC1035: 4.1.4. Message compression
 			cmpOffsetByte1 := int(nextNameLen)
@@ -148,21 +150,26 @@ func (reader *Reader) ReadName() (string, error) {
 			}
 			cmpReader := NewReaderWithBytes(cmpBytes[cmpOffset:])
 			cmpReader.SetCompressionBytes(cmpBytes)
-			nextName, err = cmpReader.ReadName()
+			nextName, err := cmpReader.ReadName()
 			if err != nil {
 				return "", err
 			}
-		} else {
-			if nextNameLen == 0 {
-				break
+			// Per RFC1035, a compression pointer terminates the current name.
+			if 0 < len(name) {
+				name += LabelSeparator
 			}
-			nextNameBytes := make([]byte, nextNameLen)
-			_, err = reader.Read(nextNameBytes)
-			if err != nil {
-				return "", err
-			}
-			nextName = string(nextNameBytes)
+			name += nextName
+			return name, nil
 		}
+		if nextNameLen == 0 {
+			break
+		}
+		nextNameBytes := make([]byte, nextNameLen)
+		_, err = reader.Read(nextNameBytes)
+		if err != nil {
+			return "", err
+		}
+		nextName := string(nextNameBytes)
 		if 0 < len(name) {
 			name += LabelSeparator
 		}
