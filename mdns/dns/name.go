@@ -37,6 +37,11 @@ func AppendName(base string, name string) string {
 	return base + LabelSeparator + name
 }
 
+// SplitName splits the given name into its labels.
+func SplitName(name string) []string {
+	return strings.Split(name, LabelSeparator)
+}
+
 func nameToBytes(name string) []byte {
 	bytes := []byte{}
 	tokens := strings.SplitSeq(name, LabelSeparator)
