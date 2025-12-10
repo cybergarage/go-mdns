@@ -144,7 +144,15 @@ func TestResponseMessages(t *testing.T) {
 			[]answer{
 				{"_S9._sub._matterc._udp.local"},
 			},
-			map[string]string{},
+			map[string]string{
+				"VP": "5002+5010",
+				"DT": "14",
+				"T":  "1",
+				"CM": "1",
+				"RI": "0F0072207A66D38D32D2BF9DF653E9735F86",
+				"PH": "33",
+				"PI": "",
+			},
 		},
 	}
 
@@ -172,7 +180,11 @@ func TestResponseMessages(t *testing.T) {
 				return
 			}
 
-			t.Log("\n" + srv.String())
+			printErrorInfo := func(msg mdns.Message, srv mdns.Service, format string, args ...any) {
+				t.Errorf(format, args...)
+				t.Log("\n" + msg.String())
+				t.Log("\n" + srv.String())
+			}
 
 			for _, answer := range test.answers {
 				if _, ok := msg.LookupResourceRecordByName(answer.name); ok {
@@ -181,17 +193,19 @@ func TestResponseMessages(t *testing.T) {
 				if _, ok := msg.LookupResourceRecordByNameSuffix(answer.name); ok {
 					continue
 				}
-				t.Errorf("answer (%s) not found", answer.name)
+				printErrorInfo(msg, srv, "answer (%s) not found", answer.name)
+				return
 			}
 
 			for name, value := range test.attributes {
 				attr, ok := srv.LookupResourceAttribute(name)
 				if !ok {
-					t.Errorf("attribute (%s) not found", name)
-					continue
+					printErrorInfo(msg, srv, "attribute (%s) not found", name)
+					return
 				}
 				if attr.Value() != value {
-					t.Errorf("attribute (%s) value (%s) != (%s)", name, attr.Value(), value)
+					printErrorInfo(msg, srv, "attribute (%s) value (%s) != (%s)", name, attr.Value(), value)
+					return
 				}
 			}
 		})
