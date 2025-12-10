@@ -170,17 +170,16 @@ func TestResponseMessages(t *testing.T) {
 				return
 			}
 
-			t.Log("\n" + msg.String())
-
 			srv, err := mdns.NewService(
 				mdns.WithServiceMessage(msg),
 			)
 			if err != nil {
+				t.Log("\n" + msg.String())
 				t.Error(err)
 				return
 			}
 
-			printErrorInfo := func(msg mdns.Message, srv mdns.Service, format string, args ...any) {
+			reportError := func(msg mdns.Message, srv mdns.Service, format string, args ...any) {
 				t.Errorf(format, args...)
 				t.Log("\n" + msg.String())
 				t.Log("\n" + srv.String())
@@ -193,18 +192,18 @@ func TestResponseMessages(t *testing.T) {
 				if _, ok := msg.LookupResourceRecordByNameSuffix(answer.name); ok {
 					continue
 				}
-				printErrorInfo(msg, srv, "answer (%s) not found", answer.name)
+				reportError(msg, srv, "answer (%s) not found", answer.name)
 				return
 			}
 
 			for name, value := range test.attributes {
 				attr, ok := srv.LookupResourceAttribute(name)
 				if !ok {
-					printErrorInfo(msg, srv, "attribute (%s) not found", name)
+					reportError(msg, srv, "attribute (%s) not found", name)
 					return
 				}
 				if attr.Value() != value {
-					printErrorInfo(msg, srv, "attribute (%s) value (%s) != (%s)", name, attr.Value(), value)
+					reportError(msg, srv, "attribute (%s) value (%s) != (%s)", name, attr.Value(), value)
 					return
 				}
 			}
