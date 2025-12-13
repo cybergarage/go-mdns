@@ -24,8 +24,8 @@ const (
 	nameLenMask           = uint8(0x3F)
 )
 
-// NameWithStrings returns a DNS name constructed by joining the given strings with dots.
-func NameWithStrings(s ...string) string {
+// NewNameWithStrings returns a DNS name constructed by joining the given strings with dots.
+func NewNameWithStrings(s ...string) string {
 	return strings.Join(s, LabelSeparator)
 }
 

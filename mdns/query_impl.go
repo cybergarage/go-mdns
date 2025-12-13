@@ -71,7 +71,7 @@ func (q *queryImp) String() string {
 		if 0 < i {
 			s.WriteString(",")
 		}
-		s.WriteString(dns.NameWithStrings(service, q.domain))
+		s.WriteString(dns.NewNameWithStrings(service, q.domain))
 	}
 	return s.String()
 }

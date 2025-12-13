@@ -26,7 +26,7 @@ func NewRequestWithQuery(query Query) Message {
 	questions := []dns.Question{}
 	for _, service := range query.Services() {
 		q := dns.NewQuestion(
-			dns.WithQuestionName(dns.NameWithStrings(service, query.Domain())),
+			dns.WithQuestionName(dns.NewNameWithStrings(service, query.Domain())),
 			dns.WithQuestionType(dns.PTR),
 			dns.WithQuestionClass(dns.IN),
 		)
