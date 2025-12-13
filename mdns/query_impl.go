@@ -15,18 +15,31 @@
 package mdns
 
 import (
-	"strings"
-
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 type queryImp struct {
+	subtype  string
 	services []string
 	domain   string
 }
 
 // QueryOption represents a query option.
 type QueryOption func(*queryImp)
+
+// WithQuerySubtype sets the subtype of the query.
+func WithQuerySubtype(subtype string) QueryOption {
+	return func(q *queryImp) {
+		q.subtype = subtype
+	}
+}
+
+// WithQueryService sets the service name of the query.
+func WithQueryService(service string) QueryOption {
+	return func(q *queryImp) {
+		q.services = []string{service}
+	}
+}
 
 // WithQueryServices sets the service name of the query.
 func WithQueryServices(services ...string) QueryOption {
@@ -45,6 +58,7 @@ func WithQueryDomain(domain string) QueryOption {
 // NewQuery returns a new query instance with the specified options.
 func NewQuery(opts ...QueryOption) Query {
 	q := &queryImp{
+		subtype:  "",
 		services: []string{DefaultQueryService},
 		domain:   DefaultQueryDomain,
 	}
@@ -52,6 +66,11 @@ func NewQuery(opts ...QueryOption) Query {
 		opt(q)
 	}
 	return q
+}
+
+// Subtype returns the subtype of the query.
+func (q *queryImp) Subtype() string {
+	return q.subtype
 }
 
 // Services returns the service names of the query.
@@ -66,12 +85,13 @@ func (q *queryImp) Domain() string {
 
 // String returns the string representation of the query.
 func (q *queryImp) String() string {
-	var s strings.Builder
-	for i, service := range q.services {
-		if 0 < i {
-			s.WriteString(",")
-		}
-		s.WriteString(dns.NewNameWithStrings(service, q.domain))
+	labels := []string{}
+	if 0 < len(q.subtype) {
+		labels = append(labels, q.subtype)
 	}
-	return s.String()
+	if 0 < len(q.services) {
+		labels = append(labels, q.services...)
+	}
+	labels = append(labels, q.domain)
+	return dns.NewNameWithStrings(labels...)
 }

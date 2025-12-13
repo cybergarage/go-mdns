@@ -56,6 +56,8 @@ const (
 
 // Query represents a question query.
 type Query interface {
+	// Subtype returns the subtype of the query.
+	Subtype() string
 	// Services returns the service names of the query.
 	Services() []string
 	// Domain returns the domain name of the query.
