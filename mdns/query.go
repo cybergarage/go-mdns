@@ -14,7 +14,17 @@
 
 package mdns
 
-import "time"
+import (
+	"time"
+)
+
+const (
+	// 4.1.3. Domain Names
+	LocalDomain = "local"
+	// Subtype is the service subtype label.
+	// 7.1. Selective Instance Enumeration (Subtypes)
+	Subtype = "_sub"
+)
 
 // RFC 6763: 7.2. Browsing for Services.
 const (
@@ -39,7 +49,7 @@ const (
 	// DefaultQueryService is the default service for mDNS queries.
 	DefaultQueryService = ServiceTypeEnumerationName
 	// DefaultQueryDomain is the default domain for mDNS queries.
-	DefaultQueryDomain = "local"
+	DefaultQueryDomain = LocalDomain
 	// DefaultQueryTimeout is the default timeout duration for mDNS queries.
 	DefaultQueryTimeout = time.Duration(5) * time.Second
 )
