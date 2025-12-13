@@ -35,7 +35,7 @@ func TestClient(t *testing.T) {
 	}
 
 	query := mdns.NewQuery(
-		mdns.WithQueryServices(mdns.AutomaticBrowsingService),
+		mdns.WithQueryService(mdns.AutomaticBrowsingService),
 	)
 
 	_, err = client.Query(context.Background(), query)

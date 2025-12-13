@@ -31,7 +31,7 @@ func TestQuery(t *testing.T) {
 		{
 			name: AutomaticBrowsingService,
 			query: NewQuery(
-				WithQueryServices(DefaultQueryService),
+				WithQueryService(DefaultQueryService),
 				WithQueryDomain(DefaultQueryDomain),
 			),
 		},

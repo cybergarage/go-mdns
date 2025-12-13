@@ -19,9 +19,9 @@ import (
 )
 
 type queryImp struct {
-	subtype  string
-	services []string
-	domain   string
+	subtype string
+	service string
+	domain  string
 }
 
 // QueryOption represents a query option.
@@ -37,14 +37,7 @@ func WithQuerySubtype(subtype string) QueryOption {
 // WithQueryService sets the service name of the query.
 func WithQueryService(service string) QueryOption {
 	return func(q *queryImp) {
-		q.services = []string{service}
-	}
-}
-
-// WithQueryServices sets the service name of the query.
-func WithQueryServices(services ...string) QueryOption {
-	return func(q *queryImp) {
-		q.services = services
+		q.service = service
 	}
 }
 
@@ -58,9 +51,9 @@ func WithQueryDomain(domain string) QueryOption {
 // NewQuery returns a new query instance with the specified options.
 func NewQuery(opts ...QueryOption) Query {
 	q := &queryImp{
-		subtype:  "",
-		services: []string{DefaultQueryService},
-		domain:   DefaultQueryDomain,
+		subtype: "",
+		service: "",
+		domain:  DefaultQueryDomain,
 	}
 	for _, opt := range opts {
 		opt(q)
@@ -73,9 +66,9 @@ func (q *queryImp) Subtype() string {
 	return q.subtype
 }
 
-// Services returns the service names of the query.
-func (q *queryImp) Services() []string {
-	return q.services
+// Service returns the service name of the query.
+func (q *queryImp) Service() string {
+	return q.service
 }
 
 // Domain returns the domain name of the query.
@@ -87,10 +80,10 @@ func (q *queryImp) Domain() string {
 func (q *queryImp) String() string {
 	labels := []string{}
 	if 0 < len(q.subtype) {
-		labels = append(labels, q.subtype)
+		labels = append(labels, q.subtype, Subtype)
 	}
-	if 0 < len(q.services) {
-		labels = append(labels, q.services...)
+	if 0 < len(q.service) {
+		labels = append(labels, q.service)
 	}
 	labels = append(labels, q.domain)
 	return dns.NewNameWithStrings(labels...)

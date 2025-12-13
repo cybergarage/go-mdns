@@ -41,7 +41,7 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 		defer client.Stop()
 
 		query := mdns.NewQuery(
-			mdns.WithQueryServices(mdns.DefaultQueryService),
+			mdns.WithQueryService(mdns.DefaultQueryService),
 			mdns.WithQueryDomain(mdns.DefaultQueryDomain),
 		)
 
