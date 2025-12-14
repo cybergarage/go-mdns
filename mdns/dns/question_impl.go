@@ -39,7 +39,7 @@ func WithQuestionType(t Type) QuestionOption {
 	}
 }
 
-// WithQuestionTTL sets the question TTL.
+// WithQuestionClass sets the question class.
 func WithQuestionClass(cls Class) QuestionOption {
 	return func(q *question) {
 		q.SetClass(cls)
