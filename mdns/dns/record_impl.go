@@ -23,6 +23,9 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/encoding"
 )
 
+// recordOptions represents a record option.
+type recordOptions func(*record)
+
 // record represents a base record.
 type record struct {
 	reader          *Reader
@@ -36,8 +39,8 @@ type record struct {
 }
 
 // newResourceRecord returns a new base record instance.
-func newResourceRecord() *record {
-	return &record{
+func newResourceRecord(opts ...recordOptions) *record {
+	r := &record{
 		reader:          nil,
 		name:            "",
 		unicastResponse: false,
@@ -47,6 +50,10 @@ func newResourceRecord() *record {
 		data:            nil,
 		cmpBytes:        nil,
 	}
+	for _, opt := range opts {
+		opt(r)
+	}
+	return r
 }
 
 // newRecordWithReader returns a new base record instance with the specified reader.
