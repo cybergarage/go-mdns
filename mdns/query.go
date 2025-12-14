@@ -16,32 +16,45 @@ package mdns
 
 import (
 	"time"
+
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
+// Class represents a DNS class.
+type Class = dns.Class
+
+// RFC 6762 - Multicast DNS.
 const (
-	// 4.1.3. Domain Names
+	// LocalDomain is the local domain name.
+	// 4.1.3. Domain Names.
 	LocalDomain = "local"
+	// QU is the unicast response class.
+	// 5.4. Questions Requesting Unicast Responses
+	// 18.12. Repurposing of Top Bit of qclass in Question Section.
+	QU Class = 0x8000
 	// Subtype is the service subtype label.
-	// 7.1. Selective Instance Enumeration (Subtypes)
+	// 7.1. Selective Instance Enumeration (Subtypes).
 	Subtype = "_sub"
 )
 
-// RFC 6763: 7.2. Browsing for Services.
+// RFC 6763 - DNS-Based Service Discovery.
 const (
+	// ServiceTypeEnumerationName is the service type for service enumeration.
+	// 7.2. Browsing for Services.
 	ServiceTypeEnumerationName = "_services._dns-sd._udp"
 )
 
 // RFC 6765: 11. Discovery of Browsing and Registration Domains (Domain Enumeration).
 const (
-	// A list of domains recommended for browsing.
+	// RecommendedBrowsingService is a list of domains recommended for browsing.
 	RecommendedBrowsingService = "b._dns-sd._udp"
-	// A single recommended default domain for browsing.
+	// DefaultBrowsingService is a single recommended default domain for browsing.
 	DefaultBrowsingService = "db._dns-sd._udp"
-	// A list of domains recommended for registering services using Dynamic Update.
+	// RecommendedRegisteringService is a list of domains recommended for registering services using Dynamic Update.
 	RecommendedRegisteringService = "r._dns-sd._udp"
-	// A single recommended default domain for registering services.
+	// DefaultRegisteringService is a single recommended default domain for registering services.
 	DefaultRegisteringService = "dr._dns-sd._udp"
-	// The "legacy browsing" or "automatic browsing" domain(s).
+	// AutomaticBrowsingService is the "legacy browsing" or "automatic browsing" domain(s).
 	AutomaticBrowsingService = "lb._dns-sd._udp"
 )
 

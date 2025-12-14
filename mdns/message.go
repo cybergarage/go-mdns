@@ -26,7 +26,7 @@ func NewRequestWithQuery(query Query) Message {
 	question := dns.NewQuestion(
 		dns.WithQuestionName(query.String()),
 		dns.WithQuestionType(dns.PTR),
-		dns.WithQuestionClass(dns.IN),
+		dns.WithQuestionClass(QU|dns.IN),
 	)
 	return dns.NewRequestMessage(dns.WithMessageQuestions(question))
 }
