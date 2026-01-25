@@ -18,22 +18,39 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var (
+const (
+	ProgramName     = "mdnsctl"
 	VerboseParamStr = "verbose"
 	DebugParamStr   = "debug"
 )
 
 var rootCmd = &cobra.Command{ // nolint:exhaustruct
-	Use:               "mdnsctl",
+	Use:               ProgramName,
 	Version:           mdns.Version,
 	Short:             "",
 	Long:              "",
 	DisableAutoGenTag: true,
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		verbose := viper.GetBool(VerboseParamStr)
+		debug := viper.GetBool(DebugParamStr)
+		if debug {
+			verbose = true
+		}
+		if verbose {
+			enableStdoutVerbose(verbose, debug)
+		}
+		if verbose {
+			log.Infof("%s version %s", ProgramName, mdns.Version)
+			log.Infof("verbose:%t, debug:%t", verbose, debug)
+		}
+		return nil
+	},
 }
 
 func GetRootCommand() *cobra.Command {
