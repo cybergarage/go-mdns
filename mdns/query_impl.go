@@ -22,6 +22,7 @@ type queryImp struct {
 	subtype string
 	service string
 	domain  string
+	handler MessageHandler
 }
 
 // QueryOption represents a query option.
@@ -48,12 +49,20 @@ func WithQueryDomain(domain string) QueryOption {
 	}
 }
 
+// WithQueryMessageHandler sets the message handler of the query.
+func WithQueryMessageHandler(handler MessageHandler) QueryOption {
+	return func(q *queryImp) {
+		q.handler = handler
+	}
+}
+
 // NewQuery returns a new query instance with the specified options.
 func NewQuery(opts ...QueryOption) Query {
 	q := &queryImp{
 		subtype: "",
 		service: "",
 		domain:  DefaultQueryDomain,
+		handler: nil,
 	}
 	for _, opt := range opts {
 		opt(q)
@@ -74,6 +83,14 @@ func (q *queryImp) Service() string {
 // Domain returns the domain name of the query.
 func (q *queryImp) Domain() string {
 	return q.domain
+}
+
+// MessageHandler returns the message handler of the query if set.
+func (q *queryImp) MessageHandler() (MessageHandler, bool) {
+	if q.handler == nil {
+		return nil, false
+	}
+	return q.handler, true
 }
 
 // String returns the string representation of the query.

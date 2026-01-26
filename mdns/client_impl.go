@@ -105,6 +105,12 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 		defer cancel()
 	}
 
+	handler, ok := q.MessageHandler()
+	if ok {
+		client.RegisterHandler(handler)
+		defer client.UnregisterHandler(handler)
+	}
+
 	msg := NewRequestWithQuery(q)
 	err := client.AnnounceMessage(msg)
 	if err != nil {

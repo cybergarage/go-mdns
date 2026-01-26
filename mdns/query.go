@@ -75,6 +75,8 @@ type Query interface {
 	Service() string
 	// Domain returns the domain name of the query.
 	Domain() string
+	// MessageHandler returns the message handler of the query if set.
+	MessageHandler() (MessageHandler, bool)
 	// String returns the string representation of the query.
 	String() string
 }
