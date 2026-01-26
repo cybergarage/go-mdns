@@ -173,7 +173,7 @@ func (records Records) LookupTXTRecords() []TXTRecord {
 func (records Records) String() string {
 	type record []string
 
-	lines := []record{}
+	lines := make([]record, 0, len(records))
 	for _, r := range records {
 		record := record{
 			r.Name(),

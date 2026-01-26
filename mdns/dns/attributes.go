@@ -56,7 +56,7 @@ func (attrs Attributes) HasAttribute(name string) bool {
 
 // String returns the attribute string.
 func (attrs Attributes) String() string {
-	strs := []string{}
+	strs := make([]string, 0, len(attrs))
 	for _, attr := range attrs {
 		strs = append(strs, attr.String())
 	}

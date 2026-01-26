@@ -15,7 +15,11 @@
 package dns
 
 func txtToBytes(attrs []string) []byte {
-	bytes := []byte{}
+	capacity := 1
+	for _, attr := range attrs {
+		capacity += 1 + len(attr)
+	}
+	bytes := make([]byte, 0, capacity)
 	for _, attr := range attrs {
 		attrLen := byte(len(attr) & 0xFF)
 		bytes = append(bytes, attrLen)
