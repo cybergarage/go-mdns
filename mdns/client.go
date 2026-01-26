@@ -26,8 +26,8 @@ type Client interface {
 	Stop() error
 	// Restart restarts the client.
 	Restart() error
-	// SetListener sets a message listener to listen raw protocol messages.
-	SetListener(l MessageListener)
+	// AddHandler adds a message handler to the client.
+	AddHandler(handler MessageHandler)
 	// Query sends a question message to the multicast address.
 	Query(ctx context.Context, query Query) ([]Service, error)
 }

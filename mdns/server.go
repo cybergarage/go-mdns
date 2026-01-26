@@ -23,7 +23,7 @@ import (
 type Server struct {
 	*transport.MessageManager
 	*services
-	userListener MessageListener
+	handlers []MessageHandler
 }
 
 // NewServer returns a new server instance.
@@ -31,15 +31,15 @@ func NewServer() *Server {
 	server := &Server{
 		MessageManager: transport.NewMessageManager(),
 		services:       newServices(),
-		userListener:   nil,
+		handlers:       []MessageHandler{},
 	}
 	server.SetMessageHandler(server)
 	return server
 }
 
-// SetListener sets a message listner to listen raw protocol messages.
-func (server *Server) SetListener(l MessageListener) {
-	server.userListener = l
+// AddHandler adds a message handler to the server.
+func (server *Server) AddHandler(l MessageHandler) {
+	server.handlers = append(server.handlers, l)
 }
 
 // Start starts the server instance.
@@ -64,8 +64,8 @@ func (server *Server) Restart() error {
 }
 
 func (server *Server) MessageReceived(msg dns.Message) (dns.Message, error) {
-	if server.userListener != nil {
-		server.userListener.MessageReceived(msg)
+	for _, handler := range server.handlers {
+		handler(msg)
 	}
 
 	if msg.IsResponse() {

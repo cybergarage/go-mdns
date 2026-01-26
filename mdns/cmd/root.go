@@ -37,15 +37,18 @@ var rootCmd = &cobra.Command{ // nolint:exhaustruct
 	Long:              "",
 	DisableAutoGenTag: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		log.SetSharedLogger(nil)
 		verbose := viper.GetBool(VerboseParamStr)
 		debug := viper.GetBool(DebugParamStr)
 		if debug {
 			verbose = true
 		}
 		if verbose {
-			enableStdoutVerbose(verbose, debug)
-		}
-		if verbose {
+			if debug {
+				log.SetSharedLogger(log.NewStdoutLogger(log.LevelDebug))
+			} else {
+				log.SetSharedLogger(log.NewStdoutLogger(log.LevelInfo))
+			}
 			log.Infof("%s version %s", ProgramName, mdns.Version)
 			log.Infof("verbose:%t, debug:%t", verbose, debug)
 		}

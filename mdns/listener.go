@@ -14,7 +14,5 @@
 
 package mdns
 
-// MessageListener represents a protocol message listiner interface.
-type MessageListener interface {
-	MessageReceived(Message)
-}
+// MessageHandler is a message handler function type.
+type MessageHandler func(Message)

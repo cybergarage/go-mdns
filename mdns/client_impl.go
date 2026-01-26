@@ -28,7 +28,7 @@ type clientImpl struct {
 	sync.Mutex
 	*transport.MessageManager
 	*services
-	userListener MessageListener
+	handlers []MessageHandler
 }
 
 // NewClient returns a new client instance.
@@ -37,15 +37,14 @@ func NewClient() Client {
 		Mutex:          sync.Mutex{},
 		MessageManager: transport.NewMessageManager(),
 		services:       newServices(),
-		userListener:   nil,
+		handlers:       []MessageHandler{},
 	}
-	client.SetMessageHandler(client)
 	return client
 }
 
-// SetListener sets a message listner to listen raw protocol messages.
-func (client *clientImpl) SetListener(l MessageListener) {
-	client.userListener = l
+// AddHandler adds a message handler to the client.
+func (client *clientImpl) AddHandler(l MessageHandler) {
+	client.handlers = append(client.handlers, l)
 }
 
 // Start starts the client instance.
@@ -97,8 +96,8 @@ func (client *clientImpl) MessageReceived(msg dns.Message) (dns.Message, error) 
 	client.Lock()
 	defer client.Unlock()
 
-	if client.userListener != nil {
-		client.userListener.MessageReceived(msg)
+	for _, handler := range client.handlers {
+		handler(msg)
 	}
 
 	if !msg.IsResponse() {
