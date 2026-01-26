@@ -16,6 +16,7 @@ package mdns
 
 import (
 	"context"
+	"reflect"
 	"sync"
 
 	"github.com/cybergarage/go-logger/log"
@@ -43,19 +44,31 @@ func NewClient() Client {
 }
 
 // RegisterHandler adds a message handler to the client.
-func (client *clientImpl) RegisterHandler(l MessageHandler) {
+func (client *clientImpl) RegisterHandler(handler MessageHandler) {
 	client.Lock()
 	defer client.Unlock()
-	client.handlers = append(client.handlers, l)
+	// Check if handler already exists using reflection
+	handlerVal := reflect.ValueOf(handler)
+	for _, h := range client.handlers {
+		if reflect.ValueOf(h).Pointer() == handlerVal.Pointer() {
+			return
+		}
+	}
+	client.handlers = append(client.handlers, handler)
 }
 
 // UnregisterHandler removes a message handler from the client.
-func (client *clientImpl) UnregisterHandler(l MessageHandler) {
+func (client *clientImpl) UnregisterHandler(handler MessageHandler) {
 	client.Lock()
 	defer client.Unlock()
-	// Cannot compare functions in Go, so we clear all handlers
-	// Users should manage handler registration carefully
-	client.handlers = []MessageHandler{}
+	// Use reflection to compare function pointers
+	handlerVal := reflect.ValueOf(handler)
+	for i, h := range client.handlers {
+		if reflect.ValueOf(h).Pointer() == handlerVal.Pointer() {
+			client.handlers = append(client.handlers[:i], client.handlers[i+1:]...)
+			return
+		}
+	}
 }
 
 // Start starts the client instance.

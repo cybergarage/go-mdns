@@ -15,6 +15,7 @@
 package mdns
 
 import (
+	"reflect"
 	"sync"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
@@ -42,19 +43,31 @@ func NewServer() *Server {
 }
 
 // RegisterHandler adds a message handler to the server.
-func (server *Server) RegisterHandler(l MessageHandler) {
+func (server *Server) RegisterHandler(handler MessageHandler) {
 	server.Lock()
 	defer server.Unlock()
-	server.handlers = append(server.handlers, l)
+	// Check if handler already exists using reflection
+	handlerVal := reflect.ValueOf(handler)
+	for _, h := range server.handlers {
+		if reflect.ValueOf(h).Pointer() == handlerVal.Pointer() {
+			return
+		}
+	}
+	server.handlers = append(server.handlers, handler)
 }
 
 // UnregisterHandler removes a message handler from the server.
-func (server *Server) UnregisterHandler(l MessageHandler) {
+func (server *Server) UnregisterHandler(handler MessageHandler) {
 	server.Lock()
 	defer server.Unlock()
-	// Cannot compare functions in Go, so we clear all handlers
-	// Users should manage handler registration carefully
-	server.handlers = []MessageHandler{}
+	// Use reflection to compare function pointers
+	handlerVal := reflect.ValueOf(handler)
+	for i, h := range server.handlers {
+		if reflect.ValueOf(h).Pointer() == handlerVal.Pointer() {
+			server.handlers = append(server.handlers[:i], server.handlers[i+1:]...)
+			return
+		}
+	}
 }
 
 // Start starts the server instance.
