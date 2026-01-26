@@ -34,7 +34,7 @@ var dumpCmd = &cobra.Command{ // nolint:exhaustruct
 	Long:  "Dump mDNS messages.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client := NewClient()
-		client.AddHandler(client.MessageReceived)
+		client.RegisterHandler(client.MessageReceived)
 
 		err := client.Start()
 		if err != nil {

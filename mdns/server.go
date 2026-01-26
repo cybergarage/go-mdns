@@ -15,12 +15,15 @@
 package mdns
 
 import (
+	"sync"
+
 	"github.com/cybergarage/go-mdns/mdns/dns"
 	"github.com/cybergarage/go-mdns/mdns/transport"
 )
 
 // Server represents a server node instance.
 type Server struct {
+	sync.Mutex
 	*transport.MessageManager
 	*services
 	handlers []MessageHandler
@@ -29,6 +32,7 @@ type Server struct {
 // NewServer returns a new server instance.
 func NewServer() *Server {
 	server := &Server{
+		Mutex:          sync.Mutex{},
 		MessageManager: transport.NewMessageManager(),
 		services:       newServices(),
 		handlers:       []MessageHandler{},
@@ -37,9 +41,20 @@ func NewServer() *Server {
 	return server
 }
 
-// AddHandler adds a message handler to the server.
-func (server *Server) AddHandler(l MessageHandler) {
+// RegisterHandler adds a message handler to the server.
+func (server *Server) RegisterHandler(l MessageHandler) {
+	server.Lock()
+	defer server.Unlock()
 	server.handlers = append(server.handlers, l)
+}
+
+// UnregisterHandler removes a message handler from the server.
+func (server *Server) UnregisterHandler(l MessageHandler) {
+	server.Lock()
+	defer server.Unlock()
+	// Cannot compare functions in Go, so we clear all handlers
+	// Users should manage handler registration carefully
+	server.handlers = []MessageHandler{}
 }
 
 // Start starts the server instance.
@@ -64,7 +79,12 @@ func (server *Server) Restart() error {
 }
 
 func (server *Server) MessageReceived(msg dns.Message) (dns.Message, error) {
-	for _, handler := range server.handlers {
+	server.Lock()
+	handlers := make([]MessageHandler, len(server.handlers))
+	copy(handlers, server.handlers)
+	server.Unlock()
+
+	for _, handler := range handlers {
 		handler(msg)
 	}
 

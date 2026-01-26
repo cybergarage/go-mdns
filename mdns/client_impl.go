@@ -42,9 +42,20 @@ func NewClient() Client {
 	return client
 }
 
-// AddHandler adds a message handler to the client.
-func (client *clientImpl) AddHandler(l MessageHandler) {
+// RegisterHandler adds a message handler to the client.
+func (client *clientImpl) RegisterHandler(l MessageHandler) {
+	client.Lock()
+	defer client.Unlock()
 	client.handlers = append(client.handlers, l)
+}
+
+// UnregisterHandler removes a message handler from the client.
+func (client *clientImpl) UnregisterHandler(l MessageHandler) {
+	client.Lock()
+	defer client.Unlock()
+	// Cannot compare functions in Go, so we clear all handlers
+	// Users should manage handler registration carefully
+	client.handlers = []MessageHandler{}
 }
 
 // Start starts the client instance.
@@ -94,9 +105,11 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 
 func (client *clientImpl) MessageReceived(msg dns.Message) (dns.Message, error) {
 	client.Lock()
-	defer client.Unlock()
+	handlers := make([]MessageHandler, len(client.handlers))
+	copy(handlers, client.handlers)
+	client.Unlock()
 
-	for _, handler := range client.handlers {
+	for _, handler := range handlers {
 		handler(msg)
 	}
 
