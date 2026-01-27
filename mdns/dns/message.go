@@ -14,12 +14,18 @@
 
 package dns
 
-import "regexp"
+import (
+	"net"
+	"regexp"
+)
 
 // MessageOption represents a message option.
 type MessageOption func(*message) error
 
+// Message represents a DNS message.
 type Message interface {
+	// From returns the source address of the message.
+	From() net.Addr
 	// Flags returns the flags.
 	Flags() []byte
 	// ID returns the query identifier.
@@ -103,9 +109,11 @@ type Message interface {
 	Bytes() []byte
 	// String returns the string representation of the message.
 	String() string
+	// MessageHelper represents a message helper functions.
 	MessageHelper
 }
 
+// MessageHelper represents a message helper functions.
 type MessageHelper interface {
 	// LookupResourceRecordByNamePrefix returns the resource record of the specified name prefix.
 	LookupResourceRecordByNamePrefix(prefix string) (ResourceRecord, bool)

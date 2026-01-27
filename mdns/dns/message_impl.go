@@ -17,12 +17,14 @@ package dns
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"regexp"
 )
 
 // message represents a protocol message.
 type message struct {
 	*Header
+	from        net.Addr
 	questions   Questions
 	answers     Answers
 	nameServers NameServers
@@ -32,6 +34,7 @@ type message struct {
 func newMessage(opts ...MessageOption) *message {
 	msg := &message{
 		Header:      NewHeader(),
+		from:        nil,
 		questions:   Questions{},
 		answers:     Answers{},
 		nameServers: NameServers{},
@@ -49,6 +52,14 @@ func WithMessageQuestions(questions ...Question) MessageOption {
 		for _, q := range questions {
 			msg.AddQuestion(q)
 		}
+		return nil
+	}
+}
+
+// WithMessageFrom returns a message option with the specified source address.
+func WithMessageFrom(addr net.Addr) MessageOption {
+	return func(msg *message) error {
+		msg.from = addr
 		return nil
 	}
 }
@@ -79,12 +90,20 @@ func NewResponseMessage(opts ...MessageOption) Message {
 }
 
 // NewMessageWithBytes returns a message instance with the specified bytes.
-func NewMessageWithBytes(msgBytes []byte) (Message, error) {
+func NewMessageWithBytes(msgBytes []byte, opts ...MessageOption) (Message, error) {
 	msg := newMessage()
 	if err := msg.Parse(msgBytes); err != nil {
 		return nil, err
 	}
+	for _, opt := range opts {
+		opt(msg)
+	}
 	return msg, nil
+}
+
+// From returns the source address of the message.
+func (msg *message) From() net.Addr {
+	return msg.from
 }
 
 // AddQuestion adds the specified question into the message.
@@ -165,6 +184,7 @@ func (msg *message) Equal(other *message) bool {
 func (msg *message) Copy() Message {
 	return &message{
 		Header:      NewHeaderWithBytes(msg.Header.bytes),
+		from:        msg.from,
 		questions:   msg.questions,
 		answers:     msg.answers,
 		nameServers: msg.nameServers,

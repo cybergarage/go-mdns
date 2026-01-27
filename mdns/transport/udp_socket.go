@@ -107,7 +107,10 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 
 	log.Debugf("RECV %s -> %s", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 
-	msg, err := dns.NewMessageWithBytes(sock.ReadBuffer[:n])
+	msg, err := dns.NewMessageWithBytes(
+		sock.ReadBuffer[:n],
+		dns.WithMessageFrom(fromAddr),
+	)
 	if err != nil {
 		log.Debugf("Failed to parse DNS message: %s", err)
 		log.HexDebug(sock.ReadBuffer[:n])
