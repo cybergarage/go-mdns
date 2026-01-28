@@ -24,7 +24,7 @@ import (
 // A MulticastManager represents a multicast server manager.
 type MulticastManager struct {
 	Servers []*MulticastServer
-	Handler MulticastHandler
+	Handler dns.MessageProcessor
 }
 
 // NewMulticastManager returns a new MulticastManager.
@@ -37,7 +37,7 @@ func NewMulticastManager() *MulticastManager {
 }
 
 // SetHandler set a listener to all servers.
-func (mgr *MulticastManager) SetHandler(l MulticastHandler) {
+func (mgr *MulticastManager) SetHandler(l dns.MessageProcessor) {
 	mgr.Handler = l
 }
 

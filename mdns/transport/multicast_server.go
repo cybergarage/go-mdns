@@ -28,7 +28,7 @@ type MulticastServer struct {
 	*Server
 	*MulticastSocket
 	Channel chan any
-	Handler MulticastHandler
+	Handler dns.MessageProcessor
 }
 
 // NewMulticastServer returns a new MulticastServer.
@@ -43,7 +43,7 @@ func NewMulticastServer() *MulticastServer {
 }
 
 // SetHandler set a listener.
-func (server *MulticastServer) SetHandler(handler MulticastHandler) {
+func (server *MulticastServer) SetHandler(handler dns.MessageProcessor) {
 	server.Handler = handler
 }
 
@@ -70,7 +70,7 @@ func handleMulticastRequestMessage(server *MulticastServer, reqMsg dns.Message) 
 	if server.Handler == nil {
 		return
 	}
-	resMsg, err := server.Handler.MessageReceived(reqMsg)
+	resMsg, err := server.Handler(reqMsg)
 	if err != nil || resMsg == nil {
 		return
 	}

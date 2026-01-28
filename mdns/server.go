@@ -38,7 +38,7 @@ func NewServer() *Server {
 		services:       newServices(),
 		handlers:       []MessageHandler{},
 	}
-	server.SetMessageHandler(server)
+	server.SetMessageProcessor(server.MessageReceived)
 	return server
 }
 

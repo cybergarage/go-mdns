@@ -14,7 +14,5 @@
 
 package dns
 
-// MessageHandler represents a protocol message handler interface.
-type MessageHandler interface {
-	MessageReceived(Message) (Message, error)
-}
+// MessageProcessor represents a protocol message handler interface.
+type MessageProcessor func(Message) (Message, error)
