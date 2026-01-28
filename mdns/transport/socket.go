@@ -24,17 +24,17 @@ import (
 
 // A Socket represents a socket.
 type Socket struct {
-	BoundInterface *net.Interface
-	BoundPort      int
-	BoundAddress   string
+	listenInterface *net.Interface
+	listenPort      int
+	listenAddress   string
 }
 
 // NewSocket returns a new UDPSocket.
 func NewSocket() *Socket {
 	sock := &Socket{
-		BoundInterface: nil,
-		BoundPort:      0,
-		BoundAddress:   "",
+		listenInterface: nil,
+		listenPort:      0,
+		listenAddress:   "",
 	}
 	sock.Close()
 	return sock
@@ -42,56 +42,56 @@ func NewSocket() *Socket {
 
 // Close initialize this socket.
 func (sock *Socket) Close() {
-	sock.BoundInterface = nil
-	sock.BoundAddress = ""
-	sock.BoundPort = 0
+	sock.listenInterface = nil
+	sock.listenAddress = ""
+	sock.listenPort = 0
 }
 
-// SetBoundStatus sets the bound interface, port, and address.
-func (sock *Socket) SetBoundStatus(i *net.Interface, addr string, port int) {
-	sock.BoundInterface = i
-	sock.BoundAddress = addr
-	sock.BoundPort = port
+// SetListenStatus sets the listening interface, port, and address.
+func (sock *Socket) SetListenStatus(i *net.Interface, addr string, port int) {
+	sock.listenInterface = i
+	sock.listenAddress = addr
+	sock.listenPort = port
 }
 
-// IsBound returns true whether the socket is bound, otherwise false.
-func (sock *Socket) IsBound() bool {
-	return sock.BoundPort != 0
+// IsListening returns true whether the socket is listening, otherwise false.
+func (sock *Socket) IsListening() bool {
+	return sock.listenPort != 0
 }
 
-// GetBoundPort returns the bound port.
-func (sock *Socket) GetBoundPort() (int, error) {
-	if !sock.IsBound() {
+// ListenPort returns the listening port.
+func (sock *Socket) ListenPort() (int, error) {
+	if !sock.IsListening() {
 		return 0, errors.New(errorSocketClosed)
 	}
-	return sock.BoundPort, nil
+	return sock.listenPort, nil
 }
 
-// GetBoundInterface returns the bound interface.
-func (sock *Socket) GetBoundInterface() (*net.Interface, error) {
-	if !sock.IsBound() {
+// ListenInterface returns the listening interface.
+func (sock *Socket) ListenInterface() (*net.Interface, error) {
+	if !sock.IsListening() {
 		return nil, errors.New(errorSocketClosed)
 	}
-	return sock.BoundInterface, nil
+	return sock.listenInterface, nil
 }
 
-// GetBoundAddr returns the bound address.
-func (sock *Socket) GetBoundAddr() (string, error) {
-	if !sock.IsBound() {
+// ListenAddr returns the listening address.
+func (sock *Socket) ListenAddr() (string, error) {
+	if !sock.IsListening() {
 		return "", errors.New(errorSocketClosed)
 	}
 
-	return sock.BoundAddress, nil
+	return sock.listenAddress, nil
 }
 
-// GetBoundIPAddr returns the bound address.
-func (sock *Socket) GetBoundIPAddr() (string, error) {
-	port, err := sock.GetBoundPort()
+// ListenIPAddr returns the listening address.
+func (sock *Socket) ListenIPAddr() (string, error) {
+	port, err := sock.ListenPort()
 	if err != nil {
 		return "", err
 	}
 
-	addr, err := sock.GetBoundAddr()
+	addr, err := sock.ListenAddr()
 	if err != nil {
 		return "", err
 	}

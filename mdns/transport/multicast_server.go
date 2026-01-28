@@ -62,7 +62,7 @@ func (server *MulticastServer) Stop() error {
 	if err := server.MulticastSocket.Close(); err != nil {
 		return err
 	}
-	server.SetBoundInterface(nil)
+	server.SetListenInterface(nil)
 	return nil
 }
 

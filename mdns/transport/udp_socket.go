@@ -84,8 +84,8 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (
 		return 0, err
 	}
 
-	fromAddr, _ := sock.GetBoundAddr()
-	fromPort, _ := sock.GetBoundPort()
+	fromAddr, _ := sock.ListenAddr()
+	fromPort, _ := sock.ListenPort()
 	log.Debugf("SEND %s -> %s", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 
 	return sock.Conn.WriteToUDP(msg.Bytes(), toUDPAddr)
@@ -102,8 +102,8 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 		return nil, err
 	}
 
-	toAddr, _ := sock.GetBoundAddr()
-	toPort, _ := sock.GetBoundPort()
+	toAddr, _ := sock.ListenAddr()
+	toPort, _ := sock.ListenPort()
 
 	log.Debugf("RECV %s -> %s", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 

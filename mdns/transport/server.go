@@ -31,12 +31,12 @@ func NewServer() *Server {
 	return server
 }
 
-// SetBoundInterface sets a bind interface.
-func (server *Server) SetBoundInterface(i *net.Interface) {
+// SetListenInterface sets a listening interface.
+func (server *Server) SetListenInterface(i *net.Interface) {
 	server.Interface = i
 }
 
-// GetBoundInterface return a bind interface.
-func (server *Server) GetBoundInterface() *net.Interface {
+// ListenInterface return a listening interface.
+func (server *Server) ListenInterface() *net.Interface {
 	return server.Interface
 }

@@ -51,7 +51,7 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface, ifaddr string) error {
 		return errors.New(errorAvailableAddressNotFound)
 	}
 
-	sock.SetBoundStatus(ifi, ifaddr, Port)
+	sock.SetListenStatus(ifi, ifaddr, Port)
 
 	if err != nil {
 		return fmt.Errorf("%w (%s)", err, ifi.Name)
@@ -79,9 +79,9 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface, ifaddr string) error {
 	return nil
 }
 
-// AnnounceMessage announces the message to the bound multicast address.
+// AnnounceMessage announces the message to the listening multicast address.
 func (sock *MulticastSocket) AnnounceMessage(msg dns.Message) error {
-	addr, err := sock.GetBoundAddr()
+	addr, err := sock.ListenAddr()
 	if err != nil {
 		return err
 	}
