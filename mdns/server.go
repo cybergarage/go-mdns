@@ -15,7 +15,6 @@
 package mdns
 
 import (
-	"reflect"
 	"sync"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
@@ -27,7 +26,7 @@ type Server struct {
 	sync.Mutex
 	*transport.MessageManager
 	*services
-	handlers []MessageHandler
+	*msgHandler
 }
 
 // NewServer returns a new server instance.
@@ -36,38 +35,10 @@ func NewServer() *Server {
 		Mutex:          sync.Mutex{},
 		MessageManager: transport.NewMessageManager(),
 		services:       newServices(),
-		handlers:       []MessageHandler{},
+		msgHandler:     newMessageHandler(),
 	}
 	server.SetMessageProcessor(server.MessageReceived)
 	return server
-}
-
-// RegisterHandler adds a message handler to the server.
-func (server *Server) RegisterHandler(handler MessageHandler) {
-	server.Lock()
-	defer server.Unlock()
-	// Check if handler already exists using reflection
-	handlerVal := reflect.ValueOf(handler)
-	for _, h := range server.handlers {
-		if reflect.ValueOf(h).Pointer() == handlerVal.Pointer() {
-			return
-		}
-	}
-	server.handlers = append(server.handlers, handler)
-}
-
-// UnregisterHandler removes a message handler from the server.
-func (server *Server) UnregisterHandler(handler MessageHandler) {
-	server.Lock()
-	defer server.Unlock()
-	// Use reflection to compare function pointers
-	handlerVal := reflect.ValueOf(handler)
-	for i, h := range server.handlers {
-		if reflect.ValueOf(h).Pointer() == handlerVal.Pointer() {
-			server.handlers = append(server.handlers[:i], server.handlers[i+1:]...)
-			return
-		}
-	}
 }
 
 // Start starts the server instance.
@@ -92,18 +63,11 @@ func (server *Server) Restart() error {
 }
 
 func (server *Server) MessageReceived(msg dns.Message) (dns.Message, error) {
-	server.Lock()
-	handlers := make([]MessageHandler, len(server.handlers))
-	copy(handlers, server.handlers)
-	server.Unlock()
-
-	for _, handler := range handlers {
-		handler(msg)
-	}
-
 	if msg.IsResponse() {
 		return nil, nil
 	}
+
+	server.processMessageHandlers(msg)
 
 	return nil, nil
 }

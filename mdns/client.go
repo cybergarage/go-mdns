@@ -26,10 +26,10 @@ type Client interface {
 	Stop() error
 	// Restart restarts the client.
 	Restart() error
-	// RegisterHandler adds a message handler to the client.
-	RegisterHandler(handler MessageHandler)
-	// UnregisterHandler removes a message handler from the client.
-	UnregisterHandler(handler MessageHandler)
+	// RegisterMessageHandler adds a message handler to the client.
+	RegisterMessageHandler(handler MessageHandler)
+	// UnRegisterMessageHandler removes a message handler from the client.
+	UnRegisterMessageHandler(handler MessageHandler)
 	// Query sends a question message to the multicast address.
 	Query(ctx context.Context, query Query) ([]Service, error)
 }

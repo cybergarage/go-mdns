@@ -16,7 +16,6 @@ package mdns
 
 import (
 	"context"
-	"reflect"
 	"sync"
 
 	"github.com/cybergarage/go-logger/log"
@@ -29,7 +28,7 @@ type clientImpl struct {
 	sync.Mutex
 	*transport.MessageManager
 	*services
-	handlers []MessageHandler
+	*msgHandler
 }
 
 // NewClient returns a new client instance.
@@ -38,37 +37,10 @@ func NewClient() Client {
 		Mutex:          sync.Mutex{},
 		MessageManager: transport.NewMessageManager(),
 		services:       newServices(),
-		handlers:       []MessageHandler{},
+		msgHandler:     newMessageHandler(),
 	}
+	client.MessageManager.SetMessageProcessor(client.messageReceived)
 	return client
-}
-
-// RegisterHandler adds a message handler to the client.
-func (client *clientImpl) RegisterHandler(handler MessageHandler) {
-	client.Lock()
-	defer client.Unlock()
-	// Check if handler already exists using reflection
-	handlerVal := reflect.ValueOf(handler)
-	for _, h := range client.handlers {
-		if reflect.ValueOf(h).Pointer() == handlerVal.Pointer() {
-			return
-		}
-	}
-	client.handlers = append(client.handlers, handler)
-}
-
-// UnregisterHandler removes a message handler from the client.
-func (client *clientImpl) UnregisterHandler(handler MessageHandler) {
-	client.Lock()
-	defer client.Unlock()
-	// Use reflection to compare function pointers
-	handlerVal := reflect.ValueOf(handler)
-	for i, h := range client.handlers {
-		if reflect.ValueOf(h).Pointer() == handlerVal.Pointer() {
-			client.handlers = append(client.handlers[:i], client.handlers[i+1:]...)
-			return
-		}
-	}
 }
 
 // Start starts the client instance.
@@ -107,8 +79,8 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 
 	handler, ok := q.MessageHandler()
 	if ok {
-		client.RegisterHandler(handler)
-		defer client.UnregisterHandler(handler)
+		client.RegisterMessageHandler(handler)
+		defer client.UnRegisterMessageHandler(handler)
 	}
 
 	msg := NewRequestWithQuery(q)
@@ -122,19 +94,12 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 	return client.Services(), nil
 }
 
-func (client *clientImpl) MessageReceived(msg dns.Message) (dns.Message, error) {
-	client.Lock()
-	handlers := make([]MessageHandler, len(client.handlers))
-	copy(handlers, client.handlers)
-	client.Unlock()
-
-	for _, handler := range handlers {
-		handler(msg)
-	}
-
+func (client *clientImpl) messageReceived(msg dns.Message) (dns.Message, error) {
 	if !msg.IsResponse() {
 		return nil, nil
 	}
+
+	client.processMessageHandlers(msg)
 
 	newService, err := NewService(
 		WithServiceMessage(msg),
