@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/spf13/cobra"
 )
@@ -37,12 +38,16 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 		if err != nil {
 			return err
 		}
-
 		defer client.Stop()
+
+		msgHandler := mdns.MessageHandler(func(msg mdns.Message) {
+			log.Debugf("%s\n", msg.String())
+		})
 
 		query := mdns.NewQuery(
 			mdns.WithQueryService(mdns.DefaultQueryService),
 			mdns.WithQueryDomain(mdns.DefaultQueryDomain),
+			mdns.WithQueryMessageHandler(msgHandler),
 		)
 
 		services, err := client.Query(context.Background(), query)
