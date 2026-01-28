@@ -23,22 +23,22 @@ import (
 
 // A MulticastManager represents a multicast server manager.
 type MulticastManager struct {
-	Servers []*MulticastServer
-	Handler dns.MessageProcessor
+	Servers   []*MulticastServer
+	processor dns.MessageProcessor
 }
 
 // NewMulticastManager returns a new MulticastManager.
 func NewMulticastManager() *MulticastManager {
 	mgr := &MulticastManager{
-		Servers: make([]*MulticastServer, 0),
-		Handler: nil,
+		Servers:   make([]*MulticastServer, 0),
+		processor: nil,
 	}
 	return mgr
 }
 
-// SetHandler set a listener to all servers.
-func (mgr *MulticastManager) SetHandler(l dns.MessageProcessor) {
-	mgr.Handler = l
+// SetMessageProcessor sets a message processor to all servers.
+func (mgr *MulticastManager) SetMessageProcessor(processor dns.MessageProcessor) {
+	mgr.processor = processor
 }
 
 // BoundInterfaces returns the listen interfaces.
@@ -64,7 +64,7 @@ func (mgr *MulticastManager) AnnounceMessage(msg dns.Message) error {
 // startWithInterface starts this server on the specified interface.
 func (mgr *MulticastManager) startWithInterface(ifi *net.Interface, ifaddr string) (*MulticastServer, error) {
 	server := NewMulticastServer()
-	server.Handler = mgr.Handler
+	server.processor = mgr.processor
 	if err := server.Start(ifi, ifaddr); err != nil {
 		return nil, err
 	}
@@ -93,6 +93,7 @@ func (mgr *MulticastManager) Start() error {
 			if err != nil {
 				continue
 			}
+			server.SetMessageProcessor(mgr.processor)
 			mgr.Servers = append(mgr.Servers, server)
 		}
 	}

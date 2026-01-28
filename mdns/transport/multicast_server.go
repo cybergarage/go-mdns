@@ -27,8 +27,8 @@ import (
 type MulticastServer struct {
 	*Server
 	*MulticastSocket
-	Channel chan any
-	Handler dns.MessageProcessor
+	channel   chan any
+	processor dns.MessageProcessor
 }
 
 // NewMulticastServer returns a new MulticastServer.
@@ -36,15 +36,15 @@ func NewMulticastServer() *MulticastServer {
 	server := &MulticastServer{
 		Server:          NewServer(),
 		MulticastSocket: NewMulticastSocket(),
-		Channel:         nil,
-		Handler:         nil,
+		channel:         nil,
+		processor:       nil,
 	}
 	return server
 }
 
-// SetHandler set a listener.
-func (server *MulticastServer) SetHandler(handler dns.MessageProcessor) {
-	server.Handler = handler
+// SetMessageProcessor sets the message processor.
+func (server *MulticastServer) SetMessageProcessor(processor dns.MessageProcessor) {
+	server.processor = processor
 }
 
 // Start starts this server.
@@ -52,8 +52,8 @@ func (server *MulticastServer) Start(ifi *net.Interface, ifaddr string) error {
 	if err := server.MulticastSocket.Bind(ifi, ifaddr); err != nil {
 		return err
 	}
-	server.Channel = make(chan any)
-	go handleMulticastConnection(server, server.Channel)
+	server.channel = make(chan any)
+	go handleMulticastConnection(server, server.channel)
 	return nil
 }
 
@@ -67,10 +67,10 @@ func (server *MulticastServer) Stop() error {
 }
 
 func handleMulticastRequestMessage(server *MulticastServer, reqMsg dns.Message) {
-	if server.Handler == nil {
+	if server.processor == nil {
 		return
 	}
-	resMsg, err := server.Handler(reqMsg)
+	resMsg, err := server.processor(reqMsg)
 	if err != nil || resMsg == nil {
 		return
 	}

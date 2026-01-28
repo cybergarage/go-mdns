@@ -20,26 +20,18 @@ import (
 
 // A MessageManager represents a multicast server list.
 type MessageManager struct {
-	msgProcessor dns.MessageProcessor
 	*MulticastManager
 }
 
 // NewMessageManager returns a new message manager.
 func NewMessageManager() *MessageManager {
 	mgr := &MessageManager{
-		msgProcessor:     nil,
 		MulticastManager: NewMulticastManager(),
 	}
 	return mgr
 }
 
 // SetMessageProcessor sets the message processor.
-func (mgr *MessageManager) SetMessageProcessor(h dns.MessageProcessor) {
-	mgr.SetHandler(h)
-	mgr.msgProcessor = h
-}
-
-// MessageProcessor returns the message processor.
-func (mgr *MessageManager) MessageProcessor() dns.MessageProcessor {
-	return mgr.msgProcessor
+func (mgr *MessageManager) SetMessageProcessor(processor dns.MessageProcessor) {
+	mgr.MulticastManager.SetMessageProcessor(processor)
 }
