@@ -50,7 +50,7 @@ func main() {
 	server := NewServer()
 
 	if *verbose {
-		server.SetListener(server)
+		server.RegisterHandler(server.MessageReceived)
 	}
 
 	err := server.Start()
