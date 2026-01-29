@@ -278,9 +278,12 @@ func (srv *serviceImpl) Equal(other Service) bool {
 
 // String returns the string representation.
 func (srv *serviceImpl) String() string {
-	return fmt.Sprintf(
-		"%s (%s)",
-		dns.NewNameWithStrings(srv.name, srv.host, srv.domain),
-		srv.From().String(),
-	)
+	str := dns.NewNameWithStrings(srv.name, srv.host, srv.domain)
+	if srv.Message != nil {
+		from := srv.From()
+		if from != nil {
+			str += " (" + from.String() + ")"
+		}
+	}
+	return str
 }
