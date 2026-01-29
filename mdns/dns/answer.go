@@ -18,4 +18,4 @@ package dns
 type Answer = ResourceRecord
 
 // Answers represents an answer resource record array.
-type Answers = Records
+type Answers = RecordSet

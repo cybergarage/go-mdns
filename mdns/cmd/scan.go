@@ -58,7 +58,7 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 
 		for n, srv := range services {
 			fmt.Printf("[%d] %s\n", n, srv.String())
-			fmt.Printf("%s\n", srv.ResourceRecords().String())
+			fmt.Printf("%s\n", srv.ResourceRecordSet().String())
 		}
 
 		return nil

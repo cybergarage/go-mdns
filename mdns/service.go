@@ -27,8 +27,8 @@ type Attribute = dns.Attribute
 // Attributes represents a TXT record attributes map.
 type Attributes = dns.Attributes
 
-// ResourceRecords represents a resource record array.
-type ResourceRecords = dns.ResourceRecords
+// ResourceRecordSet represents a resource record array.
+type ResourceRecordSet = dns.ResourceRecordSet
 
 // ResourceRecord represents a resource record.
 type ResourceRecord = dns.ResourceRecord
@@ -45,8 +45,8 @@ type Service interface {
 	Port() int
 	// Addresses returns the service addresses.
 	Addresses() []net.IP
-	// ResourceRecords returns the service resource records.
-	ResourceRecords() ResourceRecords
+	// ResourceRecordSet returns the service resource records.
+	ResourceRecordSet() ResourceRecordSet
 	// ResourceAttributes returns the service TXT attributes.
 	ResourceAttributes() Attributes
 	// LookupResourceAttribute returns the attribute with the specified name.

@@ -90,15 +90,15 @@ type Message interface {
 	// Questions returns all questions in the message.
 	Questions() Questions
 	// Answers returns all answers in the message.
-	Answers() ResourceRecords
+	Answers() ResourceRecordSet
 	// NameServers returns all name servers in the message.
-	NameServers() ResourceRecords
+	NameServers() ResourceRecordSet
 	// Additions returns all additional records in the message.
-	Additions() ResourceRecords
+	Additions() ResourceRecordSet
 	// Records returns all records which includes questions, answers, name servers, and additions.
-	Records() Records
-	// ResourceRecords returns only all resource records in the message without questions.
-	ResourceRecords() ResourceRecords
+	Records() RecordSet
+	// ResourceRecordSet returns only all resource records in the message without questions.
+	ResourceRecordSet() ResourceRecordSet
 	// LookupResourceRecordByName returns the resource record of the specified name.
 	LookupResourceRecordByName(name string) (ResourceRecord, bool)
 	// LookupResourceRecordByNameRegex returns the resource record of the specified name regex.

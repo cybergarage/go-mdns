@@ -198,23 +198,23 @@ func (msg *message) Questions() Questions {
 }
 
 // Answers returns all answers in the message.
-func (msg *message) Answers() ResourceRecords {
+func (msg *message) Answers() ResourceRecordSet {
 	return msg.answers
 }
 
 // NameServers returns all name servers in the message.
-func (msg *message) NameServers() ResourceRecords {
+func (msg *message) NameServers() ResourceRecordSet {
 	return msg.nameServers
 }
 
 // Additions returns all additional records in the message.
-func (msg *message) Additions() ResourceRecords {
+func (msg *message) Additions() ResourceRecordSet {
 	return msg.additions
 }
 
 // Records returns all records which includes questions, answers, name servers, and additions.
-func (msg *message) Records() Records {
-	records := Records{}
+func (msg *message) Records() RecordSet {
+	records := RecordSet{}
 	for _, r := range msg.questions {
 		records = append(records, r)
 	}
@@ -224,9 +224,9 @@ func (msg *message) Records() Records {
 	return records
 }
 
-// ResourceRecords returns only all resource records in the message without questions.
-func (msg *message) ResourceRecords() ResourceRecords {
-	records := ResourceRecords{}
+// ResourceRecordSet returns only all resource records in the message without questions.
+func (msg *message) ResourceRecordSet() ResourceRecordSet {
+	records := ResourceRecordSet{}
 	records = append(records, msg.answers...)
 	records = append(records, msg.nameServers...)
 	records = append(records, msg.additions...)
@@ -235,22 +235,22 @@ func (msg *message) ResourceRecords() ResourceRecords {
 
 // LookupResourceRecordByName returns the resource record of the specified name.
 func (msg *message) LookupResourceRecordByName(name string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordByName(name)
+	return msg.ResourceRecordSet().LookupRecordByName(name)
 }
 
 // LookupResourceRecordByNameRegex returns the resource record of the specified name regex.
 func (msg *message) LookupResourceRecordByNameRegex(re *regexp.Regexp) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordByNameRegex(re)
+	return msg.ResourceRecordSet().LookupRecordByNameRegex(re)
 }
 
 // LookupResourceRecordByNamePrefix returns the resource record of the specified name prefix.
 func (msg *message) LookupResourceRecordByNamePrefix(prefix string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordByNamePrefix(prefix)
+	return msg.ResourceRecordSet().LookupRecordByNamePrefix(prefix)
 }
 
 // LookupResourceRecordByNameSuffix returns the resource record of the specified name suffix.
 func (msg *message) LookupResourceRecordByNameSuffix(suffix string) (ResourceRecord, bool) {
-	return msg.ResourceRecords().LookupRecordByNameSuffix(suffix)
+	return msg.ResourceRecordSet().LookupRecordByNameSuffix(suffix)
 }
 
 // String returns the string representation.

@@ -21,17 +21,17 @@ import (
 	"strings"
 )
 
-// Records is a list of Record.
-type Records []Record
+// RecordSet represents a set of resource records.
+type RecordSet []Record
 
 // HasRecord returns true if the resource record of the specified name is included in the list. otherwise false.
-func (records Records) HasRecord(name string) bool {
+func (records RecordSet) HasRecord(name string) bool {
 	_, ok := records.LookupRecordByName(name)
 	return ok
 }
 
 // LookupRecordByName returns the resource record of the specified name.
-func (records Records) LookupRecordByName(name string) (Record, bool) {
+func (records RecordSet) LookupRecordByName(name string) (Record, bool) {
 	lookupRecords := records.LookupRecordsByName(name)
 	if len(lookupRecords) == 0 {
 		return nil, false
@@ -40,7 +40,7 @@ func (records Records) LookupRecordByName(name string) (Record, bool) {
 }
 
 // LookupRecordByNameRegex returns the resource record of the specified name.
-func (records Records) LookupRecordByNameRegex(re *regexp.Regexp) (Record, bool) {
+func (records RecordSet) LookupRecordByNameRegex(re *regexp.Regexp) (Record, bool) {
 	lookupRecords := records.LookupRecordsByNameRegex(re)
 	if len(lookupRecords) == 0 {
 		return nil, false
@@ -49,19 +49,19 @@ func (records Records) LookupRecordByNameRegex(re *regexp.Regexp) (Record, bool)
 }
 
 // LookupRecordByNamePrefix returns the resource record of the specified name prefix.
-func (records Records) LookupRecordByNamePrefix(prefix string) (Record, bool) {
+func (records RecordSet) LookupRecordByNamePrefix(prefix string) (Record, bool) {
 	re := regexp.MustCompile("^" + regexp.QuoteMeta(prefix))
 	return records.LookupRecordByNameRegex(re)
 }
 
 // LookupRecordByNameSuffix returns the resource record of the specified name suffix.
-func (records Records) LookupRecordByNameSuffix(suffix string) (Record, bool) {
+func (records RecordSet) LookupRecordByNameSuffix(suffix string) (Record, bool) {
 	re := regexp.MustCompile(regexp.QuoteMeta(suffix) + "$")
 	return records.LookupRecordByNameRegex(re)
 }
 
 // LookupRecordByType returns the resource record of the specified type.
-func (records Records) LookupRecordByType(t Type) (Record, bool) {
+func (records RecordSet) LookupRecordByType(t Type) (Record, bool) {
 	lookupRecords := records.LookupRecordsByType(t)
 	if len(lookupRecords) == 0 {
 		return nil, false
@@ -70,8 +70,8 @@ func (records Records) LookupRecordByType(t Type) (Record, bool) {
 }
 
 // LookupRecordsByName returns the resource records of the specified name.
-func (records Records) LookupRecordsByName(name string) Records {
-	lookupRecords := Records{}
+func (records RecordSet) LookupRecordsByName(name string) RecordSet {
+	lookupRecords := RecordSet{}
 	for _, record := range records {
 		if record.IsName(name) {
 			lookupRecords = append(lookupRecords, record)
@@ -81,8 +81,8 @@ func (records Records) LookupRecordsByName(name string) Records {
 }
 
 // LookupRecordsByNameRegex returns the resource records that match the specified name regular expression.
-func (records Records) LookupRecordsByNameRegex(re *regexp.Regexp) Records {
-	lookupRecords := Records{}
+func (records RecordSet) LookupRecordsByNameRegex(re *regexp.Regexp) RecordSet {
+	lookupRecords := RecordSet{}
 	for _, record := range records {
 		if re.MatchString(record.Name()) {
 			lookupRecords = append(lookupRecords, record)
@@ -92,19 +92,19 @@ func (records Records) LookupRecordsByNameRegex(re *regexp.Regexp) Records {
 }
 
 // LookupRecordsByNamePrefix returns the resource records of the specified name prefix.
-func (records Records) LookupRecordsByNamePrefix(prefix string) Records {
+func (records RecordSet) LookupRecordsByNamePrefix(prefix string) RecordSet {
 	re := regexp.MustCompile("^" + regexp.QuoteMeta(prefix))
 	return records.LookupRecordsByNameRegex(re)
 }
 
 // LookupRecordsByNameSuffix returns the resource records of the specified name suffix.
-func (records Records) LookupRecordsByNameSuffix(suffix string) Records {
+func (records RecordSet) LookupRecordsByNameSuffix(suffix string) RecordSet {
 	re := regexp.MustCompile(regexp.QuoteMeta(suffix) + "$")
 	return records.LookupRecordsByNameRegex(re)
 }
 
 // LookupRecordsByType returns the resource records of the specified type.
-func (records Records) LookupRecordsByType(t Type) []Record {
+func (records RecordSet) LookupRecordsByType(t Type) []Record {
 	resRecords := []Record{}
 	for _, record := range records {
 		if record.Type() == t {
@@ -115,7 +115,7 @@ func (records Records) LookupRecordsByType(t Type) []Record {
 }
 
 // LookupARecords returns the A records.
-func (records Records) LookupARecords() []ARecord {
+func (records RecordSet) LookupARecords() []ARecord {
 	resRecords := []ARecord{}
 	for _, record := range records {
 		if aRecord, ok := record.(ARecord); ok {
@@ -126,7 +126,7 @@ func (records Records) LookupARecords() []ARecord {
 }
 
 // LookupAAAARecords returns the AAAA records.
-func (records Records) LookupAAAARecords() []AAAARecord {
+func (records RecordSet) LookupAAAARecords() []AAAARecord {
 	resRecords := []AAAARecord{}
 	for _, record := range records {
 		if aaaaRecord, ok := record.(AAAARecord); ok {
@@ -137,7 +137,7 @@ func (records Records) LookupAAAARecords() []AAAARecord {
 }
 
 // LookupPTRRecords returns the PTR records.
-func (records Records) LookupPTRRecords() []PTRRecord {
+func (records RecordSet) LookupPTRRecords() []PTRRecord {
 	resRecords := []PTRRecord{}
 	for _, record := range records {
 		if ptrRecord, ok := record.(PTRRecord); ok {
@@ -148,7 +148,7 @@ func (records Records) LookupPTRRecords() []PTRRecord {
 }
 
 // LookupSRVRecords returns the SRV records.
-func (records Records) LookupSRVRecords() []SRVRecord {
+func (records RecordSet) LookupSRVRecords() []SRVRecord {
 	resRecords := []SRVRecord{}
 	for _, record := range records {
 		if srvRecord, ok := record.(SRVRecord); ok {
@@ -159,7 +159,7 @@ func (records Records) LookupSRVRecords() []SRVRecord {
 }
 
 // LookupTXTRecords returns the TXT records.
-func (records Records) LookupTXTRecords() []TXTRecord {
+func (records RecordSet) LookupTXTRecords() []TXTRecord {
 	resRecords := []TXTRecord{}
 	for _, record := range records {
 		if txtRecord, ok := record.(TXTRecord); ok {
@@ -170,7 +170,7 @@ func (records Records) LookupTXTRecords() []TXTRecord {
 }
 
 // String returns the string representation.
-func (records Records) String() string {
+func (records RecordSet) String() string {
 	type record []string
 
 	lines := make([]record, 0, len(records))

@@ -14,5 +14,5 @@
 
 package dns
 
-// ResourceRecords is a list of ResourceRecord.
-type ResourceRecords = Records
+// ResourceRecordSet represents a set of resource records.
+type ResourceRecordSet = RecordSet

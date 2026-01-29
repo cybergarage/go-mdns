@@ -18,4 +18,4 @@ package dns
 type Addition = ResourceRecord
 
 // Additions represents an additional resource record array.
-type Additions = Records
+type Additions = RecordSet

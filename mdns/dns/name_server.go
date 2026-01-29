@@ -18,4 +18,4 @@ package dns
 type NameServer = ResourceRecord
 
 // NameServers represents an authoritative nameserver resource record array.
-type NameServers = Records
+type NameServers = RecordSet

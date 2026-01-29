@@ -128,7 +128,7 @@ func (srv *serviceImpl) Addresses() []net.IP {
 // parseMessage updates the service data by the specified message.
 func (srv *serviceImpl) parseMessage(msg Message) error {
 	srv.Message = msg
-	for _, record := range msg.ResourceRecords() {
+	for _, record := range msg.ResourceRecordSet() {
 		err := srv.parseRecord(record)
 		if err != nil {
 			return err
@@ -137,9 +137,9 @@ func (srv *serviceImpl) parseMessage(msg Message) error {
 	return nil
 }
 
-// ResourceRecords returns the service resource records.
-func (srv *serviceImpl) ResourceRecords() ResourceRecords {
-	return srv.Message.ResourceRecords()
+// ResourceRecordSet returns the service resource records.
+func (srv *serviceImpl) ResourceRecordSet() ResourceRecordSet {
+	return srv.Message.ResourceRecordSet()
 }
 
 // ResourceAttributes returns the service TXT attributes.
