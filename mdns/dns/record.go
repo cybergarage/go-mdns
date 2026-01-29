@@ -56,6 +56,8 @@ type Record interface {
 	RequestBytes() ([]byte, error)
 	// ResponseBytes returns only the binary representation of the all fields.
 	ResponseBytes() ([]byte, error)
+	// Equal returns true if the record is equal to the specified record.
+	Equal(record Record) bool
 	// Bytes returns the binary representation of the record.
 	Bytes() ([]byte, error)
 }

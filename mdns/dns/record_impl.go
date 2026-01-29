@@ -15,7 +15,6 @@
 package dns
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 	"unicode"
@@ -318,13 +317,14 @@ func (r *record) CompressionBytes() []byte {
 
 // Equal returns true if this record is equal to  the specified resource record. otherwise false.
 func (r *record) Equal(other ResourceRecord) bool {
-	rBytes, err := r.Bytes()
-	if err != nil {
+	if r.Type() != other.Type() {
 		return false
 	}
-	otherBytes, err := other.Bytes()
-	if err != nil {
+	if !strings.EqualFold(r.Name(), other.Name()) {
 		return false
 	}
-	return bytes.Equal(rBytes, otherBytes)
+	if !strings.EqualFold(r.Content(), other.Content()) {
+		return false
+	}
+	return true
 }
