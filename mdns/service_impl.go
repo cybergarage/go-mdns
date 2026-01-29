@@ -246,6 +246,12 @@ func (srv *serviceImpl) Equal(other Service) bool {
 		return false
 	}
 
+	thisRRSet := srv.ResourceRecordSet()
+	otherRRSet := other.ResourceRecordSet()
+	if thisRRSet != nil && otherRRSet != nil {
+		return thisRRSet.Equal(otherRRSet)
+	}
+
 	if len(srv.addrs) != len(other.Addresses()) {
 		return false
 	}
