@@ -15,7 +15,6 @@
 package dns
 
 import (
-	"bytes"
 	"fmt"
 	"net"
 	"regexp"
@@ -172,26 +171,6 @@ func (msg *message) Parse(msgBytes []byte) error {
 	return nil
 }
 
-// Equal returns true if the message is same as the specified message, otherwise false.
-func (msg *message) Equal(other *message) bool {
-	if other == nil {
-		return false
-	}
-	return bytes.Equal(msg.Bytes(), other.Bytes())
-}
-
-// Copy returns the copy message instance.
-func (msg *message) Copy() Message {
-	return &message{
-		Header:      NewHeaderWithBytes(msg.Header.bytes),
-		from:        msg.from,
-		questions:   msg.questions,
-		answers:     msg.answers,
-		nameServers: msg.nameServers,
-		additions:   msg.additions,
-	}
-}
-
 // Questions returns all questions in the message.
 func (msg *message) Questions() Questions {
 	return msg.questions
@@ -251,6 +230,34 @@ func (msg *message) LookupResourceRecordByNamePrefix(prefix string) (ResourceRec
 // LookupResourceRecordByNameSuffix returns the resource record of the specified name suffix.
 func (msg *message) LookupResourceRecordByNameSuffix(suffix string) (ResourceRecord, bool) {
 	return msg.ResourceRecordSet().LookupRecordByNameSuffix(suffix)
+}
+
+// Equal returns true if the message is same as the specified message, otherwise false.
+func (msg *message) Equal(other Message) bool {
+	if other == nil {
+		return false
+	}
+	if msg.ID() != other.ID() ||
+		msg.QR() != other.QR() || msg.Opcode() != other.Opcode() ||
+		msg.AA() != other.AA() || msg.TC() != other.TC() ||
+		msg.RD() != other.RD() || msg.RA() != other.RA() ||
+		msg.Z() != other.Z() || msg.AD() != other.AD() ||
+		msg.CD() != other.CD() || msg.ResponseCode() != other.ResponseCode() {
+		return false
+	}
+	return msg.RecordSet().Equal(other.RecordSet())
+}
+
+// Copy returns the copy message instance.
+func (msg *message) Copy() Message {
+	return &message{
+		Header:      NewHeaderWithBytes(msg.Header.bytes),
+		from:        msg.from,
+		questions:   msg.questions,
+		answers:     msg.answers,
+		nameServers: msg.nameServers,
+		additions:   msg.additions,
+	}
 }
 
 // String returns the string representation.

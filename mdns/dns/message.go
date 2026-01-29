@@ -103,6 +103,8 @@ type Message interface {
 	LookupResourceRecordByName(name string) (ResourceRecord, bool)
 	// LookupResourceRecordByNameRegex returns the resource record of the specified name regex.
 	LookupResourceRecordByNameRegex(re *regexp.Regexp) (ResourceRecord, bool)
+	// Equal returns true if the message is same as the specified message, otherwise false.
+	Equal(other Message) bool
 	// Copy returns the copy message instance.
 	Copy() Message
 	// Bytes returns the byte representation of the message.
