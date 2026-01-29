@@ -279,9 +279,8 @@ func (srv *serviceImpl) Equal(other Service) bool {
 // String returns the string representation.
 func (srv *serviceImpl) String() string {
 	return fmt.Sprintf(
-		"%s (%s:%d)",
+		"%s (%s)",
 		dns.NewNameWithStrings(srv.name, srv.host, srv.domain),
-		srv.host,
-		srv.port,
+		srv.From().String(),
 	)
 }

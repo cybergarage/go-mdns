@@ -41,7 +41,7 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 		defer client.Stop()
 
 		msgHandler := mdns.MessageHandler(func(msg mdns.Message) {
-			log.Debugf("%s\n", msg.String())
+			log.HexDebug(msg.Bytes())
 		})
 
 		query := mdns.NewQuery(
