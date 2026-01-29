@@ -95,8 +95,8 @@ type Message interface {
 	NameServers() ResourceRecordSet
 	// Additions returns all additional records in the message.
 	Additions() ResourceRecordSet
-	// Records returns all records which includes questions, answers, name servers, and additions.
-	Records() RecordSet
+	// RecordSet returns all records which includes questions, answers, name servers, and additions.
+	RecordSet() RecordSet
 	// ResourceRecordSet returns only all resource records in the message without questions.
 	ResourceRecordSet() ResourceRecordSet
 	// LookupResourceRecordByName returns the resource record of the specified name.

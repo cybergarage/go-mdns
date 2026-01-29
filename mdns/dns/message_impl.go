@@ -212,8 +212,8 @@ func (msg *message) Additions() ResourceRecordSet {
 	return msg.additions
 }
 
-// Records returns all records which includes questions, answers, name servers, and additions.
-func (msg *message) Records() RecordSet {
+// RecordSet returns all records which includes questions, answers, name servers, and additions.
+func (msg *message) RecordSet() RecordSet {
 	records := RecordSet{}
 	for _, r := range msg.questions {
 		records = append(records, r)
@@ -255,7 +255,7 @@ func (msg *message) LookupResourceRecordByNameSuffix(suffix string) (ResourceRec
 
 // String returns the string representation.
 func (msg *message) String() string {
-	return msg.Records().String()
+	return msg.RecordSet().String()
 }
 
 // Bytes returns the binary representation.

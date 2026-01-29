@@ -169,6 +169,23 @@ func (records RecordSet) LookupTXTRecords() []TXTRecord {
 	return resRecords
 }
 
+// Equal returns true if the record sets are equal. otherwise false.
+func (records RecordSet) Equal(other RecordSet) bool {
+	if len(records) != len(other) {
+		return false
+	}
+	for _, record := range records {
+		otherRecord, ok := other.LookupRecordByName(record.Name())
+		if !ok {
+			return false
+		}
+		if !record.Equal(otherRecord) {
+			return false
+		}
+	}
+	return true
+}
+
 // String returns the string representation.
 func (records RecordSet) String() string {
 	type record []string
