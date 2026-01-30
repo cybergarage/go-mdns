@@ -175,11 +175,15 @@ func (records RecordSet) Equal(other RecordSet) bool {
 		return false
 	}
 	for _, record := range records {
-		otherRecord, ok := other.LookupRecordByName(record.Name())
-		if !ok {
-			return false
+		hasRecord := false
+		otherRecordSet := other.LookupRecordSetByName(record.Name())
+		for _, otherRecord := range otherRecordSet {
+			if record.Equal(otherRecord) {
+				hasRecord = true
+				break
+			}
 		}
-		if !record.Equal(otherRecord) {
+		if !hasRecord {
 			return false
 		}
 	}
