@@ -242,7 +242,9 @@ func (msg *message) Equal(other Message) bool {
 		msg.AA() != other.AA() || msg.TC() != other.TC() ||
 		msg.RD() != other.RD() || msg.RA() != other.RA() ||
 		msg.Z() != other.Z() || msg.AD() != other.AD() ||
-		msg.CD() != other.CD() || msg.ResponseCode() != other.ResponseCode() {
+		msg.CD() != other.CD() || msg.ResponseCode() != other.ResponseCode() ||
+		msg.QD() != other.QD() || msg.AN() != other.AN() ||
+		msg.NS() != other.NS() || msg.AR() != other.AR() {
 		return false
 	}
 	return msg.RecordSet().Equal(other.RecordSet())
