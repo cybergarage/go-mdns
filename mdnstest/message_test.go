@@ -210,3 +210,74 @@ func TestResponseMessages(t *testing.T) {
 		})
 	}
 }
+
+func TestEqualMessages(t *testing.T) {
+	tests := []struct {
+		name string
+		dump string
+	}{
+		{
+			"google-cast-01",
+			googlecast01,
+		},
+		{
+			"google-cast-02",
+			googlecast02,
+		},
+		{
+			"google-cast-03",
+			googlecast03,
+		},
+		{
+			"matter 120 4.3.1.13/dns-sd",
+			matterSpec12043113DNSSD,
+		},
+		{
+			"matter 120 4.3.1.13/avahi#01",
+			matterSpec12043113Avahi01,
+		},
+		{
+			"matter 120 4.3.1.13/avahi#02",
+			matterSpec12043113Avahi02,
+		},
+		{
+			"matter service 01",
+			matterService01,
+		},
+		{
+			"matter service 02",
+			matterService02,
+		},
+	}
+
+	msgs := make([]dns.Message, 0)
+	for _, test := range tests {
+		msgBytes, err := hexdump.DecodeHexdumpLogs(strings.Split(test.dump, "\n"))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		msg, err := dns.NewMessageWithBytes(msgBytes)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		msgs = append(msgs, msg)
+	}
+
+	for i, msg1 := range msgs {
+		for j, msg2 := range msgs {
+			equal := msg1.Equal(msg2)
+			if i == j {
+				if !equal {
+					t.Errorf("messages[%d] and messages[%d] should be equal", i, j)
+				}
+			} else {
+				if equal {
+					t.Errorf("messages[%d] and messages[%d] should not be equal", i, j)
+				}
+			}
+		}
+	}
+}

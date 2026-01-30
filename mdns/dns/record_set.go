@@ -32,7 +32,7 @@ func (records RecordSet) HasRecord(name string) bool {
 
 // LookupRecordByName returns the resource record of the specified name.
 func (records RecordSet) LookupRecordByName(name string) (Record, bool) {
-	lookupRecords := records.LookupRecordsByName(name)
+	lookupRecords := records.LookupRecordSetByName(name)
 	if len(lookupRecords) == 0 {
 		return nil, false
 	}
@@ -41,7 +41,7 @@ func (records RecordSet) LookupRecordByName(name string) (Record, bool) {
 
 // LookupRecordByNameRegex returns the resource record of the specified name.
 func (records RecordSet) LookupRecordByNameRegex(re *regexp.Regexp) (Record, bool) {
-	lookupRecords := records.LookupRecordsByNameRegex(re)
+	lookupRecords := records.LookupRecordSetByNameRegex(re)
 	if len(lookupRecords) == 0 {
 		return nil, false
 	}
@@ -62,15 +62,15 @@ func (records RecordSet) LookupRecordByNameSuffix(suffix string) (Record, bool) 
 
 // LookupRecordByType returns the resource record of the specified type.
 func (records RecordSet) LookupRecordByType(t Type) (Record, bool) {
-	lookupRecords := records.LookupRecordsByType(t)
+	lookupRecords := records.LookupRecordSetByType(t)
 	if len(lookupRecords) == 0 {
 		return nil, false
 	}
 	return lookupRecords[0], true
 }
 
-// LookupRecordsByName returns the resource records of the specified name.
-func (records RecordSet) LookupRecordsByName(name string) RecordSet {
+// LookupRecordSetByName returns the resource records of the specified name.
+func (records RecordSet) LookupRecordSetByName(name string) RecordSet {
 	lookupRecords := RecordSet{}
 	for _, record := range records {
 		if record.IsName(name) {
@@ -80,8 +80,8 @@ func (records RecordSet) LookupRecordsByName(name string) RecordSet {
 	return lookupRecords
 }
 
-// LookupRecordsByNameRegex returns the resource records that match the specified name regular expression.
-func (records RecordSet) LookupRecordsByNameRegex(re *regexp.Regexp) RecordSet {
+// LookupRecordSetByNameRegex returns the resource records of the specified name regex.
+func (records RecordSet) LookupRecordSetByNameRegex(re *regexp.Regexp) RecordSet {
 	lookupRecords := RecordSet{}
 	for _, record := range records {
 		if re.MatchString(record.Name()) {
@@ -91,20 +91,20 @@ func (records RecordSet) LookupRecordsByNameRegex(re *regexp.Regexp) RecordSet {
 	return lookupRecords
 }
 
-// LookupRecordsByNamePrefix returns the resource records of the specified name prefix.
-func (records RecordSet) LookupRecordsByNamePrefix(prefix string) RecordSet {
+// LookupRecordSetByNamePrefix returns the resource records of the specified name prefix.
+func (records RecordSet) LookupRecordSetByNamePrefix(prefix string) RecordSet {
 	re := regexp.MustCompile("^" + regexp.QuoteMeta(prefix))
-	return records.LookupRecordsByNameRegex(re)
+	return records.LookupRecordSetByNameRegex(re)
 }
 
-// LookupRecordsByNameSuffix returns the resource records of the specified name suffix.
-func (records RecordSet) LookupRecordsByNameSuffix(suffix string) RecordSet {
+// LookupRecordSetByNameSuffix returns the resource records of the specified name suffix.
+func (records RecordSet) LookupRecordSetByNameSuffix(suffix string) RecordSet {
 	re := regexp.MustCompile(regexp.QuoteMeta(suffix) + "$")
-	return records.LookupRecordsByNameRegex(re)
+	return records.LookupRecordSetByNameRegex(re)
 }
 
-// LookupRecordsByType returns the resource records of the specified type.
-func (records RecordSet) LookupRecordsByType(t Type) []Record {
+// LookupRecordSetByType returns the resource records of the specified type.
+func (records RecordSet) LookupRecordSetByType(t Type) []Record {
 	resRecords := []Record{}
 	for _, record := range records {
 		if record.Type() == t {
@@ -114,8 +114,8 @@ func (records RecordSet) LookupRecordsByType(t Type) []Record {
 	return resRecords
 }
 
-// LookupARecords returns the A records.
-func (records RecordSet) LookupARecords() []ARecord {
+// LookupARecordSet returns the A records.
+func (records RecordSet) LookupARecordSet() []ARecord {
 	resRecords := []ARecord{}
 	for _, record := range records {
 		if aRecord, ok := record.(ARecord); ok {
@@ -125,8 +125,8 @@ func (records RecordSet) LookupARecords() []ARecord {
 	return resRecords
 }
 
-// LookupAAAARecords returns the AAAA records.
-func (records RecordSet) LookupAAAARecords() []AAAARecord {
+// LookupAAAARecordSet returns the AAAA records.
+func (records RecordSet) LookupAAAARecordSet() []AAAARecord {
 	resRecords := []AAAARecord{}
 	for _, record := range records {
 		if aaaaRecord, ok := record.(AAAARecord); ok {
@@ -136,8 +136,8 @@ func (records RecordSet) LookupAAAARecords() []AAAARecord {
 	return resRecords
 }
 
-// LookupPTRRecords returns the PTR records.
-func (records RecordSet) LookupPTRRecords() []PTRRecord {
+// LookupPTRRecordSet returns the PTR records.
+func (records RecordSet) LookupPTRRecordSet() []PTRRecord {
 	resRecords := []PTRRecord{}
 	for _, record := range records {
 		if ptrRecord, ok := record.(PTRRecord); ok {
@@ -147,8 +147,8 @@ func (records RecordSet) LookupPTRRecords() []PTRRecord {
 	return resRecords
 }
 
-// LookupSRVRecords returns the SRV records.
-func (records RecordSet) LookupSRVRecords() []SRVRecord {
+// LookupSRVRecordSet returns the SRV records.
+func (records RecordSet) LookupSRVRecordSet() []SRVRecord {
 	resRecords := []SRVRecord{}
 	for _, record := range records {
 		if srvRecord, ok := record.(SRVRecord); ok {
@@ -158,8 +158,8 @@ func (records RecordSet) LookupSRVRecords() []SRVRecord {
 	return resRecords
 }
 
-// LookupTXTRecords returns the TXT records.
-func (records RecordSet) LookupTXTRecords() []TXTRecord {
+// LookupTXTRecordSet returns the TXT records.
+func (records RecordSet) LookupTXTRecordSet() []TXTRecord {
 	resRecords := []TXTRecord{}
 	for _, record := range records {
 		if txtRecord, ok := record.(TXTRecord); ok {
