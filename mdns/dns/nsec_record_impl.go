@@ -55,3 +55,8 @@ func (nsec *nsecRecord) Content() string {
 	}
 	return ""
 }
+
+// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+func (nsec *nsecRecord) Equal(other Record) bool {
+	return EqualContent(nsec, other)
+}

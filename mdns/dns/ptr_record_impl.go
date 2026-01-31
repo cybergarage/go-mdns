@@ -57,3 +57,8 @@ func (ptr *ptrRecord) DomainName() string {
 func (ptr *ptrRecord) Content() string {
 	return ptr.DomainName()
 }
+
+// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+func (ptr *ptrRecord) Equal(other Record) bool {
+	return EqualContent(ptr, other)
+}

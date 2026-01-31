@@ -83,3 +83,8 @@ func (txt *txtRecord) HasAttribute(name string) bool {
 func (txt *txtRecord) Content() string {
 	return strings.Join(txt.strs, " ")
 }
+
+// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+func (txt *txtRecord) Equal(other Record) bool {
+	return EqualContent(txt, other)
+}

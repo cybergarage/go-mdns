@@ -315,16 +315,21 @@ func (r *record) CompressionBytes() []byte {
 	return r.cmpBytes
 }
 
-// Equal returns true if this record is equal to  the specified resource record. otherwise false.
-func (r *record) Equal(other ResourceRecord) bool {
-	if r.Type() != other.Type() {
+// EqualContent returns true if the record contents are equal. otherwise false.
+func EqualContent(r1, r2 Record) bool {
+	if r1.Type() != r2.Type() {
 		return false
 	}
-	if !strings.EqualFold(r.Name(), other.Name()) {
+	if !strings.EqualFold(r1.Name(), r2.Name()) {
 		return false
 	}
-	if !strings.EqualFold(r.Content(), other.Content()) {
+	if !strings.EqualFold(r1.Content(), r2.Content()) {
 		return false
 	}
 	return true
+}
+
+// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+func (r *record) Equal(other Record) bool {
+	return EqualContent(r, other)
 }

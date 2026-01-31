@@ -133,3 +133,8 @@ func (srv *srvRecord) Content() string {
 	}
 	return fmt.Sprintf("%d %d %d %s", srv.priority, srv.weight, srv.port, srv.target)
 }
+
+// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+func (srv *srvRecord) Equal(other Record) bool {
+	return EqualContent(srv, other)
+}

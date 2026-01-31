@@ -69,3 +69,8 @@ func NewQuestionWithReader(reader *Reader) (Question, error) {
 	r, err := NewRequestRecordWithReader(reader)
 	return NewQuestionWithRecord(r), err
 }
+
+// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+func (q *question) Equal(other Record) bool {
+	return EqualContent(q, other)
+}

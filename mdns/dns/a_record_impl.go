@@ -49,3 +49,8 @@ func (a *aRecord) Address() net.IP {
 func (a *aRecord) Content() string {
 	return a.Address().String()
 }
+
+// Equal returns true if this record is equal to  the specified resource record. otherwise false.
+func (a *aRecord) Equal(other Record) bool {
+	return EqualContent(a, other)
+}
