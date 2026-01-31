@@ -59,6 +59,7 @@ type Service interface {
 	Equal(other Service) bool
 	// String returns the string representation.
 	String() string
+	// ServiceHelper returns the service helper.
 	ServiceHelper
 }
 

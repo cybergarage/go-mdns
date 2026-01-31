@@ -26,7 +26,14 @@ const (
 
 // NewNameWithStrings returns a DNS name constructed by joining the given strings with dots.
 func NewNameWithStrings(s ...string) string {
-	return strings.Join(s, LabelSeparator)
+	strs := []string{}
+	for _, str := range s {
+		if len(str) == 0 {
+			continue
+		}
+		strs = append(strs, str)
+	}
+	return strings.Join(strs, LabelSeparator)
 }
 
 // AppendName appends the given name to the base name.

@@ -285,6 +285,16 @@ func (srv *serviceImpl) Equal(other Service) bool {
 // String returns the string representation.
 func (srv *serviceImpl) String() string {
 	str := dns.NewNameWithStrings(srv.name, srv.host, srv.domain)
+	if len(str) == 0 {
+		for _, record := range srv.ResourceRecordSet() {
+			name := record.Name()
+			if len(name) == 0 {
+				continue
+			}
+			str = name
+			break
+		}
+	}
 	if srv.Message != nil {
 		from := srv.From()
 		if from != nil {
