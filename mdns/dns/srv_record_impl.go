@@ -14,7 +14,10 @@
 
 package dns
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // srvRecord represents a SRV record.
 // RFC 2782: A DNS RR for specifying the location of services (DNS SRV).
@@ -23,7 +26,6 @@ type srvRecord struct {
 	*record
 	service  string
 	proto    string
-	name     string
 	priority uint16
 	weight   uint16
 	port     uint16
@@ -36,7 +38,6 @@ func NewSRVRecord() SRVRecord {
 		record:   newResourceRecord(),
 		service:  "",
 		proto:    "",
-		name:     "",
 		priority: 0,
 		weight:   0,
 		port:     0,
@@ -50,13 +51,32 @@ func newSRVRecordWithResourceRecord(res *record) (SRVRecord, error) {
 		record:   res,
 		service:  "",
 		proto:    "",
-		name:     "",
 		priority: 0,
 		weight:   0,
 		port:     0,
 		target:   "",
 	}
-	return srv, srv.parseResourceRecord()
+	if err := srv.parseName(); err != nil {
+		return nil, err
+	}
+	if err := srv.parseResourceRecord(); err != nil {
+		return nil, err
+	}
+	return srv, nil
+}
+
+func (srv *srvRecord) parseName() error {
+	name := srv.Name()
+	if len(name) == 0 {
+		return nil
+	}
+	names := strings.SplitN(name, ".", 3)
+	if len(names) < 3 {
+		return fmt.Errorf("%w SRV record name: %s", ErrInvalid, name)
+	}
+	srv.service = names[0]
+	srv.proto = names[1]
+	return nil
 }
 
 func (srv *srvRecord) parseResourceRecord() error {
@@ -99,11 +119,6 @@ func (srv *srvRecord) Service() string {
 // Proto returns the protocol name.
 func (srv *srvRecord) Proto() string {
 	return srv.proto
-}
-
-// Name returns the resource name.
-func (srv *srvRecord) Name() string {
-	return srv.name
 }
 
 // Priority returns the resource priority.

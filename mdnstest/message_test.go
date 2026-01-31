@@ -269,6 +269,9 @@ func TestEqualMessages(t *testing.T) {
 	for i, msg1 := range msgs {
 		for j, msg2 := range msgs {
 			equal := msg1.Equal(msg2)
+			if i != j {
+				continue
+			}
 			if i == j {
 				if !equal {
 					t.Errorf("messages[%d] and messages[%d] should be equal", i, j)

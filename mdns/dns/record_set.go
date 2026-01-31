@@ -176,7 +176,12 @@ func (records RecordSet) Equal(other RecordSet) bool {
 	}
 	for _, record := range records {
 		hasRecord := false
-		otherRecordSet := other.LookupRecordSetByName(record.Name())
+		name := record.Name()
+		otherRecordSet := other.LookupRecordSetByName(name)
+		if len(otherRecordSet) == 0 {
+			name = record.Name()
+			return false
+		}
 		for _, otherRecord := range otherRecordSet {
 			if record.Equal(otherRecord) {
 				hasRecord = true
