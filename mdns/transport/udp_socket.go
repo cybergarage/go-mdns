@@ -87,7 +87,7 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (
 	msgBytes := msg.Bytes()
 	fromAddr, _ := sock.ListenAddr()
 	fromPort, _ := sock.ListenPort()
-	log.Debugf("SEND %s -> %s", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
+	log.Debugf("SEND %s -> %s (%d bytes)", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)), len(msgBytes))
 	log.HexDebug(msgBytes)
 
 	return sock.Conn.WriteToUDP(msgBytes, toUDPAddr)
@@ -107,19 +107,21 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 	toAddr, _ := sock.ListenAddr()
 	toPort, _ := sock.ListenPort()
 
-	log.Debugf("RECV %s -> %s", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
+	log.Debugf("RECV %s -> %s (%d bytes)", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)), n)
+
+	msgBytes := sock.ReadBuffer[:n]
 
 	msg, err := dns.NewMessageWithBytes(
-		sock.ReadBuffer[:n],
+		msgBytes,
 		dns.WithMessageFrom(fromAddr),
 	)
 	if err != nil {
 		log.Debugf("Failed to parse DNS message: %s", err)
-		log.HexDebug(sock.ReadBuffer[:n])
+		log.HexDebug(msgBytes)
 		return nil, err
 	}
 
-	log.HexDebug(msg.Bytes())
+	log.HexDebug(msgBytes)
 
 	return msg, nil
 }
