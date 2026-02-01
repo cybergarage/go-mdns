@@ -258,6 +258,7 @@ func (msg *message) Copy() Message {
 	return &message{
 		Header:      NewHeaderWithBytes(msg.Header.bytes),
 		from:        msg.from,
+		pktBytes:    msg.pktBytes,
 		questions:   msg.questions,
 		answers:     msg.answers,
 		nameServers: msg.nameServers,

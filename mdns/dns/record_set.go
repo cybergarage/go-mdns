@@ -17,6 +17,7 @@ package dns
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -179,14 +180,10 @@ func (records RecordSet) Equal(other RecordSet) bool {
 		name := record.Name()
 		otherRecordSet := other.LookupRecordSetByName(name)
 		if len(otherRecordSet) == 0 {
-			name = record.Name()
 			return false
 		}
-		for _, otherRecord := range otherRecordSet {
-			if record.Equal(otherRecord) {
-				hasRecord = true
-				break
-			}
+		if slices.ContainsFunc(otherRecordSet, record.Equal) {
+			hasRecord = true
 		}
 		if !hasRecord {
 			return false
