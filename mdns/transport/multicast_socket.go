@@ -76,6 +76,11 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface, ifaddr string) error {
 		return err
 	}
 
+	err = sock.SetMulticastHops(f, ifaddr, 255)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
