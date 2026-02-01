@@ -110,7 +110,7 @@ func (client *clientImpl) messageReceived(msg dns.Message) (dns.Message, error) 
 
 	ok := client.AddService(newService)
 
-	log.Debugf("Service responded: %s (added=%t)", newService.String(), ok)
+	log.Debugf("mDNS Service responded: %s (added=%t)", newService.String(), ok)
 
 	return nil, nil
 }
