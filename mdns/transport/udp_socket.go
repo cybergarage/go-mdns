@@ -84,11 +84,13 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (
 		return 0, err
 	}
 
+	msgBytes := msg.Bytes()
 	fromAddr, _ := sock.ListenAddr()
 	fromPort, _ := sock.ListenPort()
 	log.Debugf("SEND %s -> %s", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
+	log.HexDebug(msgBytes)
 
-	return sock.Conn.WriteToUDP(msg.Bytes(), toUDPAddr)
+	return sock.Conn.WriteToUDP(msgBytes, toUDPAddr)
 }
 
 // ReadMessage reads a message from the current opened socket.
@@ -116,6 +118,8 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 		log.HexDebug(sock.ReadBuffer[:n])
 		return nil, err
 	}
+
+	log.HexDebug(msg.Bytes())
 
 	return msg, nil
 }
