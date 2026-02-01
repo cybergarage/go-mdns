@@ -24,6 +24,7 @@ import (
 type message struct {
 	*Header
 	from        net.Addr
+	pktBytes    []byte
 	questions   Questions
 	answers     Answers
 	nameServers NameServers
@@ -34,6 +35,7 @@ func newMessage(opts ...MessageOption) *message {
 	msg := &message{
 		Header:      NewHeader(),
 		from:        nil,
+		pktBytes:    nil,
 		questions:   Questions{},
 		answers:     Answers{},
 		nameServers: NameServers{},
@@ -131,6 +133,7 @@ func (msg *message) AddAddition(a Addition) {
 
 // Parse parses the specified reader.
 func (msg *message) Parse(msgBytes []byte) error {
+	msg.pktBytes = msgBytes
 	reader := NewReaderWithBytes(msgBytes)
 	if err := msg.Header.Parse(reader); err != nil {
 		return fmt.Errorf("header : %w", err)
@@ -269,6 +272,9 @@ func (msg *message) String() string {
 
 // Bytes returns the binary representation.
 func (msg *message) Bytes() []byte {
+	if msg.pktBytes != nil {
+		return msg.pktBytes
+	}
 	bytes := msg.Header.Bytes()
 	for _, q := range msg.questions {
 		if b, err := q.RequestBytes(); err == nil {
