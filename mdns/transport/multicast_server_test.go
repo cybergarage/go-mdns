@@ -34,7 +34,7 @@ func newTestMulticastServer() *testMulticastServer {
 		MulticastServer: NewMulticastServer(),
 		lastMessage:     nil,
 	}
-	server.SetHandler(server)
+	server.SetMessageProcessor(server.MessageReceived)
 	return server
 }
 
