@@ -58,23 +58,14 @@ func (sock *UDPSocket) GetReadBufferSize() int {
 
 // Close closes the current opened socket.
 func (sock *UDPSocket) Close() error {
-	if sock.Conn == nil {
+	conn := sock.Conn
+	if conn == nil {
 		return nil
 	}
-
-	// FIXME : sock.Conn.Close() hung up on darwin
-	/*
-		err := sock.Conn.Close()
-		if err != nil {
-			return err
-		}
-	*/
-	go sock.Conn.Close()
-	time.Sleep(time.Millisecond * 100)
-
 	sock.Conn = nil
 
-	return nil
+	conn.SetDeadline(time.Now().Add(-time.Second))
+	return conn.Close()
 }
 
 // SendMessage sends the message to the destination address.
