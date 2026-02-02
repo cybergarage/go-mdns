@@ -80,7 +80,12 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (
 	msgBytes := msg.Bytes()
 	fromAddr, _ := sock.ListenAddr()
 	fromPort, _ := sock.ListenPort()
-	log.Debugf("SEND %s -> %s (%d bytes)", net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)), len(msgBytes))
+	log.Debugf("SEND %s %s -> %s (%d bytes)",
+		sock.Transport.String(),
+		net.JoinHostPort(fromAddr, strconv.Itoa(fromPort)),
+		net.JoinHostPort(toAddr, strconv.Itoa(toPort)),
+		len(msgBytes),
+	)
 	log.HexDebug(msgBytes)
 
 	return sock.Conn.WriteToUDP(msgBytes, toUDPAddr)
@@ -100,7 +105,12 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 	toAddr, _ := sock.ListenAddr()
 	toPort, _ := sock.ListenPort()
 
-	log.Debugf("RECV %s -> %s (%d bytes)", net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)), net.JoinHostPort(toAddr, strconv.Itoa(toPort)), n)
+	log.Debugf("RECV %s %s -> %s (%d bytes)",
+		sock.Transport.String(),
+		net.JoinHostPort(fromAddr.IP.String(), strconv.Itoa(fromAddr.Port)),
+		net.JoinHostPort(toAddr, strconv.Itoa(toPort)),
+		n,
+	)
 
 	msgBytes := sock.ReadBuffer[:n]
 
