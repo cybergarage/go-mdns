@@ -15,8 +15,12 @@
 package transport
 
 import (
+	"context"
+	"fmt"
 	"net"
 	"strconv"
+	"strings"
+	"syscall"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
@@ -41,28 +45,49 @@ func (sock *UnicastUDPSocket) Bind(ifi *net.Interface, ifaddr string, port int) 
 		return err
 	}
 
-	boundAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(ifaddr, strconv.Itoa(port)))
+	var boundAddr *net.UDPAddr
+	host := ifaddr
+	zone := ""
+	if strings.Contains(ifaddr, "%") {
+		host, zone, _ = strings.Cut(ifaddr, "%")
+	}
+	if ip := net.ParseIP(host); ip != nil {
+		if zone == "" && ip.To4() == nil && ip.IsLinkLocalUnicast() && ifi != nil {
+			zone = ifi.Name
+		}
+		boundAddr = &net.UDPAddr{IP: ip, Port: port, Zone: zone}
+	} else {
+		var err error
+		boundAddr, err = net.ResolveUDPAddr("udp", net.JoinHostPort(ifaddr, strconv.Itoa(port)))
+		if err != nil {
+			return err
+		}
+	}
+
+	listenConfig := net.ListenConfig{ // nolint: exhaustruct
+		Control: func(network, address string, c syscall.RawConn) error {
+			var ctrlErr error
+			if err := c.Control(func(fd uintptr) {
+				ctrlErr = sock.SetReuseAddrFd(fd, true)
+			}); err != nil {
+				return err
+			}
+			return ctrlErr
+		},
+	}
+
+	pc, err := listenConfig.ListenPacket(context.Background(), "udp", boundAddr.String())
 	if err != nil {
 		return err
 	}
 
-	sock.Conn, err = net.ListenUDP("udp", boundAddr)
-	if err != nil {
-		return err
+	conn, ok := pc.(*net.UDPConn)
+	if !ok {
+		_ = pc.Close()
+		return fmt.Errorf("invalid udp packet connection: %T", pc)
 	}
 
-	f, err := sock.Conn.File()
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	err = sock.SetReuseAddr(f, true)
-	if err != nil {
-		sock.Close()
-		return err
-	}
+	sock.Conn = conn
 
 	sock.SetListenStatus(ifi, ifaddr, port)
 

@@ -19,6 +19,7 @@ import (
 	"io"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cybergarage/go-logger/log"
@@ -50,9 +51,23 @@ func (sock *TCPSocket) Bind(ifi *net.Interface, ifaddr string, port int) error {
 		return err
 	}
 
-	boundAddr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(ifaddr, strconv.Itoa(port)))
-	if err != nil {
-		return err
+	var boundAddr *net.TCPAddr
+	host := ifaddr
+	zone := ""
+	if strings.Contains(ifaddr, "%") {
+		host, zone, _ = strings.Cut(ifaddr, "%")
+	}
+	if ip := net.ParseIP(host); ip != nil {
+		if zone == "" && ip.To4() == nil && ip.IsLinkLocalUnicast() && ifi != nil {
+			zone = ifi.Name
+		}
+		boundAddr = &net.TCPAddr{IP: ip, Port: port, Zone: zone}
+	} else {
+		var err error
+		boundAddr, err = net.ResolveTCPAddr("tcp", net.JoinHostPort(ifaddr, strconv.Itoa(port)))
+		if err != nil {
+			return err
+		}
 	}
 
 	sock.Listener, err = net.ListenTCP("tcp", boundAddr)
@@ -60,16 +75,23 @@ func (sock *TCPSocket) Bind(ifi *net.Interface, ifaddr string, port int) error {
 		return err
 	}
 
-	f, err := sock.Listener.File()
+	rawConn, err := sock.Listener.SyscallConn()
 	if err != nil {
 		return err
 	}
 
-	defer f.Close()
-
-	err = sock.SetReuseAddr(f, true)
+	var ctrlErr error
+	err = rawConn.Control(func(fd uintptr) {
+		if err := sock.SetReuseAddrFd(fd, true); err != nil {
+			ctrlErr = err
+			return
+		}
+	})
 	if err != nil {
 		return err
+	}
+	if ctrlErr != nil {
+		return ctrlErr
 	}
 
 	sock.SetListenStatus(ifi, ifaddr, port)

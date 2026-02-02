@@ -58,26 +58,31 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface, ifaddr string) error {
 
 	sock.Conn.SetReadBuffer(sock.GetReadBufferSize())
 
-	f, err := sock.Conn.File()
+	rawConn, err := sock.Conn.SyscallConn()
 	if err != nil {
 		return err
 	}
 
-	defer f.Close()
-
-	err = sock.SetReuseAddr(f, true)
+	var ctrlErr error
+	err = rawConn.Control(func(fd uintptr) {
+		if err := sock.SetReuseAddrFd(fd, true); err != nil {
+			ctrlErr = err
+			return
+		}
+		if err := sock.SetMulticastLoopFd(fd, ifaddr, true); err != nil {
+			ctrlErr = err
+			return
+		}
+		if err := sock.SetMulticastHopsFd(fd, ifaddr, 255); err != nil {
+			ctrlErr = err
+			return
+		}
+	})
 	if err != nil {
 		return err
 	}
-
-	err = sock.SetMulticastLoop(f, ifaddr, true)
-	if err != nil {
-		return err
-	}
-
-	err = sock.SetMulticastHops(f, ifaddr, 255)
-	if err != nil {
-		return err
+	if ctrlErr != nil {
+		return ctrlErr
 	}
 
 	return nil

@@ -90,6 +90,7 @@ func handleMulticastConnection(server *MulticastServer, cancel chan any) {
 					return
 				}
 				log.Debugf("Failed to read multicast message: %s", err)
+				continue
 			}
 			go handleMulticastRequestMessage(server, msg)
 		}

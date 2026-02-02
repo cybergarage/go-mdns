@@ -21,20 +21,18 @@ import (
 	"syscall"
 )
 
-// SetReuseAddr sets a flag to SO_REUSEADDR and SO_REUSEPORT.
+// SetReuseAddrFd sets a flag to SO_REUSEADDR.
 // nolint: nosnakecase
-func (sock *Socket) SetReuseAddr(file *os.File, flag bool) error {
-	fd := file.Fd()
-
+func (sock *Socket) SetReuseAddrFd(fd uintptr, flag bool) error {
 	opt := 0
 	if flag {
 		opt = 1
 	}
+	return syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEADDR, opt)
+}
 
-	err := syscall.SetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_REUSEADDR, opt)
-	if err != nil {
-		return err
-	}
-
-	return nil
+// SetReuseAddr sets a flag to SO_REUSEADDR and SO_REUSEPORT.
+// nolint: nosnakecase
+func (sock *Socket) SetReuseAddr(file *os.File, flag bool) error {
+	return sock.SetReuseAddrFd(file.Fd(), flag)
 }

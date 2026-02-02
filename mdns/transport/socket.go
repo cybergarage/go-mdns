@@ -101,30 +101,38 @@ func (sock *Socket) ListenIPAddr() (string, error) {
 
 // SetMulticastLoop sets a flag to IP_MULTICAST_LOOP.
 // nolint: nosnakecase
-func (sock *Socket) SetMulticastLoop(file *os.File, addr string, flag bool) error {
-	fd := file.Fd()
 
+func (sock *Socket) SetMulticastLoopFd(fd uintptr, addr string, flag bool) error {
 	opt := 0
 	if flag {
 		opt = 1
 	}
-
 	if IsIPv6Address(addr) {
 		return syscall.SetsockoptInt(int(fd), syscall.IPPROTO_IPV6, syscall.IPV6_MULTICAST_LOOP, opt)
 	}
 	return syscall.SetsockoptInt(int(fd), syscall.IPPROTO_IP, syscall.IP_MULTICAST_LOOP, opt)
 }
 
-// SetMulticastHops sets the multicast TTL (IPv4) / HopLimit (IPv6).
+// SetMulticastLoop sets a flag to IP_MULTICAST_LOOP.
+// nolint: nosnakecase
+func (sock *Socket) SetMulticastLoop(file *os.File, addr string, flag bool) error {
+	return sock.SetMulticastLoopFd(file.Fd(), addr, flag)
+}
+
+// SetMulticastHopsFd sets the multicast TTL (IPv4) / HopLimit (IPv6).
 // RFC 6762 requires IP TTL / IPv6 Hop Limit = 255 for mDNS.
-func (sock *Socket) SetMulticastHops(file *os.File, addr string, hops int) error {
+func (sock *Socket) SetMulticastHopsFd(fd uintptr, addr string, hops int) error {
 	if hops < 0 || 255 < hops {
 		return fmt.Errorf("invalid multicast hops: %d", hops)
 	}
-
-	fd := file.Fd()
 	if IsIPv6Address(addr) {
 		return syscall.SetsockoptInt(int(fd), syscall.IPPROTO_IPV6, syscall.IPV6_MULTICAST_HOPS, hops)
 	}
 	return syscall.SetsockoptInt(int(fd), syscall.IPPROTO_IP, syscall.IP_MULTICAST_TTL, hops)
+}
+
+// SetMulticastHops sets the multicast TTL (IPv4) / HopLimit (IPv6).
+// RFC 6762 requires IP TTL / IPv6 Hop Limit = 255 for mDNS.
+func (sock *Socket) SetMulticastHops(file *os.File, addr string, hops int) error {
+	return sock.SetMulticastHopsFd(file.Fd(), addr, hops)
 }
