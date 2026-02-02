@@ -15,7 +15,6 @@
 package dns
 
 import (
-	"net"
 	"regexp"
 )
 
@@ -25,7 +24,7 @@ type MessageOption func(*message) error
 // Message represents a DNS message.
 type Message interface {
 	// From returns the source address of the message.
-	From() net.Addr
+	From() Addr
 	// Flags returns the flags.
 	Flags() []byte
 	// ID returns the query identifier.

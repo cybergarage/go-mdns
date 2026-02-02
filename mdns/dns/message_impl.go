@@ -16,14 +16,13 @@ package dns
 
 import (
 	"fmt"
-	"net"
 	"regexp"
 )
 
 // message represents a protocol message.
 type message struct {
 	*Header
-	from        net.Addr
+	from        Addr
 	pktBytes    []byte
 	questions   Questions
 	answers     Answers
@@ -58,7 +57,7 @@ func WithMessageQuestions(questions ...Question) MessageOption {
 }
 
 // WithMessageFrom returns a message option with the specified source address.
-func WithMessageFrom(addr net.Addr) MessageOption {
+func WithMessageFrom(addr Addr) MessageOption {
 	return func(msg *message) error {
 		msg.from = addr
 		return nil
@@ -103,7 +102,7 @@ func NewMessageWithBytes(msgBytes []byte, opts ...MessageOption) (Message, error
 }
 
 // From returns the source address of the message.
-func (msg *message) From() net.Addr {
+func (msg *message) From() Addr {
 	return msg.from
 }
 
