@@ -18,20 +18,6 @@ import (
 	"net"
 )
 
-// Transport represents the transport protocol.
-type Transport int
-
-const (
-	// TransportUnknown represents an unknown transport protocol.
-	TransportUnknown Transport = iota
-	// TransportUDP represents the UDP transport protocol.
-	TransportUDP
-	// TransportTCP represents the TCP transport protocol.
-	TransportTCP
-	// TransportUDPGroup represents the UDP multicast transport protocol.
-	TransportUDPGroup
-)
-
 // Addr represents a network address.
 type Addr interface {
 	// IP returns the IP address.

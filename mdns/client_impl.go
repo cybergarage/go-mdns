@@ -39,7 +39,7 @@ func NewClient() Client {
 		services:       newServices(),
 		msgHandler:     newMessageHandler(),
 	}
-	client.MessageManager.SetMessageProcessor(client.messageReceived)
+	client.MessageManager.SetMessageProcessor(client.processMessage)
 	return client
 }
 
@@ -94,8 +94,8 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 	return client.Services(), nil
 }
 
-func (client *clientImpl) messageReceived(msg dns.Message) (dns.Message, error) {
-	if !msg.IsResponse() {
+func (client *clientImpl) processMessage(msg dns.Message) (dns.Message, error) {
+	if !msg.IsResponse() || msg.From().Transport().Is(dns.TransportUDPGroup) {
 		return nil, nil
 	}
 
