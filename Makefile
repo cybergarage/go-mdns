@@ -70,9 +70,11 @@ test: lint
 install:
 	go install ${BINS}
 	${GOBIN}/${BIN_CTRL} doc > ${DOCS_ROOT_DIR}/${BIN_CTRL}.md
-	-git commit ${DOCS_ROOT_DIR}/${BIN_CTRL}.md -m "docs: update ${BIN_CTRL} command reference"
+	@git diff --quiet -- ${DOCS_ROOT_DIR}/${BIN_CTRL}.md || \
+		git commit ${DOCS_ROOT_DIR}/${BIN_CTRL}.md -m "docs: update ${BIN_CTRL} command reference"
 	${GOBIN}/${BIN_SERVER} doc > ${DOCS_ROOT_DIR}/${BIN_SERVER}.md
-	-git commit ${DOCS_ROOT_DIR}/${BIN_SERVER}.md -m "docs: update ${BIN_SERVER} command reference"
+	@git diff --quiet -- ${DOCS_ROOT_DIR}/${BIN_SERVER}.md || \
+		git commit ${DOCS_ROOT_DIR}/${BIN_SERVER}.md -m "docs: update ${BIN_SERVER} command reference"
 
 clean:
 	go clean -i ${PKG} ${TEST_PKG} ${BINS}
