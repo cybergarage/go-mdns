@@ -20,28 +20,65 @@ import (
 	"strconv"
 )
 
+// AddrOption is a function type that modifies an addr.
+type AddrOption func(*addr)
+
 type addr struct {
-	ip   net.IP
-	port int
-	zone string // IPv6 scoped addring zone
+	ip        net.IP
+	port      int
+	zone      string // IPv6 scoped addring zone
+	transport Transport
 }
 
-func newAddr() *addr {
-	return &addr{
-		ip:   nil,
-		port: 0,
-		zone: "",
+func newAddr(opts ...AddrOption) *addr {
+	addr := &addr{
+		ip:        nil,
+		port:      0,
+		zone:      "",
+		transport: TransportUnknown,
+	}
+	for _, opt := range opts {
+		opt(addr)
+	}
+	return addr
+}
+
+// WithAddrIP returns an AddrOption with the specified IP address.
+func WithAddrIP(ip net.IP) AddrOption {
+	return func(a *addr) {
+		a.ip = ip
+	}
+}
+
+// WithAddrPort returns an AddrOption with the specified port number.
+func WithAddrPort(port int) AddrOption {
+	return func(a *addr) {
+		a.port = port
+	}
+}
+
+// WithAddrZone returns an AddrOption with the specified zone string.
+func WithAddrZone(zone string) AddrOption {
+	return func(a *addr) {
+		a.zone = zone
+	}
+}
+
+// WithAddrTransport returns an AddrOption with the specified transport protocol.
+func WithAddrTransport(transport Transport) AddrOption {
+	return func(a *addr) {
+		a.transport = transport
 	}
 }
 
 // NewAddr returns a new blank addr.
-func NewAddr() Addr {
-	return newAddr()
+func NewAddr(opts ...AddrOption) Addr {
+	return newAddr(opts...)
 }
 
 // NewAddrFromString returns a new addr parsed from the specified addr string.
-func NewAddrFromString(addrString string) (Addr, error) {
-	addr := newAddr()
+func NewAddrFromString(addrString string, opts ...AddrOption) (Addr, error) {
+	addr := newAddr(opts...)
 	err := addr.parseString(addrString)
 	if err != nil {
 		return nil, err
@@ -80,6 +117,11 @@ func (addr *addr) Port() int {
 // Zone returns the zone string.
 func (addr *addr) Zone() string {
 	return addr.zone
+}
+
+// Transport returns the transport protocol.
+func (addr *addr) Transport() Transport {
+	return addr.transport
 }
 
 // String returns the node string representation.
