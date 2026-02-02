@@ -108,8 +108,8 @@ func (sock *UnicastUDPSocket) AnnounceMessage(msg dns.Message) error {
 	return err
 }
 
-// ResponseMessageForRequestMessage sends a specified response message to the request node.
-func (sock *UnicastUDPSocket) ResponseMessageForRequestMessage(reqMsg dns.Message, resMsg dns.Message) error {
+// responseForRequest sends a specified response message to the request node.
+func (sock *UnicastUDPSocket) responseForRequest(reqMsg dns.Message, resMsg dns.Message) error {
 	dstAddr := reqMsg.From().IP().String()
 	dstPort := reqMsg.From().Port()
 	_, err := sock.SendMessage(dstAddr, dstPort, resMsg)

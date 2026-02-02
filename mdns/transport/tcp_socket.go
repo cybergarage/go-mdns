@@ -172,16 +172,8 @@ func (sock *TCPSocket) PostMessage(addr string, port int, reqMsg dns.Message, ti
 	return sock.ReadMessage(conn)
 }
 
-// ResponseMessageForRequestMessage sends a specified response message to the request node.
-func (sock *TCPSocket) ResponseMessageForRequestMessage(reqMsg dns.Message, resMsg dns.Message, timeout time.Duration) error {
-	dstAddr := reqMsg.From().IP().String()
-	dstPort := reqMsg.From().Port()
-	_, err := sock.SendMessage(dstAddr, dstPort, resMsg, timeout)
-	return err
-}
-
-// ResponseMessageToConnection sends a response message to the specified connection.
-func (sock *TCPSocket) ResponseMessageToConnection(conn *net.TCPConn, resMsg dns.Message) error {
+// responseToConnection sends a response message to the specified connection.
+func (sock *TCPSocket) responseToConnection(conn *net.TCPConn, resMsg dns.Message) error {
 	_, err := sock.writeBytesToConnection(conn, resMsg.Bytes())
 	return err
 }

@@ -7,6 +7,7 @@ package transport
 import (
 	"net"
 
+	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
@@ -109,11 +110,16 @@ func handleUnicastUDPRequestMessage(server *UnicastServer, reqMsg dns.Message) {
 	}
 
 	resMsg, err := server.processor(reqMsg)
-	if err != nil || resMsg == nil {
+	if err != nil {
+		log.Error(err)
+	}
+	if resMsg == nil {
 		return
 	}
 
-	server.UDPSocket.ResponseMessageForRequestMessage(reqMsg, resMsg)
+	if err := server.UDPSocket.responseForRequest(reqMsg, resMsg); err != nil {
+		log.Error(err)
+	}
 }
 
 func handleUnicastUDPConnection(server *UnicastServer, cancel chan any) {
@@ -145,11 +151,17 @@ func handleUnicastTCPConnection(server *UnicastServer, conn *net.TCPConn) {
 	}
 
 	resMsg, err := server.processor(reqMsg)
-	if err != nil || resMsg == nil {
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	if resMsg == nil {
 		return
 	}
 
-	server.TCPSocket.ResponseMessageToConnection(conn, resMsg)
+	if err := server.TCPSocket.responseToConnection(conn, resMsg); err != nil {
+		log.Error(err)
+	}
 }
 
 func handleUnicastTCPListener(server *UnicastServer, cancel chan any) {
