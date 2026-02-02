@@ -28,6 +28,8 @@ const (
 	TransportUDP
 	// TransportTCP represents the TCP transport protocol.
 	TransportTCP
+	// TransportUDPGroup represents the UDP multicast transport protocol.
+	TransportUDPGroup
 )
 
 // Addr represents a network address.

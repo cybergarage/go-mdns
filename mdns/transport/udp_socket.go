@@ -31,15 +31,17 @@ type UDPSocket struct {
 	Conn           *net.UDPConn
 	ReadBufferSize int
 	ReadBuffer     []byte
+	dns.Transport
 }
 
 // NewUDPSocket returns a new UDPSocket.
-func NewUDPSocket() *UDPSocket {
+func NewUDPSocket(transport dns.Transport) *UDPSocket {
 	sock := &UDPSocket{
 		Socket:         NewSocket(),
 		Conn:           nil,
 		ReadBufferSize: MaxPacketSize,
 		ReadBuffer:     make([]byte, 0),
+		Transport:      transport,
 	}
 	sock.SetReadBufferSize(MaxPacketSize)
 	return sock
@@ -104,7 +106,7 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 
 	add, err := dns.NewAddrFromString(
 		fromAddr.String(),
-		dns.WithAddrTransport(dns.TransportUDP),
+		dns.WithAddrTransport(sock.Transport),
 	)
 	if err != nil {
 		log.Debugf("Failed to parse source address: %s", err)

@@ -33,7 +33,7 @@ type UnicastUDPSocket struct {
 // NewUnicastUDPSocket returns a new UnicastUDPSocket.
 func NewUnicastUDPSocket() *UnicastUDPSocket {
 	sock := &UnicastUDPSocket{
-		UDPSocket: NewUDPSocket(),
+		UDPSocket: NewUDPSocket(dns.TransportUDP),
 	}
 	return sock
 }
