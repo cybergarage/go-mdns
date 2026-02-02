@@ -295,11 +295,18 @@ func (srv *serviceImpl) String() string {
 			break
 		}
 	}
-	if srv.Message != nil {
+	addrs := []string{}
+	for _, addr := range srv.Addresses() {
+		addrs = append(addrs, addr.String())
+	}
+	if len(addrs) == 0 {
 		from := srv.From()
 		if from != nil {
-			str += " (" + from.String() + ")"
+			addrs = append(addrs, from.IP().String())
 		}
+	}
+	if 0 < len(addrs) {
+		str += " [" + strings.Join(addrs, ", ") + "]"
 	}
 	return str
 }
