@@ -87,7 +87,7 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (
 // ReadMessage reads a message from the current opened socket.
 func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 	if sock.Conn == nil {
-		return nil, fmt.Errorf("%w: %s", io.EOF, errorSocketClosed)
+		return nil, fmt.Errorf("%w: %s", io.EOF, errSocketClosed)
 	}
 
 	n, fromAddr, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)

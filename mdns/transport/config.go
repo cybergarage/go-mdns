@@ -16,12 +16,14 @@ package transport
 
 // Config represents a cofiguration for transport.
 type Config struct {
+	*UnicastConfig
 	*MulticastConfig
 }
 
 // NewDefaultConfig returns a default configuration.
 func NewDefaultConfig() *Config {
 	conf := &Config{
+		UnicastConfig:   NewDefaultUnicastConfig(),
 		MulticastConfig: NewDefaultMulticastConfig(),
 	}
 	return conf

@@ -15,7 +15,6 @@
 package transport
 
 import (
-	"errors"
 	"net"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
@@ -99,7 +98,7 @@ func (mgr *MulticastManager) Start() error {
 	}
 
 	if len(mgr.Servers) == 0 {
-		return errors.New(errorAvailableInterfaceFound)
+		return errAvailableInterfaceFound
 	}
 
 	return nil

@@ -15,7 +15,6 @@
 package transport
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -63,7 +62,7 @@ func (sock *Socket) IsListening() bool {
 // ListenPort returns the listening port.
 func (sock *Socket) ListenPort() (int, error) {
 	if !sock.IsListening() {
-		return 0, errors.New(errorSocketClosed)
+		return 0, errSocketClosed
 	}
 	return sock.listenPort, nil
 }
@@ -71,7 +70,7 @@ func (sock *Socket) ListenPort() (int, error) {
 // ListenInterface returns the listening interface.
 func (sock *Socket) ListenInterface() (*net.Interface, error) {
 	if !sock.IsListening() {
-		return nil, errors.New(errorSocketClosed)
+		return nil, errSocketClosed
 	}
 	return sock.listenInterface, nil
 }
@@ -79,7 +78,7 @@ func (sock *Socket) ListenInterface() (*net.Interface, error) {
 // ListenAddr returns the listening address.
 func (sock *Socket) ListenAddr() (string, error) {
 	if !sock.IsListening() {
-		return "", errors.New(errorSocketClosed)
+		return "", errSocketClosed
 	}
 
 	return sock.listenAddress, nil

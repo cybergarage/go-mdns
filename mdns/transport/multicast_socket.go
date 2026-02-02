@@ -15,7 +15,6 @@
 package transport
 
 import (
-	"errors"
 	"fmt"
 	"net"
 
@@ -48,7 +47,7 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface, ifaddr string) error {
 	case IsIPv6Address(ifaddr):
 		err = sock.Listen(ifi, MulticastIPv6Address, Port)
 	default:
-		return errors.New(errorAvailableAddressNotFound)
+		return errAvailableAddressNotFound
 	}
 
 	sock.SetListenStatus(ifi, ifaddr, Port)

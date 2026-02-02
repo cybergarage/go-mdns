@@ -14,9 +14,20 @@
 
 package transport
 
+import "time"
+
 const (
 	Port                 = 5353
+	UDPPort              = Port
+	TCPPort              = Port
 	MulticastIPv4Address = "224.0.0.251"
 	MulticastIPv6Address = "ff02::fb"
 	MaxPacketSize        = 1500
+)
+
+const (
+	DefaultConnectimeTimeOut = (time.Millisecond * 5000)
+	DefaultRequestTimeout    = (time.Millisecond * 5000)
+	DefaultBindRetryCount    = 5
+	DefaultBindRetryWaitTime = (time.Millisecond * 500)
 )
