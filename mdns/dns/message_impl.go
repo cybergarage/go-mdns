@@ -103,6 +103,9 @@ func NewMessageWithBytes(msgBytes []byte, opts ...MessageOption) (Message, error
 
 // From returns the source address of the message.
 func (msg *message) From() Addr {
+	if msg == nil {
+		return nil
+	}
 	return msg.from
 }
 
