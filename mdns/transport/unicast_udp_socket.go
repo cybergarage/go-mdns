@@ -17,6 +17,8 @@ package transport
 import (
 	"net"
 	"strconv"
+
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // A UnicastUDPSocket represents a socket.
@@ -67,10 +69,24 @@ func (sock *UnicastUDPSocket) Bind(ifi *net.Interface, ifaddr string, port int) 
 	return nil
 }
 
+// AnnounceMessage announces the message to the listening multicast address.
+func (sock *UnicastUDPSocket) AnnounceMessage(msg dns.Message) error {
+	addr, err := sock.ListenAddr()
+	if err != nil {
+		return err
+	}
+	toAddr := MulticastIPv4Address
+	if IsIPv6Address(addr) {
+		toAddr = MulticastIPv6Address
+	}
+	_, err = sock.SendMessage(toAddr, Port, msg)
+	return err
+}
+
 // ResponseMessageForRequestMessage sends a specified response message to the request node.
-// func (sock *UnicastUDPSocket) ResponseMessageForRequestMessage(reqMsg *protocol.Message, resMsg *protocol.Message) error {
-// 	dstAddr := reqMsg.From.IP.String()
-// 	dstPort := reqMsg.From.Port
-// 	_, err := sock.SendMessage(dstAddr, dstPort, resMsg)
-// 	return err
-// }
+func (sock *UnicastUDPSocket) ResponseMessageForRequestMessage(reqMsg dns.Message, resMsg dns.Message) error {
+	dstAddr := reqMsg.From().IP().String()
+	dstPort := reqMsg.From().Port()
+	_, err := sock.SendMessage(dstAddr, dstPort, resMsg)
+	return err
+}

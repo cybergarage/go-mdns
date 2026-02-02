@@ -18,6 +18,7 @@ package transport
 type Config struct {
 	*UnicastConfig
 	*MulticastConfig
+	*ExtensionConfig
 }
 
 // NewDefaultConfig returns a default configuration.
@@ -25,6 +26,7 @@ func NewDefaultConfig() *Config {
 	conf := &Config{
 		UnicastConfig:   NewDefaultUnicastConfig(),
 		MulticastConfig: NewDefaultMulticastConfig(),
+		ExtensionConfig: NewDefaultExtensionConfig(),
 	}
 	return conf
 }

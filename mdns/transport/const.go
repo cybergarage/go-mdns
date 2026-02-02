@@ -31,3 +31,7 @@ const (
 	DefaultBindRetryCount    = 5
 	DefaultBindRetryWaitTime = (time.Millisecond * 500)
 )
+
+const (
+	UDPPortRange = 100
+)

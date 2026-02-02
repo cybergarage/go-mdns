@@ -16,12 +16,13 @@ package transport
 
 import (
 	"bufio"
+	"io"
 	"net"
 	"strconv"
 	"time"
 
 	"github.com/cybergarage/go-logger/log"
-	"github.com/cybergarage/uecho-go/net/echonet/protocol"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
 // A TCPSocket represents a socket for TCP.
@@ -94,17 +95,26 @@ func (sock *TCPSocket) Close() error {
 }
 
 // ReadMessage reads a message from the current opened socket.
-func (sock *TCPSocket) ReadMessage(conn net.Conn) (*protocol.Message, error) {
-	remoteAddr := conn.RemoteAddr()
-
-	reader := bufio.NewReader(conn)
-	msg, err := protocol.NewMessageWithReader(reader)
+func (sock *TCPSocket) ReadMessage(conn net.Conn) (dns.Message, error) {
+	bytes, err := io.ReadAll(bufio.NewReader(conn))
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
 
-	err = msg.From.ParseString(remoteAddr.String())
+	addr, err := dns.NewAddrFromString(
+		conn.RemoteAddr().String(),
+		dns.WithAddrTransport(dns.TransportTCP),
+	)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	msg, err := dns.NewMessageWithBytes(
+		bytes,
+		dns.WithMessageFrom(addr),
+	)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -114,7 +124,7 @@ func (sock *TCPSocket) ReadMessage(conn net.Conn) (*protocol.Message, error) {
 }
 
 // SendMessage sends a message to the destination address.
-func (sock *TCPSocket) SendMessage(addr string, port int, msg *protocol.Message, timeout time.Duration) (int, error) {
+func (sock *TCPSocket) SendMessage(addr string, port int, msg dns.Message, timeout time.Duration) (int, error) {
 	conn, nWrote, err := sock.dialAndWriteBytes(addr, port, msg.Bytes(), timeout)
 	if conn != nil {
 		conn.Close()
@@ -123,7 +133,7 @@ func (sock *TCPSocket) SendMessage(addr string, port int, msg *protocol.Message,
 }
 
 // PostMessage sends a message to the destination address.
-func (sock *TCPSocket) PostMessage(addr string, port int, reqMsg *protocol.Message, timeout time.Duration) (*protocol.Message, error) {
+func (sock *TCPSocket) PostMessage(addr string, port int, reqMsg dns.Message, timeout time.Duration) (dns.Message, error) {
 	conn, _, err := sock.dialAndWriteBytes(addr, port, reqMsg.Bytes(), timeout)
 	if err != nil {
 		return nil, err
@@ -141,15 +151,15 @@ func (sock *TCPSocket) PostMessage(addr string, port int, reqMsg *protocol.Messa
 }
 
 // ResponseMessageForRequestMessage sends a specified response message to the request node.
-func (sock *TCPSocket) ResponseMessageForRequestMessage(reqMsg *protocol.Message, resMsg *protocol.Message, timeout time.Duration) error {
-	dstAddr := reqMsg.From.IP.String()
-	dstPort := reqMsg.From.Port
+func (sock *TCPSocket) ResponseMessageForRequestMessage(reqMsg dns.Message, resMsg dns.Message, timeout time.Duration) error {
+	dstAddr := reqMsg.From().IP().String()
+	dstPort := reqMsg.From().Port()
 	_, err := sock.SendMessage(dstAddr, dstPort, resMsg, timeout)
 	return err
 }
 
 // ResponseMessageToConnection sends a response message to the specified connection.
-func (sock *TCPSocket) ResponseMessageToConnection(conn *net.TCPConn, resMsg *protocol.Message) error {
+func (sock *TCPSocket) ResponseMessageToConnection(conn *net.TCPConn, resMsg dns.Message) error {
 	_, err := sock.writeBytesToConnection(conn, resMsg.Bytes())
 	return err
 }

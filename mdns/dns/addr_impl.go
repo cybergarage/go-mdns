@@ -97,7 +97,7 @@ func (addr *addr) parseString(addrStr string) error {
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		return fmt.Errorf("%s %s", ErrInvalid, addrStr)
+		return fmt.Errorf("%w %s", ErrInvalid, addrStr)
 	}
 	addr.port = port
 

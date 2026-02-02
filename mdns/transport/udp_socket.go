@@ -87,7 +87,7 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (
 // ReadMessage reads a message from the current opened socket.
 func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 	if sock.Conn == nil {
-		return nil, fmt.Errorf("%w: %s", io.EOF, errSocketClosed)
+		return nil, fmt.Errorf("%w: %w", io.EOF, errSocketClosed)
 	}
 
 	n, fromAddr, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)
@@ -102,9 +102,18 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 
 	msgBytes := sock.ReadBuffer[:n]
 
+	add, err := dns.NewAddrFromString(
+		fromAddr.String(),
+		dns.WithAddrTransport(dns.TransportUDP),
+	)
+	if err != nil {
+		log.Debugf("Failed to parse source address: %s", err)
+		return nil, err
+	}
+
 	msg, err := dns.NewMessageWithBytes(
 		msgBytes,
-		dns.WithMessageFrom(fromAddr),
+		dns.WithMessageFrom(add),
 	)
 	if err != nil {
 		log.Debugf("Failed to parse DNS message: %s", err)
