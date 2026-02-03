@@ -3,7 +3,7 @@ module github.com/cybergarage/go-mdns
 go 1.25
 
 require (
-	github.com/cybergarage/go-logger v1.3.11
+	github.com/cybergarage/go-logger v1.3.12
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 )
