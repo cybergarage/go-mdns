@@ -28,7 +28,7 @@ type aaaaRecord struct {
 // NewAAAARecord returns a new AAAA record instance.
 func NewAAAARecord() AAAARecord {
 	return &aaaaRecord{
-		record: newResourceRecord(),
+		record: newRecord(),
 	}
 }
 

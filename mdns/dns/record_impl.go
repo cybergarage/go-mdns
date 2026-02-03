@@ -37,8 +37,8 @@ type record struct {
 	cmpBytes        []byte
 }
 
-// newResourceRecord returns a new base record instance.
-func newResourceRecord(opts ...recordOptions) *record {
+// newRecord returns a new base record instance.
+func newRecord(opts ...recordOptions) *record {
 	r := &record{
 		reader:          nil,
 		name:            "",
@@ -57,7 +57,7 @@ func newResourceRecord(opts ...recordOptions) *record {
 
 // newRecordWithReader returns a new base record instance with the specified reader.
 func newRecordWithReader(reader *Reader) *record {
-	r := newResourceRecord()
+	r := newRecord()
 	r.reader = reader
 	return r
 }

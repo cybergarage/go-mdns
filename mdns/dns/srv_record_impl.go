@@ -35,7 +35,7 @@ type srvRecord struct {
 // NewSRVRecord returns a new SRV record instance.
 func NewSRVRecord() SRVRecord {
 	return &srvRecord{
-		record:   newResourceRecord(),
+		record:   newRecord(),
 		service:  "",
 		proto:    "",
 		priority: 0,

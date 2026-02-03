@@ -24,7 +24,7 @@ type nsecRecord struct {
 // NewNSECRecord returns a new NSEC record instance.
 func NewNSECRecord() NSECRecord {
 	return &nsecRecord{
-		record: newResourceRecord(),
+		record: newRecord(),
 	}
 }
 

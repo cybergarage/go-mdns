@@ -27,7 +27,7 @@ type txtRecord struct {
 // NewTXTRecord returns a new TXT record instance.
 func NewTXTRecord() TXTRecord {
 	return &txtRecord{
-		record: newResourceRecord(),
+		record: newRecord(),
 		strs:   []string{},
 	}
 }

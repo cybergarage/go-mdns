@@ -49,7 +49,7 @@ func WithQuestionClass(cls Class) QuestionOption {
 // NewQuestion returns a new question instance.
 func NewQuestion(opts ...QuestionOption) Question {
 	q := &question{
-		record: newResourceRecord(),
+		record: newRecord(),
 	}
 	for _, opt := range opts {
 		opt(q)

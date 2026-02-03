@@ -23,7 +23,7 @@ type ptrRecord struct {
 // NewPTRRecord returns a new PTR record instance.
 func NewPTRRecord() PTRRecord {
 	return &ptrRecord{
-		record:     newResourceRecord(),
+		record:     newRecord(),
 		domainName: "",
 	}
 }
