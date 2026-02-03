@@ -15,21 +15,21 @@
 package cmd
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
+	"context"
+	"fmt"
 
+	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	rootCmd.AddCommand(scanCmd)
+	rootCmd.AddCommand(queryCmd)
 }
 
-var scanCmd = &cobra.Command{ // nolint:exhaustruct
-	Use:   "scan",
-	Short: "Scan for mDNS devices.",
-	Long:  "Scan for mDNS devices packets.",
+var queryCmd = &cobra.Command{ // nolint:exhaustruct
+	Use:   "query",
+	Short: "Query for mDNS devices.",
+	Long:  "Query for mDNS devices.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		client := NewClient()
@@ -39,10 +39,24 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 		}
 		defer client.Stop()
 
-		ctx, stop := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
-		defer stop()
+		msgHandler := mdns.MessageHandler(func(msg mdns.Message) {
+		})
 
-		<-ctx.Done()
+		query := mdns.NewQuery(
+			mdns.WithQueryService(mdns.DefaultQueryService),
+			mdns.WithQueryDomain(mdns.DefaultQueryDomain),
+			mdns.WithQueryMessageHandler(msgHandler),
+		)
+
+		services, err := client.Query(context.Background(), query)
+		if err != nil {
+			return err
+		}
+
+		for n, srv := range services {
+			fmt.Printf("[%d] %s\n", n, srv.String())
+			fmt.Printf("%s\n", srv.ResourceRecordSet().String())
+		}
 
 		return nil
 	},
