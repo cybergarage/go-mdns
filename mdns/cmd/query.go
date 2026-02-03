@@ -27,9 +27,11 @@ func init() {
 }
 
 var queryCmd = &cobra.Command{ // nolint:exhaustruct
-	Use:   "query",
-	Short: "Query for mDNS devices.",
-	Long:  "Query for mDNS devices.",
+	Use:     "query [service]",
+	Short:   "Query for mDNS devices.",
+	Long:    "Query for mDNS devices.",
+	Example: "query _matterc._udp.local",
+	Args:    cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		client := NewClient()
@@ -42,8 +44,14 @@ var queryCmd = &cobra.Command{ // nolint:exhaustruct
 		msgHandler := mdns.MessageHandler(func(msg mdns.Message) {
 		})
 
+		queryService := mdns.DefaultQueryService
+		switch {
+		case len(args) == 1:
+			queryService = args[0]
+		}
+
 		query := mdns.NewQuery(
-			mdns.WithQueryService(mdns.DefaultQueryService),
+			mdns.WithQueryService(queryService),
 			mdns.WithQueryDomain(mdns.DefaultQueryDomain),
 			mdns.WithQueryMessageHandler(msgHandler),
 		)
