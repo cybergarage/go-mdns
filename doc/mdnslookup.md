@@ -13,6 +13,7 @@
 
 * [mdnslookup doc]()	 - Generate markdown documentation to stdout
 * [mdnslookup dump]()	 - Dump mDNS messages.
+* [mdnslookup query]()	 - Query for mDNS devices.
 * [mdnslookup scan]()	 - Scan for mDNS devices.
 
 ## mdnslookup completion
@@ -323,13 +324,46 @@ mdnslookup help [command] [flags]
 ```
 
 
+## mdnslookup query
+
+Query for mDNS devices.
+
+### Synopsis
+
+Query for mDNS devices.
+
+```
+mdnslookup query [service] [flags]
+```
+
+### Examples
+
+```
+query _matterc._udp.local
+```
+
+### Options
+
+```
+  -h, --help   help for query
+```
+
+### Options inherited from parent commands
+
+```
+      --debug           enable debug output
+      --format string   output format: table|json|csv (default "table")
+      --verbose         enable verbose output
+```
+
+
 ## mdnslookup scan
 
 Scan for mDNS devices.
 
 ### Synopsis
 
-Scan for mDNS devices.
+Scan for mDNS devices packets.
 
 ```
 mdnslookup scan [flags]
