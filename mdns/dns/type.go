@@ -14,7 +14,9 @@
 
 package dns
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Type represents a message type.
 type Type uint
@@ -34,6 +36,14 @@ const (
 	NSEC  Type = 0x002F
 	ANY   Type = 0x00FF
 )
+
+// Equal returns true if the type matches the specified one.
+func (t Type) Equal(other Type) bool {
+	if t == ANY || other == ANY {
+		return true
+	}
+	return t == other
+}
 
 // String returns the string of the type.
 func (t Type) String() string {
