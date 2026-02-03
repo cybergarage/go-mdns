@@ -126,5 +126,9 @@ func (addr *addr) Transport() Transport {
 
 // String returns the node string representation.
 func (addr *addr) String() string {
-	return net.JoinHostPort(addr.ip.String(), strconv.Itoa(addr.port))
+	str := net.JoinHostPort("", strconv.Itoa(addr.port))
+	if addr.ip != nil {
+		str = net.JoinHostPort(addr.ip.String(), strconv.Itoa(addr.port))
+	}
+	return str
 }
