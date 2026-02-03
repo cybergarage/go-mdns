@@ -237,37 +237,6 @@ func (msg *message) LookupResourceRecordByNameSuffix(suffix string) (ResourceRec
 	return msg.ResourceRecordSet().LookupRecordByNameSuffix(suffix)
 }
 
-// IsQueryAnswer returns true if the message is a response to a query, otherwise false.
-func (msg *message) IsQueryAnswer(resMsg Message) bool {
-	if msg == nil {
-		return true
-	}
-	if resMsg == nil {
-		return false
-	}
-	if !msg.IsQuery() || !resMsg.IsResponse() {
-		return false
-	}
-	if msg.ID() != 0 && resMsg.ID() != 0 && msg.ID() != resMsg.ID() {
-		return false
-	}
-	for _, q := range msg.Questions() {
-		for _, rr := range resMsg.ResourceRecordSet() {
-			if !rr.IsName(q.Name()) {
-				continue
-			}
-			if q.Class() != rr.Class() {
-				continue
-			}
-			if q.Type() != ANY && q.Type() != rr.Type() {
-				continue
-			}
-			return true
-		}
-	}
-	return false
-}
-
 // Equal returns true if the message is same as the specified message, otherwise false.
 func (msg *message) Equal(other Message) bool {
 	if other == nil {

@@ -70,6 +70,11 @@ func NewQuestionWithReader(reader *Reader) (Question, error) {
 	return NewQuestionWithRecord(r), err
 }
 
+// IsUnicastResponse returns true if the question has the unicast response bit set, otherwise false.
+func (q *question) IsUnicastResponse() bool {
+	return (q.Class() & QU) == QU
+}
+
 // Equal returns true if this record is equal to  the specified resource record. otherwise false.
 func (q *question) Equal(other Record) bool {
 	return EqualContent(q, other)

@@ -17,4 +17,6 @@ package dns
 // Question represents a DNS question record interface.
 type Question interface {
 	Record
+	// IsUnicastResponse returns true if the question has the unicast response bit set, otherwise false.
+	IsUnicastResponse() bool
 }

@@ -116,6 +116,8 @@ type Message interface {
 
 // MessageHelper represents a message helper functions.
 type MessageHelper interface {
+	// IsQueryWithUnicastResponse returns true if the message is a query with the unicast response bit set, otherwise false.
+	IsQueryWithUnicastResponse() bool
 	// IsQueryAnswer returns true if the message is a response to a query, otherwise false.
 	IsQueryAnswer(msg Message) bool
 	// LookupResourceRecordByNamePrefix returns the resource record of the specified name prefix.

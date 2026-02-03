@@ -31,7 +31,7 @@ const (
 	// QU is the unicast response class.
 	// 5.4. Questions Requesting Unicast Responses
 	// 18.12. Repurposing of Top Bit of qclass in Question Section.
-	QU Class = 0x8000
+	QU Class = dns.QU
 	// Subtype is the service subtype label.
 	// 7.1. Selective Instance Enumeration (Subtypes).
 	Subtype = "_sub"

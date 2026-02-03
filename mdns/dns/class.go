@@ -20,6 +20,14 @@ const (
 	IN Class = 0x0001
 )
 
+// RFC 6762 - Multicast DNS.
+const (
+	// QU is the unicast response class.
+	// 5.4. Questions Requesting Unicast Responses
+	// 18.12. Repurposing of Top Bit of qclass in Question Section.
+	QU Class = 0x8000
+)
+
 const (
 	unicastResponseMask = 0x8000
 	typeMask            = 0x7FFF
