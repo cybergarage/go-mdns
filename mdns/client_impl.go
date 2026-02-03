@@ -90,6 +90,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 
 	queryMsg := NewRequestWithQuery(q)
 
+	respondServices := newServices()
 	queryResponseHandler := func(resMsg dns.Message) {
 		if !resMsg.IsResponse() {
 			return
@@ -109,7 +110,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 
 		added := false
 		if queryMsg.IsQueryAnswer(resMsg) {
-			added = client.AddService(newService)
+			added = respondServices.AddService(newService)
 		}
 
 		log.Debugf("mDNS Service responded: %s (added=%t)", newService.String(), added)
@@ -124,5 +125,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 
 	<-ctx.Done()
 
-	return client.Services(), nil
+	client.AddServices(respondServices.Services())
+
+	return respondServices.Services(), nil
 }

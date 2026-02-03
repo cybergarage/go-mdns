@@ -49,6 +49,17 @@ func (services *services) AddService(service Service) bool {
 	return true
 }
 
+// AddServices adds the specified services into th service array.
+func (services *services) AddServices(newServices []Service) int {
+	addedCount := 0
+	for _, service := range newServices {
+		if services.AddService(service) {
+			addedCount++
+		}
+	}
+	return addedCount
+}
+
 // Clear removes all services from the service array.
 func (services *services) Clear() {
 	services.services = []Service{}
