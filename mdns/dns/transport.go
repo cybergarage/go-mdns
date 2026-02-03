@@ -24,8 +24,8 @@ const (
 	TransportUDP
 	// TransportTCP represents the TCP transport protocol.
 	TransportTCP
-	// TransportUDPGroup represents the UDP multicast transport protocol.
-	TransportUDPGroup
+	// TransportMulticast represents the UDP multicast transport protocol.
+	TransportMulticast
 )
 
 // Is returns true if the transport protocol matches the specified one.
@@ -40,9 +40,9 @@ func (t Transport) String() string {
 		return "UDP"
 	case TransportTCP:
 		return "TCP"
-	case TransportUDPGroup:
-		return "UDPGroup"
+	case TransportMulticast:
+		return "MCAST"
 	default:
-		return "Unknown"
+		return "?"
 	}
 }

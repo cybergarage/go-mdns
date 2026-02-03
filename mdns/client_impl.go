@@ -96,7 +96,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 			return
 		}
 		if queryMsg.IsQueryWithUnicastResponse() {
-			if resMsg.From().Transport().Is(dns.TransportUDPGroup) {
+			if resMsg.From().Transport().Is(dns.TransportMulticast) {
 				return
 			}
 		}
