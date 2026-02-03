@@ -39,7 +39,12 @@ func NewClient() Client {
 		services:       newServices(),
 		msgHandler:     newMessageHandler(),
 	}
-	client.MessageManager.SetMessageProcessor(client.processMessage)
+	client.MessageManager.SetMessageProcessor(
+		func(msg dns.Message) (dns.Message, error) {
+			client.processMessageHandlers(msg)
+			return nil, nil
+		})
+
 	return client
 }
 
@@ -83,8 +88,36 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 		defer client.UnRegisterMessageHandler(handler)
 	}
 
-	msg := NewRequestWithQuery(q)
-	err := client.AnnounceMessage(msg)
+	queryMsg := NewRequestWithQuery(q)
+
+	queryResponseHandler := func(resMsg dns.Message) {
+		if !resMsg.IsResponse() {
+			return
+		}
+		if queryMsg.IsQueryWithUnicastResponse() {
+			if resMsg.From().Transport().Is(dns.TransportUDPGroup) {
+				return
+			}
+		}
+
+		newService, err := NewService(
+			WithServiceMessage(resMsg),
+		)
+		if err != nil {
+			return
+		}
+
+		added := false
+		if queryMsg.IsQueryAnswer(resMsg) {
+			added = client.AddService(newService)
+		}
+
+		log.Debugf("mDNS Service responded: %s (added=%t)", newService.String(), added)
+	}
+	client.RegisterMessageHandler(queryResponseHandler)
+	defer client.UnRegisterMessageHandler(queryResponseHandler)
+
+	err := client.AnnounceMessage(queryMsg)
 	if err != nil {
 		return []Service{}, err
 	}
@@ -92,25 +125,4 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 	<-ctx.Done()
 
 	return client.Services(), nil
-}
-
-func (client *clientImpl) processMessage(msg dns.Message) (dns.Message, error) {
-	if !msg.IsResponse() || msg.From().Transport().Is(dns.TransportUDPGroup) {
-		return nil, nil
-	}
-
-	client.processMessageHandlers(msg)
-
-	newService, err := NewService(
-		WithServiceMessage(msg),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	ok := client.AddService(newService)
-
-	log.Debugf("mDNS Service responded: %s (added=%t)", newService.String(), ok)
-
-	return nil, nil
 }
