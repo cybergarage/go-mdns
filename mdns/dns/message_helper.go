@@ -49,7 +49,7 @@ func (msg *message) IsQueryAnswer(resMsg Message) bool {
 			if !rr.IsName(q.Name()) {
 				continue
 			}
-			if q.Class() != rr.Class() {
+			if !q.Class().Equal(rr.Class()) {
 				continue
 			}
 			if q.Type() != ANY && q.Type() != rr.Type() {

@@ -223,7 +223,7 @@ func (r *record) parseSection(reader *Reader) error {
 	}
 	cls := encoding.BytesToInteger(classBytes)
 	r.unicastResponse = false
-	if (cls & unicastResponseMask) != 0 {
+	if (cls & uint(QU)) != 0 {
 		r.unicastResponse = true
 	}
 	r.class = Class(cls & classMask)
@@ -274,7 +274,7 @@ func (r *record) RequestBytes() ([]byte, error) {
 	}
 	cls := r.class
 	if r.unicastResponse {
-		cls |= cacheFlushMask
+		cls |= QU
 	}
 	if err := w.WriteClass(cls); err != nil {
 		return nil, err

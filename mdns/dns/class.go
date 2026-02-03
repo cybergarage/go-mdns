@@ -14,9 +14,11 @@
 
 package dns
 
+// Class represents the DNS class.
 type Class uint
 
 const (
+	// IN represents the Internet class.
 	IN Class = 0x0001
 )
 
@@ -29,8 +31,15 @@ const (
 )
 
 const (
-	unicastResponseMask = 0x8000
-	typeMask            = 0x7FFF
-	cacheFlushMask      = 0x8000
-	classMask           = 0x7FFF
+	classMask = 0x7FFF
 )
+
+// IsUnicastResponse returns true if the class has the unicast response bit set, otherwise false.
+func (c Class) IsUnicastResponse() bool {
+	return (c & QU) == QU
+}
+
+// Equal returns true if the class matches the specified one.
+func (c Class) Equal(other Class) bool {
+	return (c & classMask) == (other & classMask)
+}
