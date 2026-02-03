@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	ProgramName     = "mdnsctl"
+	ProgramName     = "mdnslookup"
 	VerboseParamStr = "verbose"
 	DebugParamStr   = "debug"
 )
@@ -65,20 +65,20 @@ func Execute() error {
 }
 
 func init() {
-	viper.SetEnvPrefix("mdnsctl")
+	viper.SetEnvPrefix("mdnslookup")
 
 	viper.SetDefault(FormatParamStr, FormatTableStr)
 	rootCmd.PersistentFlags().String(FormatParamStr, FormatTableStr, fmt.Sprintf("output format: %s", strings.Join(allSupportedFormats(), "|")))
 	viper.BindPFlag(FormatParamStr, rootCmd.PersistentFlags().Lookup(FormatParamStr))
-	viper.BindEnv(FormatParamStr) // MDNSCTL_FORMAT
+	viper.BindEnv(FormatParamStr) // mdnslookup_FORMAT
 
 	viper.SetDefault(VerboseParamStr, false)
 	rootCmd.PersistentFlags().Bool((VerboseParamStr), false, "enable verbose output")
 	viper.BindPFlag(VerboseParamStr, rootCmd.PersistentFlags().Lookup(VerboseParamStr))
-	viper.BindEnv(VerboseParamStr) // MDNSCTL_VERBOSE
+	viper.BindEnv(VerboseParamStr) // mdnslookup_VERBOSE
 
 	viper.SetDefault(DebugParamStr, false)
 	rootCmd.PersistentFlags().Bool((DebugParamStr), false, "enable debug output")
 	viper.BindPFlag(DebugParamStr, rootCmd.PersistentFlags().Lookup(DebugParamStr))
-	viper.BindEnv(DebugParamStr) // MDNSCTL_DEBUG
+	viper.BindEnv(DebugParamStr) // mdnslookup_DEBUG
 }

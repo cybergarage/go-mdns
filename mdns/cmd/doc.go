@@ -46,7 +46,7 @@ var docCmd = &cobra.Command{ // nolint:exhaustruct
 				// Check for start of a meaningless SEE ALSO section (only an empty link follows)
 				// ### SEE ALSO
 				//
-				// * [mdnsctl]()	 -
+				// * [mdnslookup]()	 -
 				if i < len(lines)-2 && strings.HasPrefix(lines[i], "### SEE ALSO") {
 					// Skip these two lines as they do not provide any meaningful information
 					i += 2 // skip the next two lines
