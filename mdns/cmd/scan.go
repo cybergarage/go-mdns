@@ -19,6 +19,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/cybergarage/go-logger/log"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +34,19 @@ var scanCmd = &cobra.Command{ // nolint:exhaustruct
 	Long:  "Scan for mDNS devices packets.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
+		logger := log.Default()
+		if logger == nil {
+			log.SetDefault(log.NewStdoutLogger(log.LevelInfo))
+		}
+
 		client := NewClient()
+		client.RegisterMessageHandler(
+			func(msg dns.Message) {
+				msgBytes := msg.Bytes()
+				log.Infof("mDNS packet received (%d bytes) via %s from %s", len(msgBytes), msg.From().Transport().String(), msg.From().String())
+				log.HexInfo(msgBytes)
+			})
+
 		err := client.Start()
 		if err != nil {
 			return err

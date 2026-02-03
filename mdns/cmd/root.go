@@ -45,9 +45,9 @@ var rootCmd = &cobra.Command{ // nolint:exhaustruct
 		}
 		if verbose {
 			if debug {
-				log.SetSharedLogger(log.NewStdoutLogger(log.LevelDebug))
+				log.SetDefault(log.NewStdoutLogger(log.LevelDebug))
 			} else {
-				log.SetSharedLogger(log.NewStdoutLogger(log.LevelInfo))
+				log.SetDefault(log.NewStdoutLogger(log.LevelInfo))
 			}
 			log.Infof("%s version %s", ProgramName, mdns.Version)
 			log.Infof("verbose:%t, debug:%t", verbose, debug)
