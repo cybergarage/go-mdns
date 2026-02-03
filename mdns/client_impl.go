@@ -27,7 +27,7 @@ import (
 type clientImpl struct {
 	sync.Mutex
 	*transport.MessageManager
-	*services
+	*serviceSet
 	*msgHandler
 }
 
@@ -36,7 +36,7 @@ func NewClient() Client {
 	client := &clientImpl{
 		Mutex:          sync.Mutex{},
 		MessageManager: transport.NewMessageManager(),
-		services:       newServices(),
+		serviceSet:     newServiceSet(),
 		msgHandler:     newMessageHandler(),
 	}
 	client.MessageManager.SetMessageProcessor(
@@ -74,7 +74,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 	client.Lock()
 	defer client.Unlock()
 
-	client.services.Clear()
+	client.serviceSet.Clear()
 
 	if _, ok := ctx.Deadline(); !ok {
 		var cancel context.CancelFunc
@@ -90,7 +90,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 
 	queryMsg := NewRequestWithQuery(q)
 
-	respondServices := newServices()
+	respondServices := newServiceSet()
 	queryResponseHandler := func(resMsg dns.Message) {
 		if !resMsg.IsResponse() {
 			return

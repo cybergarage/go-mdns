@@ -25,7 +25,7 @@ import (
 type Server struct {
 	sync.Mutex
 	*transport.MessageManager
-	*services
+	*serviceSet
 	*msgHandler
 }
 
@@ -34,7 +34,7 @@ func NewServer() *Server {
 	server := &Server{
 		Mutex:          sync.Mutex{},
 		MessageManager: transport.NewMessageManager(),
-		services:       newServices(),
+		serviceSet:     newServiceSet(),
 		msgHandler:     newMessageHandler(),
 	}
 	server.SetMessageProcessor(server.MessageReceived)

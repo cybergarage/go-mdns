@@ -14,24 +14,24 @@
 
 package mdns
 
-// services represents a service array.
-type services struct {
+// serviceSet represents a service array.
+type serviceSet struct {
 	services []Service
 }
 
-// newServices returns a blank service array.
-func newServices() *services {
-	return &services{
+// newServiceSet returns a blank service array.
+func newServiceSet() *serviceSet {
+	return &serviceSet{
 		services: []Service{},
 	}
 }
 
 // Services returns the sercice array.
-func (services *services) Services() []Service {
+func (services *serviceSet) Services() []Service {
 	return services.services
 }
 
-func (services *services) HasService(targetService Service) bool {
+func (services *serviceSet) HasService(targetService Service) bool {
 	for _, service := range services.services {
 		if service.Equal(targetService) {
 			return true
@@ -41,7 +41,7 @@ func (services *services) HasService(targetService Service) bool {
 }
 
 // AddService adds the specified service into th service array.
-func (services *services) AddService(service Service) bool {
+func (services *serviceSet) AddService(service Service) bool {
 	if services.HasService(service) {
 		return false
 	}
@@ -50,9 +50,9 @@ func (services *services) AddService(service Service) bool {
 }
 
 // AddServices adds the specified services into th service array.
-func (services *services) AddServices(newServices []Service) int {
+func (services *serviceSet) AddServices(newServiceSet []Service) int {
 	addedCount := 0
-	for _, service := range newServices {
+	for _, service := range newServiceSet {
 		if services.AddService(service) {
 			addedCount++
 		}
@@ -61,6 +61,6 @@ func (services *services) AddServices(newServices []Service) int {
 }
 
 // Clear removes all services from the service array.
-func (services *services) Clear() {
+func (services *serviceSet) Clear() {
 	services.services = []Service{}
 }
