@@ -116,8 +116,8 @@ type Message interface {
 
 // MessageHelper represents a message helper functions.
 type MessageHelper interface {
-	// IsQueryResponse returns true if the message is a response to a query, otherwise false.
-	IsQueryResponse(msg Message) bool
+	// IsQueryAnswer returns true if the message is a response to a query, otherwise false.
+	IsQueryAnswer(msg Message) bool
 	// LookupResourceRecordByNamePrefix returns the resource record of the specified name prefix.
 	LookupResourceRecordByNamePrefix(prefix string) (ResourceRecord, bool)
 	// LookupResourceRecordByNameSuffix returns the resource record of the specified name suffix.
