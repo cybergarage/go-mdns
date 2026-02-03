@@ -239,7 +239,10 @@ func (msg *message) LookupResourceRecordByNameSuffix(suffix string) (ResourceRec
 
 // IsQueryAnswer returns true if the message is a response to a query, otherwise false.
 func (msg *message) IsQueryAnswer(resMsg Message) bool {
-	if msg == nil || resMsg == nil {
+	if msg == nil {
+		return true
+	}
+	if resMsg == nil {
 		return false
 	}
 	if !msg.IsQuery() || !resMsg.IsResponse() {
