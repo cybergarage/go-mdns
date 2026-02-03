@@ -34,13 +34,13 @@ TEST_PKG=${MODULE_ROOT}/${TEST_PKG_DIR}
 
 BIN_ROOT_DIR=cmd
 BIN_ID=${MODULE_ROOT}/${BIN_ROOT_DIR}
-BIN_CTRL=mdnslookup
-BIN_SERVER=mdnsd
+BIN_LOOKUP=${PKG_NAME}lookup
+BIN_SERVER=${PKG_NAME}d
 BIN_SRCS=\
-	${BIN_ROOT_DIR}/${BIN_CTRL} \
+	${BIN_ROOT_DIR}/${BIN_LOOKUP} \
 	${BIN_ROOT_DIR}/${BIN_SERVER}
 BINS=\
-	${BIN_ID}/${BIN_CTRL} \
+	${BIN_ID}/${BIN_LOOKUP} \
 	${BIN_ID}/${BIN_SERVER}
 
 DOCS_ROOT_DIR=doc
@@ -69,9 +69,9 @@ test: lint
 
 install:
 	go install ${BINS}
-	${GOBIN}/${BIN_CTRL} doc > ${DOCS_ROOT_DIR}/${BIN_CTRL}.md
-	@git diff --quiet -- ${DOCS_ROOT_DIR}/${BIN_CTRL}.md || \
-		git commit ${DOCS_ROOT_DIR}/${BIN_CTRL}.md -m "docs: update ${BIN_CTRL} command reference"
+	${GOBIN}/${BIN_LOOKUP} doc > ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md
+	@git diff --quiet -- ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md || \
+		git commit ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md -m "docs: update ${BIN_LOOKUP} command reference"
 	${GOBIN}/${BIN_SERVER} doc > ${DOCS_ROOT_DIR}/${BIN_SERVER}.md
 	@git diff --quiet -- ${DOCS_ROOT_DIR}/${BIN_SERVER}.md || \
 		git commit ${DOCS_ROOT_DIR}/${BIN_SERVER}.md -m "docs: update ${BIN_SERVER} command reference"
