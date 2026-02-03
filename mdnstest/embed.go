@@ -50,3 +50,15 @@ var matterService02 string
 
 //go:embed dumps/chip-tool-query-01.dump
 var chipToolQuery01 string
+
+//go:embed dumps/matter-query-01.dump
+var matterQuery01 string
+
+//go:embed dumps/matter-answer-01.dump
+var matterAnswer01 string
+
+//go:embed dumps/matter-query-02.dump
+var matterQuery02 string
+
+//go:embed dumps/matter-answer-02.dump
+var matterAnswer02 string
