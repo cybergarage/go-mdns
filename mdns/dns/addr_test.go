@@ -25,20 +25,19 @@ func TestNewAddr(t *testing.T) {
 }
 
 func TestNewAddressParse(t *testing.T) {
-	testHosts := []string{
-		"192.0.2.1",
-		"2001:db8::1",
-	}
-	testPorts := []int{
-		25,
-		80,
+	testCases := []struct {
+		hostWithZone string
+		port         int
+		expectedIP   string
+		expectedZone string
+	}{
+		{hostWithZone: "192.0.2.1", port: 25, expectedIP: "192.0.2.1", expectedZone: ""},
+		{hostWithZone: "2001:db8::1", port: 80, expectedIP: "2001:db8::1", expectedZone: ""},
+		{hostWithZone: "fe80::1%en0", port: 5353, expectedIP: "fe80::1", expectedZone: "en0"},
 	}
 
-	for n := range testHosts {
-		testHost := testHosts[n]
-		testPort := testPorts[n]
-
-		testAddr := net.JoinHostPort(testHost, strconv.Itoa(testPort))
+	for _, testCase := range testCases {
+		testAddr := net.JoinHostPort(testCase.hostWithZone, strconv.Itoa(testCase.port))
 
 		addr, err := NewAddrFromString(testAddr)
 		if err != nil {
@@ -46,14 +45,15 @@ func TestNewAddressParse(t *testing.T) {
 			continue
 		}
 
-		if addr.IP().String() != testHost {
-			t.Errorf("%s != %s", addr.IP().String(), testHost)
+		if addr.IP().String() != testCase.expectedIP {
+			t.Errorf("%s != %s", addr.IP().String(), testCase.expectedIP)
 		}
-
-		if addr.Port() != testPort {
-			t.Errorf("%d != %d", addr.Port(), testPort)
+		if addr.Zone() != testCase.expectedZone {
+			t.Errorf("%s != %s", addr.Zone(), testCase.expectedZone)
 		}
-
+		if addr.Port() != testCase.port {
+			t.Errorf("%d != %d", addr.Port(), testCase.port)
+		}
 		if addr.String() != testAddr {
 			t.Errorf("%s != %s", addr.String(), testAddr)
 		}

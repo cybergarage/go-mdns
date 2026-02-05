@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 )
 
 // AddrOption is a function type that modifies an addr.
@@ -93,7 +94,21 @@ func (addr *addr) parseString(addrStr string) error {
 		return err
 	}
 
-	addr.ip = net.ParseIP(hostStr)
+	splitIPAddrZone := func(ipAddr string) (string, string) {
+		zoneIndex := strings.LastIndex(ipAddr, "%")
+		if zoneIndex < 0 {
+			return ipAddr, ""
+		}
+		return ipAddr[:zoneIndex], ipAddr[zoneIndex+1:]
+	}
+
+	ipStr, zoneStr := splitIPAddrZone(hostStr)
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return fmt.Errorf("%w %s", ErrInvalid, addrStr)
+	}
+	addr.ip = ip
+	addr.zone = zoneStr
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
@@ -126,9 +141,12 @@ func (addr *addr) Transport() Transport {
 
 // String returns the node string representation.
 func (addr *addr) String() string {
-	str := net.JoinHostPort("", strconv.Itoa(addr.port))
+	host := ""
 	if addr.ip != nil {
-		str = net.JoinHostPort(addr.ip.String(), strconv.Itoa(addr.port))
+		host = addr.ip.String()
+		if addr.zone != "" && addr.ip.To4() == nil {
+			host = host + "%" + addr.zone
+		}
 	}
-	return str
+	return net.JoinHostPort(host, strconv.Itoa(addr.port))
 }
