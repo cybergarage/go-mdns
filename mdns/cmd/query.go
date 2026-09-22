@@ -17,55 +17,105 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/cybergarage/go-mdns/mdns"
+	"github.com/cybergarage/go-mdns/mdns/dns"
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	rootCmd.AddCommand(queryCmd)
+const (
+	typeParamStr = "type"
+)
+
+var queryTypes = map[string]mdns.Type{
+	"PTR":  mdns.PTR,
+	"SRV":  mdns.SRV,
+	"TXT":  mdns.TXT,
+	"A":    mdns.A,
+	"AAAA": mdns.AAAA,
+	"ANY":  mdns.ANY,
+}
+
+func allSupportedQueryTypes() []string {
+	return []string{"PTR", "SRV", "TXT", "A", "AAAA", "ANY"}
+}
+
+func newQueryTypeFromString(s string) (mdns.Type, error) {
+	t, ok := queryTypes[strings.ToUpper(strings.TrimSpace(s))]
+	if !ok {
+		return mdns.ANY, fmt.Errorf("invalid query type: %s", s)
+	}
+	return t, nil
 }
 
 var queryCmd = &cobra.Command{ // nolint:exhaustruct
-	Use:     "query [service]",
-	Short:   "Query for mDNS devices.",
-	Long:    "Query for mDNS devices.",
-	Example: "query _matterc._udp.local",
-	Args:    cobra.MaximumNArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Use:   "query [name]",
+	Short: "Send a single question and print the answering records",
+	Long: `Send a single question to the multicast address, and print the records of
+every answer until the timeout elapses.
 
-		client := NewClient()
-		err := client.Start()
+Use it to look at the raw records of a responder. Use "browse" and "resolve" to
+discover the services instead.`,
+	Example: `  mdnslookup query _matterc._udp.local
+  mdnslookup query --type SRV DD200C20D25AE5F7._matterc._udp.local
+  mdnslookup query --type ANY --format json macmini.local`,
+	Args: cobra.MaximumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		typeStr, err := cmd.Flags().GetString(typeParamStr)
 		if err != nil {
 			return err
 		}
-		defer client.Stop()
-
-		msgHandler := mdns.MessageHandler(func(msg mdns.Message) {
-		})
-
-		queryService := mdns.DefaultQueryService
-		switch {
-		case len(args) == 1:
-			queryService = args[0]
+		queryType, err := newQueryTypeFromString(typeStr)
+		if err != nil {
+			return err
+		}
+		unicast, err := cmd.Flags().GetBool(unicastParamStr)
+		if err != nil {
+			return err
 		}
 
+		queryName := mdns.NewQuery(
+			mdns.WithQueryService(mdns.DefaultQueryService),
+		).Name()
+		if 0 < len(args) {
+			queryName = args[0]
+		}
+
+		client, stop, err := startClient()
+		if err != nil {
+			return err
+		}
+		defer stop()
+
+		var outputErr error
 		query := mdns.NewQuery(
-			mdns.WithQueryService(queryService),
-			mdns.WithQueryDomain(mdns.DefaultQueryDomain),
-			mdns.WithQueryMessageHandler(msgHandler),
+			mdns.WithQueryName(queryName),
+			mdns.WithQueryType(queryType),
+			mdns.WithQueryUnicastResponse(unicast),
+			mdns.WithQueryMessageHandler(func(msg dns.Message) {
+				if !msg.IsResponse() {
+					return
+				}
+				if err := outputMessage(msg); err != nil {
+					outputErr = err
+				}
+			}),
 		)
 
-		services, err := client.Query(context.Background(), query)
-		if err != nil {
+		ctx, cancel := context.WithTimeout(cmd.Context(), queryTimeout())
+		defer cancel()
+
+		if _, err := client.Query(ctx, query); err != nil {
 			return err
 		}
 
-		for n, srv := range services {
-			fmt.Printf("[%d] %s\n", n, srv.String())
-			fmt.Printf("%s\n", srv.ResourceRecordSet().String())
-		}
-
-		return nil
+		return outputErr
 	},
+}
+
+func init() {
+	queryCmd.Flags().String(typeParamStr, "PTR", fmt.Sprintf("question record type: %s", strings.Join(allSupportedQueryTypes(), "|")))
+	queryCmd.Flags().Bool(unicastParamStr, false, "request unicast responses (QU)")
+	rootCmd.AddCommand(queryCmd)
 }

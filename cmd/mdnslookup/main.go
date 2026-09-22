@@ -1,4 +1,4 @@
-// Copyright (C) 2025 The go-matter Authors. All rights reserved.
+// Copyright (C) 2022 The go-mdns Authors All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/cybergarage/go-mdns/mdns/cmd"
 )
 
 func main() {
+	// The error is printed by the command itself.
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }

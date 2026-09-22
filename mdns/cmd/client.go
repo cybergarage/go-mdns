@@ -15,27 +15,57 @@
 package cmd
 
 import (
-	"github.com/cybergarage/go-logger/log"
+	"fmt"
+	"net"
+
 	"github.com/cybergarage/go-mdns/mdns"
-	"github.com/cybergarage/go-mdns/mdns/dns"
+	"github.com/spf13/viper"
 )
 
-type Client struct {
-	mdns.Client
+// newClient returns a new mDNS client which is configured by the common flags.
+func newClient() (mdns.Client, error) {
+	opts := []mdns.ClientOption{
+		mdns.WithClientQueryTimeout(queryTimeout()),
+	}
+
+	ifnames := viper.GetStringSlice(InterfaceParamStr)
+	if 0 < len(ifnames) {
+		ifis := make([]*net.Interface, 0, len(ifnames))
+		for _, ifname := range ifnames {
+			ifi, err := net.InterfaceByName(ifname)
+			if err != nil {
+				return nil, err
+			}
+			ifis = append(ifis, ifi)
+		}
+		opts = append(opts, mdns.WithClientInterfaces(ifis...))
+	}
+
+	switch family := viper.GetString(FamilyParamStr); family {
+	case FamilyAllStr, "":
+	case FamilyIPv4Str:
+		opts = append(opts, mdns.WithClientIPv6Enabled(false))
+	case FamilyIPv6Str:
+		opts = append(opts, mdns.WithClientIPv4Enabled(false))
+	default:
+		return nil, fmt.Errorf("invalid address family: %s", family)
+	}
+
+	return mdns.NewClient(opts...), nil
 }
 
-// NewClient returns a new mDNS client.
-func NewClient() *Client {
-	client := &Client{
-		Client: mdns.NewClient(),
+// startClient returns a started mDNS client and its stop function.
+func startClient() (mdns.Client, func(), error) {
+	client, err := newClient()
+	if err != nil {
+		return nil, nil, err
 	}
-	return client
-}
 
-// MessageReceived is called when a DNS message is received.
-func (client *Client) MessageReceived(msg dns.Message) {
-	if msg.IsQuery() {
-		return
+	if err := client.Start(); err != nil {
+		return nil, nil, err
 	}
-	log.HexInfo(msg.Bytes())
+
+	return client, func() {
+		client.Stop()
+	}, nil
 }
