@@ -87,6 +87,9 @@ func (srv *srvRecord) parseResourceRecord() error {
 	var err error
 
 	reader := NewReaderWithBytes(srv.data)
+	// RFC 2782: The target is a domain name, and it may be compressed, so the
+	// message bytes are required to resolve the compression pointers.
+	reader.SetCompressionBytes(srv.CompressionBytes())
 
 	srv.priority, err = reader.ReadUint16()
 	if err != nil {
@@ -103,7 +106,9 @@ func (srv *srvRecord) parseResourceRecord() error {
 		return err
 	}
 
-	srv.target, err = reader.ReadString()
+	// The target is a domain name, not a single label. Reading it as a string
+	// returned only the first label, such as "host" instead of "host.local".
+	srv.target, err = reader.ReadName()
 	if err != nil {
 		return err
 	}
