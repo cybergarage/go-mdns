@@ -30,6 +30,8 @@ type Client interface {
 	RegisterMessageHandler(handler MessageHandler)
 	// UnRegisterMessageHandler removes a message handler from the client.
 	UnRegisterMessageHandler(handler MessageHandler)
-	// Query sends a question message to the multicast address.
+	// Query sends a question message to the multicast address, and returns the
+	// services which responded until the context is done. The query is
+	// retransmitted while it is waiting, as RFC 6762 (5.2) requires.
 	Query(ctx context.Context, query Query) ([]Service, error)
 }

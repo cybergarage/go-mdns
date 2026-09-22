@@ -22,6 +22,7 @@ import (
 
 // A MulticastManager represents a multicast server manager.
 type MulticastManager struct {
+	*InterfaceSelector
 	Servers   []*MulticastServer
 	processor dns.MessageProcessor
 }
@@ -29,8 +30,9 @@ type MulticastManager struct {
 // NewMulticastManager returns a new MulticastManager.
 func NewMulticastManager() *MulticastManager {
 	mgr := &MulticastManager{
-		Servers:   make([]*MulticastServer, 0),
-		processor: nil,
+		InterfaceSelector: NewInterfaceSelector(),
+		Servers:           make([]*MulticastServer, 0),
+		processor:         nil,
 	}
 	return mgr
 }
@@ -77,13 +79,13 @@ func (mgr *MulticastManager) Start() error {
 		return err
 	}
 
-	ifis, err := GetAvailableInterfaces()
+	ifis, err := mgr.BindInterfaces()
 	if err != nil {
 		return err
 	}
 
 	for _, ifi := range ifis {
-		ifaddrs, err := GetInterfaceAddresses(ifi)
+		ifaddrs, err := mgr.BindAddresses(ifi)
 		if err != nil {
 			continue
 		}

@@ -16,6 +16,7 @@ package transport
 
 import (
 	"errors"
+	"net"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
@@ -33,6 +34,25 @@ func NewMessageManager() *MessageManager {
 		UnicastManager:   NewUnicastManager(),
 	}
 	return mgr
+}
+
+// SetInterfaces sets the network interfaces to bind. All available interfaces
+// are bound when no interface is set.
+func (mgr *MessageManager) SetInterfaces(ifis []*net.Interface) {
+	mgr.MulticastManager.SetInterfaces(ifis)
+	mgr.UnicastManager.SetInterfaces(ifis)
+}
+
+// SetIPv4Enabled sets whether the IPv4 addresses are bound.
+func (mgr *MessageManager) SetIPv4Enabled(flag bool) {
+	mgr.MulticastManager.SetIPv4Enabled(flag)
+	mgr.UnicastManager.SetIPv4Enabled(flag)
+}
+
+// SetIPv6Enabled sets whether the IPv6 addresses are bound.
+func (mgr *MessageManager) SetIPv6Enabled(flag bool) {
+	mgr.MulticastManager.SetIPv6Enabled(flag)
+	mgr.UnicastManager.SetIPv6Enabled(flag)
 }
 
 // SetMessageProcessor sets the message processor.
