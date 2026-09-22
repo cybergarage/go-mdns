@@ -223,6 +223,11 @@ func (srv *serviceImpl) Addrs() []*net.UDPAddr {
 	return addrs
 }
 
+// setAddresses sets the service addresses.
+func (srv *serviceImpl) setAddresses(ips []net.IP) {
+	srv.addrs = ips
+}
+
 // parseMessage updates the service data by the specified message.
 func (srv *serviceImpl) parseMessage(msg Message) error {
 	srv.Message = msg

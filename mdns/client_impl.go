@@ -29,9 +29,10 @@ type clientImpl struct {
 	*transport.MessageManager
 	*serviceSet
 	*msgHandler
-	queryTimeout     time.Duration
-	queryInterval    time.Duration
-	maxQueryInterval time.Duration
+	queryTimeout       time.Duration
+	queryInterval      time.Duration
+	maxQueryInterval   time.Duration
+	resolveGracePeriod time.Duration
 }
 
 // ClientOption represents a client option.
@@ -86,15 +87,24 @@ func WithClientMaxQueryInterval(interval time.Duration) ClientOption {
 	}
 }
 
+// WithClientResolveGracePeriod sets the duration to wait for the additional
+// responses after the first answer of a resolution is received.
+func WithClientResolveGracePeriod(period time.Duration) ClientOption {
+	return func(client *clientImpl) {
+		client.resolveGracePeriod = period
+	}
+}
+
 // NewClient returns a new client instance with the specified options.
 func NewClient(opts ...ClientOption) Client {
 	client := &clientImpl{
-		MessageManager:   transport.NewMessageManager(),
-		serviceSet:       newServiceSet(),
-		msgHandler:       newMessageHandler(),
-		queryTimeout:     DefaultQueryTimeout,
-		queryInterval:    DefaultQueryInterval,
-		maxQueryInterval: DefaultMaxQueryInterval,
+		MessageManager:     transport.NewMessageManager(),
+		serviceSet:         newServiceSet(),
+		msgHandler:         newMessageHandler(),
+		queryTimeout:       DefaultQueryTimeout,
+		queryInterval:      DefaultQueryInterval,
+		maxQueryInterval:   DefaultMaxQueryInterval,
+		resolveGracePeriod: DefaultResolveGracePeriod,
 	}
 
 	for _, opt := range opts {

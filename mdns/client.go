@@ -16,6 +16,7 @@ package mdns
 
 import (
 	"context"
+	"net"
 )
 
 // Client represents a client node instance.
@@ -39,6 +40,14 @@ type Client interface {
 	// is done. Use Browse instead of Query to follow the services which come
 	// and go, such as the Matter nodes on a link.
 	Browse(ctx context.Context, query Query, handler ServiceHandler) error
+	// Resolve resolves the specified service instance name, such as
+	// "instance._matter._tcp.local", and returns the service with its host,
+	// port, TXT attributes and addresses.
+	Resolve(ctx context.Context, name string) (Service, error)
+	// LookupHost resolves the specified host name, such as "device.local",
+	// and returns its addresses. The IPv6 scoped addressing zone is set for
+	// the link-local addresses.
+	LookupHost(ctx context.Context, host string) ([]*net.IPAddr, error)
 	// Services returns the services which the client has discovered.
 	Services() []Service
 }
