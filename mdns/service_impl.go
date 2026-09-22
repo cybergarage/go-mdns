@@ -19,6 +19,7 @@ import (
 	"net"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
@@ -118,6 +119,50 @@ func (srv *serviceImpl) Name() string {
 // Domain returns the service domain.
 func (srv *serviceImpl) Domain() string {
 	return srv.domain
+}
+
+// FullName returns the service name with its domain.
+func (srv *serviceImpl) FullName() string {
+	return dns.NewNameWithStrings(srv.name, srv.domain)
+}
+
+// TTL returns the shortest TTL of the service records.
+//
+// RFC 6762: 10. Resource Record TTL Values and Cache Coherency
+// The service is cached until the shortest TTL of its records elapses, and a
+// zero TTL means that the service is going away (10.1).
+func (srv *serviceImpl) TTL() time.Duration {
+	if srv.Message == nil {
+		return 0
+	}
+
+	fullName := srv.FullName()
+
+	ttl := uint(0)
+	hasRecord := false
+	for _, record := range srv.Message.ResourceRecordSet() {
+		isServiceRecord := record.IsName(fullName)
+		if !isServiceRecord && 0 < len(srv.host) {
+			isServiceRecord = record.IsName(srv.host)
+		}
+		if !isServiceRecord {
+			continue
+		}
+		recordTTL := record.TTL()
+		if recordTTL == 0 {
+			return 0
+		}
+		if !hasRecord || recordTTL < ttl {
+			ttl = recordTTL
+			hasRecord = true
+		}
+	}
+
+	if !hasRecord {
+		return 0
+	}
+
+	return time.Duration(ttl) * time.Second
 }
 
 // Host returns the service host.
@@ -298,6 +343,14 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 	}
 
 	switch rr := record.(type) {
+	case dns.PTRRecord:
+		// RFC 6763: 4.1. Structured Service Instance Names
+		// The data of a PTR record is the service instance name, so a
+		// response which holds no SRV record still names the service.
+		err := parseNameDomain(rr.DomainName())
+		if err != nil {
+			return err
+		}
 	case dns.SRVRecord:
 		err := parseNameDomain(rr.Name())
 		if err != nil {

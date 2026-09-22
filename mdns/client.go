@@ -34,4 +34,11 @@ type Client interface {
 	// services which responded until the context is done. The query is
 	// retransmitted while it is waiting, as RFC 6762 (5.2) requires.
 	Query(ctx context.Context, query Query) ([]Service, error)
+	// Browse browses the services of the query, and calls the handler when a
+	// service is added, updated or removed. Browse blocks until the context
+	// is done. Use Browse instead of Query to follow the services which come
+	// and go, such as the Matter nodes on a link.
+	Browse(ctx context.Context, query Query, handler ServiceHandler) error
+	// Services returns the services which the client has discovered.
+	Services() []Service
 }

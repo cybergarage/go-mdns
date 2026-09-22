@@ -17,6 +17,7 @@ package mdns
 import (
 	"net"
 	"regexp"
+	"time"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
@@ -33,12 +34,19 @@ type ResourceRecordSet = dns.ResourceRecordSet
 // ResourceRecord represents a resource record.
 type ResourceRecord = dns.ResourceRecord
 
-// Service represents a SRV record.
+// Service represents a discovered DNS-SD service.
 type Service interface {
 	// Name returns the service name.
 	Name() string
 	// Domain returns the service domain.
 	Domain() string
+	// FullName returns the service name with its domain, such as
+	// "instance._matter._tcp.local". The full name identifies the service,
+	// and it is the question name to resolve the service.
+	FullName() string
+	// TTL returns the shortest TTL of the service records. A zero TTL means
+	// that the service is going away (RFC 6762, 10.1).
+	TTL() time.Duration
 	// Host returns the service host.
 	Host() string
 	// Port returns the service port.
