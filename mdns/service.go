@@ -45,6 +45,14 @@ type Service interface {
 	Port() int
 	// Addresses returns the service addresses.
 	Addresses() []net.IP
+	// Addrs returns the service addresses with the service port. The IPv6
+	// scoped addressing zone is set for the link-local addresses, so that
+	// the returned addresses can be used to connect to the service directly.
+	Addrs() []*net.UDPAddr
+	// Interface returns the network interface which the service was
+	// discovered on. The interface is nil when the service is not created
+	// from a received message.
+	Interface() *net.Interface
 	// ResourceRecordSet returns the service resource records.
 	ResourceRecordSet() ResourceRecordSet
 	// ResourceAttributes returns the service TXT attributes.

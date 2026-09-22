@@ -142,9 +142,15 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 
 	msgBytes := sock.ReadBuffer[:n]
 
+	// The listening interface is passed to the address so that the IPv6
+	// link-local addresses of a discovered service can be scoped to the
+	// interface which the response was received on.
+	listenIfi, _ := sock.ListenInterface()
+
 	add, err := dns.NewAddrFromString(
 		fromAddr.String(),
 		dns.WithAddrTransport(sock.Transport),
+		dns.WithAddrInterface(listenIfi),
 	)
 	if err != nil {
 		log.Debugf("Failed to parse source address: %s", err)

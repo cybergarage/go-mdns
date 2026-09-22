@@ -27,7 +27,8 @@ type AddrOption func(*addr)
 type addr struct {
 	ip        net.IP
 	port      int
-	zone      string // IPv6 scoped addring zone
+	zone      string // IPv6 scoped addressing zone
+	ifi       *net.Interface
 	transport Transport
 }
 
@@ -36,6 +37,7 @@ func newAddr(opts ...AddrOption) *addr {
 		ip:        nil,
 		port:      0,
 		zone:      "",
+		ifi:       nil,
 		transport: TransportUnknown,
 	}
 	for _, opt := range opts {
@@ -62,6 +64,15 @@ func WithAddrPort(port int) AddrOption {
 func WithAddrZone(zone string) AddrOption {
 	return func(a *addr) {
 		a.zone = zone
+	}
+}
+
+// WithAddrInterface returns an AddrOption with the specified network interface.
+// The interface name is used as the IPv6 scoped addressing zone when the zone is
+// not set explicitly.
+func WithAddrInterface(ifi *net.Interface) AddrOption {
+	return func(a *addr) {
+		a.ifi = ifi
 	}
 }
 
@@ -131,7 +142,18 @@ func (addr *addr) Port() int {
 
 // Zone returns the zone string.
 func (addr *addr) Zone() string {
-	return addr.zone
+	if 0 < len(addr.zone) {
+		return addr.zone
+	}
+	if addr.ifi != nil {
+		return addr.ifi.Name
+	}
+	return ""
+}
+
+// Interface returns the network interface which the message was received on.
+func (addr *addr) Interface() *net.Interface {
+	return addr.ifi
 }
 
 // Transport returns the transport protocol.
@@ -144,8 +166,9 @@ func (addr *addr) String() string {
 	host := ""
 	if addr.ip != nil {
 		host = addr.ip.String()
-		if addr.zone != "" && addr.ip.To4() == nil {
-			host = host + "%" + addr.zone
+		zone := addr.Zone()
+		if zone != "" && addr.ip.To4() == nil {
+			host = host + "%" + zone
 		}
 	}
 	return net.JoinHostPort(host, strconv.Itoa(addr.port))

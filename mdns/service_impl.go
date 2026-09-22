@@ -32,6 +32,7 @@ type serviceImpl struct {
 	addrs  []net.IP
 	port   int
 	attrs  dns.Attributes
+	ifi    *net.Interface
 }
 
 // ServiceOptions represents a service option.
@@ -69,6 +70,14 @@ func WithServicePort(port int) ServiceOptions {
 	}
 }
 
+// WithServiceInterface returns a service option with the specified network interface.
+func WithServiceInterface(ifi *net.Interface) ServiceOptions {
+	return func(srv *serviceImpl) error {
+		srv.ifi = ifi
+		return nil
+	}
+}
+
 // WithServiceMessage returns a service option with the specified message.
 func WithServiceMessage(msg Message) ServiceOptions {
 	return func(srv *serviceImpl) error {
@@ -90,6 +99,7 @@ func newService(opts ...ServiceOptions) (*serviceImpl, error) {
 		addrs:   []net.IP{},
 		port:    0,
 		attrs:   dns.Attributes{},
+		ifi:     nil,
 	}
 	for _, opt := range opts {
 		err := opt(srv)
@@ -123,6 +133,49 @@ func (srv *serviceImpl) Port() int {
 // Addresses returns the service addresses.
 func (srv *serviceImpl) Addresses() []net.IP {
 	return srv.addrs
+}
+
+// Interface returns the network interface which the service was discovered on.
+func (srv *serviceImpl) Interface() *net.Interface {
+	if srv.ifi != nil {
+		return srv.ifi
+	}
+	if srv.Message == nil {
+		return nil
+	}
+	from := srv.Message.From()
+	if from == nil {
+		return nil
+	}
+	return from.Interface()
+}
+
+// Addrs returns the service addresses with the service port.
+//
+// RFC 4007: IPv6 Scoped Address Architecture
+// A link-local address is ambiguous without its zone, and it cannot be used to
+// connect to the service. The interface which the response was received on is
+// used as the zone, because a link-local address is only reachable on the link
+// which advertised it.
+func (srv *serviceImpl) Addrs() []*net.UDPAddr {
+	zone := ""
+	if ifi := srv.Interface(); ifi != nil {
+		zone = ifi.Name
+	}
+
+	addrs := make([]*net.UDPAddr, 0, len(srv.addrs))
+	for _, ip := range srv.addrs {
+		udpAddr := &net.UDPAddr{ // nolint: exhaustruct
+			IP:   ip,
+			Port: srv.port,
+		}
+		if ip.To4() == nil && ip.IsLinkLocalUnicast() {
+			udpAddr.Zone = zone
+		}
+		addrs = append(addrs, udpAddr)
+	}
+
+	return addrs
 }
 
 // parseMessage updates the service data by the specified message.
@@ -338,8 +391,12 @@ func (srv *serviceImpl) String() string {
 		}
 	}
 	addrs := []string{}
-	for _, addr := range srv.Addresses() {
-		addrs = append(addrs, addr.String())
+	for _, addr := range srv.Addrs() {
+		host := addr.IP.String()
+		if 0 < len(addr.Zone) {
+			host += "%" + addr.Zone
+		}
+		addrs = append(addrs, host)
 	}
 	if len(addrs) == 0 {
 		from := srv.From()

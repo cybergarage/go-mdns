@@ -26,6 +26,9 @@ type Addr interface {
 	Port() int
 	// Zone returns the IPv6 scoped addressing zone.
 	Zone() string
+	// Interface returns the network interface which the message was received
+	// on. The interface is nil when the address is not bound to an interface.
+	Interface() *net.Interface
 	// String returns the string representation of the address.
 	String() string
 	// Transport returns the transport protocol.
