@@ -128,13 +128,63 @@ func (srv *serviceImpl) Addresses() []net.IP {
 // parseMessage updates the service data by the specified message.
 func (srv *serviceImpl) parseMessage(msg Message) error {
 	srv.Message = msg
-	for _, record := range msg.ResourceRecordSet() {
+
+	records := msg.ResourceRecordSet()
+
+	// The SRV and TXT records are parsed first because the SRV target name is
+	// required to select the address records which belong to this service.
+	for _, record := range records {
 		err := srv.parseRecord(record)
 		if err != nil {
 			return err
 		}
 	}
+
+	srv.parseAddressRecords(records)
+
 	return nil
+}
+
+// parseAddressRecords updates the service addresses by the specified records.
+func (srv *serviceImpl) parseAddressRecords(records ResourceRecordSet) {
+	appendAddress := func(record dns.Record) bool {
+		addrRecord, ok := record.(interface{ Address() net.IP })
+		if !ok {
+			return false
+		}
+		ip := addrRecord.Address()
+		if ip == nil {
+			return false
+		}
+		for _, addr := range srv.addrs {
+			if addr.Equal(ip) {
+				return false
+			}
+		}
+		srv.addrs = append(srv.addrs, ip)
+		return true
+	}
+
+	// RFC 6763: 5. Service Instance Resolution
+	// The SRV record target names the host, and only the address records of
+	// that host belong to this service. A single mDNS response may carry the
+	// records of multiple services and hosts, so the address records must not
+	// be collected without matching the target name.
+	if 0 < len(srv.host) {
+		for _, record := range records {
+			if !record.IsName(srv.host) {
+				continue
+			}
+			appendAddress(record)
+		}
+		return
+	}
+
+	// No SRV record is included in the message. The address records are
+	// collected as they are, because there is no target name to match.
+	for _, record := range records {
+		appendAddress(record)
+	}
 }
 
 // ResourceRecordSet returns the service resource records.
@@ -192,14 +242,6 @@ func (srv *serviceImpl) parseRecord(record dns.Record) error {
 			srv.domain = parts[1]
 		}
 		return nil
-	}
-
-	// Handle address records (A/AAAA) via shared Address() method.
-	if ar, ok := record.(interface{ Address() net.IP }); ok {
-		ip := ar.Address()
-		if ip != nil {
-			srv.addrs = append(srv.addrs, ip)
-		}
 	}
 
 	switch rr := record.(type) {

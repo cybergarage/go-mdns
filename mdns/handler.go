@@ -62,7 +62,15 @@ func (msg *msgHandler) UnRegisterMessageHandler(handler MessageHandler) {
 
 // processMessageHandlers processes the message using registered handlers.
 func (msg *msgHandler) processMessageHandlers(message Message) {
-	for _, handler := range msg.handlers {
+	// Copies the registered handlers to avoid holding the lock while the
+	// handlers are running, because a handler may register or unregister
+	// another handler.
+	msg.Lock()
+	handlers := make([]MessageHandler, len(msg.handlers))
+	copy(handlers, msg.handlers)
+	msg.Unlock()
+
+	for _, handler := range handlers {
 		handler(message)
 	}
 }

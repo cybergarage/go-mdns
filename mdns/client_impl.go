@@ -70,12 +70,11 @@ func (client *clientImpl) Restart() error {
 }
 
 // Query sends a question message to the multicast address.
+// The query is not serialized by the client mutex because a query waits for the
+// responses until the context is done. Serializing the queries would stop the
+// caller from running another query, such as resolving a found service, while
+// browsing.
 func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error) {
-	client.Lock()
-	defer client.Unlock()
-
-	client.serviceSet.Clear()
-
 	if _, ok := ctx.Deadline(); !ok {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, DefaultQueryTimeout)
