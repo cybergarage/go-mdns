@@ -4,8 +4,6 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
 ## [0.9.0]
 
 The first release with a client API which covers browsing, resolving and host lookup. The responder side is still under development, and it is planned for v1.0.0.
@@ -38,7 +36,3 @@ The first release with a client API which covers browsing, resolving and host lo
 - The TXT attributes were parsed by splitting a string at every `=`, so a value which held `=` was rejected, and an attribute without `=` was dropped (RFC 6763, 6.3). The attribute keys are looked up case insensitively, and the first occurrence wins (6.4).
 - A name reader followed the compression pointers without a limit, so a message which held pointers referring to each other made the parser loop forever.
 - The UDP connection was closed while the listener goroutine was reading it, and the message handlers were called while the handler list was being updated, which `go test -race` reported as data races.
-
-## [0.8.0] and earlier
-
-See the commit history.
