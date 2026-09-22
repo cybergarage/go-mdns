@@ -39,9 +39,13 @@ func NewAttributesFromStrings(strs []string) (Attributes, error) {
 }
 
 // LookupAttribute returns the attribute with the specified name.
+//
+// RFC 6763: 6.4. Rules for Keys in DNS-SD Key/Value Pairs
+// The keys are case insensitive, and if a key appears more than once, then the
+// first occurrence is used and the later occurrences are silently ignored.
 func (attrs Attributes) LookupAttribute(name string) (Attribute, bool) {
 	for _, attr := range attrs {
-		if attr.Name() == name {
+		if strings.EqualFold(attr.Name(), name) {
 			return attr, true
 		}
 	}

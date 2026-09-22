@@ -127,8 +127,23 @@ func (reader *Reader) ReadStrings() ([]string, error) {
 	return strs, nil
 }
 
+// maxNameCompressionDepth is the maximum number of the compression pointers
+// which are followed while a single name is read. RFC 1035 does not limit the
+// number of the pointers, but a malformed message can hold pointers which refer
+// to each other. The limit stops the parser from looping forever.
+const maxNameCompressionDepth = 16
+
 // ReadName returns a name from the reader with the read reader.
 func (reader *Reader) ReadName() (string, error) {
+	return reader.readName(0)
+}
+
+// readName returns a name from the reader with the specified compression depth.
+func (reader *Reader) readName(depth int) (string, error) {
+	if maxNameCompressionDepth < depth {
+		return "", fmt.Errorf("too many compression pointers : %d", depth)
+	}
+
 	nameLenIsCompressed := func(l uint8) bool {
 		return (l & nameIsCompressionMask) == nameIsCompressionMask
 	}
@@ -150,7 +165,7 @@ func (reader *Reader) ReadName() (string, error) {
 			}
 			cmpReader := NewReaderWithBytes(cmpBytes[cmpOffset:])
 			cmpReader.SetCompressionBytes(cmpBytes)
-			nextName, err := cmpReader.ReadName()
+			nextName, err := cmpReader.readName(depth + 1)
 			if err != nil {
 				return "", err
 			}

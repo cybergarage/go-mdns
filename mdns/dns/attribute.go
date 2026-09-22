@@ -14,15 +14,21 @@
 
 package dns
 
-// RFC1464: Using the Domain Name System To Store Arbitrary String Attributes
-// https://datatracker.ietf.org/doc/html/rfc1464
+// RFC 6763: 6. Data Syntax for DNS-SD TXT Records
+// https://www.rfc-editor.org/rfc/rfc6763#section-6
 
-// Attribute represents a DNS attribute.
+// Attribute represents a DNS-SD TXT record key/value pair.
 type Attribute interface {
-	// Name returns the attribute name.
+	// Name returns the attribute name (key).
 	Name() string
-	// Value returns the attribute value.
+	// Value returns the attribute value. The value is empty when the
+	// attribute has no value.
 	Value() string
+	// HasValue returns true if the attribute string has the '=' separator,
+	// otherwise false. RFC 6763 (6.1) distinguishes an attribute with an
+	// empty value ("key=") from a boolean attribute which is only present
+	// ("key").
+	HasValue() bool
 	// String returns the attribute string.
 	String() string
 }

@@ -19,27 +19,26 @@ import (
 	"strings"
 )
 
-// RFC1464: Using the Domain Name System To Store Arbitrary String Attributes
-// https://datatracker.ietf.org/doc/html/rfc1464
+// RFC 6763: 6. Data Syntax for DNS-SD TXT Records
+// https://www.rfc-editor.org/rfc/rfc6763#section-6
 
 // attrImpl represents a DNS attribute.
 type attrImpl struct {
-	name  string
-	value string
+	name     string
+	value    string
+	hasValue bool
 }
 
 // NewAttribute returns a new attribute instance.
 func NewAttribute() Attribute {
-	return &attrImpl{
-		name:  "",
-		value: "",
-	}
+	return newAttribute()
 }
 
 func newAttribute() *attrImpl {
 	return &attrImpl{
-		name:  "",
-		value: "",
+		name:     "",
+		value:    "",
+		hasValue: false,
 	}
 }
 
@@ -49,14 +48,31 @@ func NewAttributeFromString(str string) (Attribute, error) {
 	return attr, attr.parse(str)
 }
 
-// Parse parses the attribute string.
+// parse parses the attribute string.
+//
+// RFC 6763: 6.4. Rules for Keys in DNS-SD Key/Value Pairs
+// The key MUST be at least one character. The characters of a key MUST be
+// printable US-ASCII values (0x20-0x7E), excluding '=' (0x3D).
+//
+// RFC 6763: 6.3. Rules for Values in DNS-SD Key/Value Pairs
+// If there is no '=' in a DNS-SD TXT record string, then it is a boolean
+// attribute, simply identified as being present, with no value. If the '=' is
+// present, then everything after the first '=' is the value, so the value may
+// contain '=' characters.
 func (attr *attrImpl) parse(str string) error {
-	vars := strings.Split(str, "=")
-	if len(vars) != 2 {
+	if len(str) == 0 {
 		return fmt.Errorf("attribute (%s) is %w", str, ErrInvalid)
 	}
-	attr.name = vars[0]
-	attr.value = vars[1]
+
+	name, value, hasValue := strings.Cut(str, "=")
+	if len(name) == 0 {
+		return fmt.Errorf("attribute (%s) is %w", str, ErrInvalid)
+	}
+
+	attr.name = name
+	attr.value = value
+	attr.hasValue = hasValue
+
 	return nil
 }
 
@@ -70,7 +86,15 @@ func (attr *attrImpl) Value() string {
 	return attr.value
 }
 
+// HasValue returns true if the attribute has a value, otherwise false.
+func (attr *attrImpl) HasValue() bool {
+	return attr.hasValue
+}
+
 // String returns the attribute string.
 func (attr *attrImpl) String() string {
+	if !attr.hasValue {
+		return attr.name
+	}
 	return attr.name + "=" + attr.value
 }
