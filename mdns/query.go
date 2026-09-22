@@ -23,6 +23,25 @@ import (
 // Class represents a DNS class.
 type Class = dns.Class
 
+// Type represents a DNS record type.
+type Type = dns.Type
+
+// The DNS record types which are used by the mDNS and DNS-SD queries.
+const (
+	// A is the IPv4 address record type.
+	A = dns.A
+	// AAAA is the IPv6 address record type.
+	AAAA = dns.AAAA
+	// PTR is the pointer record type which is used to browse the services.
+	PTR = dns.PTR
+	// SRV is the service location record type.
+	SRV = dns.SRV
+	// TXT is the text record type which holds the service attributes.
+	TXT = dns.TXT
+	// ANY is the wildcard record type.
+	ANY = dns.ANY
+)
+
 // RFC 6762 - Multicast DNS.
 const (
 	// LocalDomain is the local domain name.
@@ -65,16 +84,38 @@ const (
 	DefaultQueryDomain = LocalDomain
 	// DefaultQueryTimeout is the default timeout duration for mDNS queries.
 	DefaultQueryTimeout = time.Duration(5) * time.Second
+	// DefaultQueryType is the default record type for mDNS queries.
+	// RFC 6763: 4.1. Structured Service Instance Names
+	// A service is browsed by querying the PTR records of the service type.
+	DefaultQueryType = PTR
+)
+
+// RFC 6762: 5.2. Continuous Multicast DNS Querying.
+const (
+	// DefaultQueryInterval is the interval before the first retransmission of
+	// a query.
+	DefaultQueryInterval = time.Duration(1) * time.Second
+	// DefaultMaxQueryInterval is the upper bound of the query interval. The
+	// interval of the successive queries is doubled until it reaches this
+	// duration.
+	DefaultMaxQueryInterval = time.Duration(60) * time.Minute
 )
 
 // Query represents a question query.
 type Query interface {
+	// Name returns the full question name of the query.
+	Name() string
 	// Subtype returns the subtype of the query.
 	Subtype() string
 	// Service returns the service name of the query.
 	Service() string
 	// Domain returns the domain name of the query.
 	Domain() string
+	// Type returns the question record type of the query.
+	Type() Type
+	// UnicastResponse returns true if the query requests a unicast response,
+	// otherwise false.
+	UnicastResponse() bool
 	// MessageHandler returns the message handler of the query if set.
 	MessageHandler() (MessageHandler, bool)
 	// String returns the string representation of the query.

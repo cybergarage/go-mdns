@@ -21,12 +21,18 @@ import (
 // Message represents a protocol message.
 type Message = dns.Message
 
-// NewRequestWithQuery returns a nil message instance.
+// NewRequestWithQuery returns a request message for the specified query.
 func NewRequestWithQuery(query Query) Message {
+	class := dns.IN
+	if query.UnicastResponse() {
+		class |= QU
+	}
+
 	question := dns.NewQuestion(
-		dns.WithQuestionName(query.String()),
-		dns.WithQuestionType(dns.ANY),
-		dns.WithQuestionClass(QU|dns.IN),
+		dns.WithQuestionName(query.Name()),
+		dns.WithQuestionType(query.Type()),
+		dns.WithQuestionClass(class),
 	)
+
 	return dns.NewRequestMessage(dns.WithMessageQuestions(question))
 }

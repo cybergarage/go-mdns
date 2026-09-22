@@ -19,14 +19,26 @@ import (
 )
 
 type queryImp struct {
-	subtype string
-	service string
-	domain  string
-	handler MessageHandler
+	name            string
+	subtype         string
+	service         string
+	domain          string
+	typ             Type
+	unicastResponse bool
+	handler         MessageHandler
 }
 
 // QueryOption represents a query option.
 type QueryOption func(*queryImp)
+
+// WithQueryName sets the full question name of the query. The name is used as
+// it is, and the subtype, the service and the domain options are ignored. Use
+// it to query a service instance name or a host name directly.
+func WithQueryName(name string) QueryOption {
+	return func(q *queryImp) {
+		q.name = name
+	}
+}
 
 // WithQuerySubtype sets the subtype of the query.
 func WithQuerySubtype(subtype string) QueryOption {
@@ -49,6 +61,30 @@ func WithQueryDomain(domain string) QueryOption {
 	}
 }
 
+// WithQueryType sets the question record type of the query.
+//
+// RFC 6763: 4.1. Structured Service Instance Names
+// A service type is browsed with PTR, a service instance is resolved with SRV
+// and TXT, and a host name is resolved with A and AAAA.
+func WithQueryType(t Type) QueryOption {
+	return func(q *queryImp) {
+		q.typ = t
+	}
+}
+
+// WithQueryUnicastResponse sets the unicast response bit (QU) of the query.
+//
+// RFC 6762: 5.4. Questions Requesting Unicast Responses
+// A querier sets the unicast response bit when it has not yet joined the
+// multicast group, such as the first query after a node starts. The bit is not
+// set by default because a multicast response lets the other nodes on the link
+// update their caches.
+func WithQueryUnicastResponse(flag bool) QueryOption {
+	return func(q *queryImp) {
+		q.unicastResponse = flag
+	}
+}
+
 // WithQueryMessageHandler sets the message handler of the query.
 func WithQueryMessageHandler(handler MessageHandler) QueryOption {
 	return func(q *queryImp) {
@@ -59,15 +95,34 @@ func WithQueryMessageHandler(handler MessageHandler) QueryOption {
 // NewQuery returns a new query instance with the specified options.
 func NewQuery(opts ...QueryOption) Query {
 	q := &queryImp{
-		subtype: "",
-		service: "",
-		domain:  DefaultQueryDomain,
-		handler: nil,
+		name:            "",
+		subtype:         "",
+		service:         "",
+		domain:          DefaultQueryDomain,
+		typ:             DefaultQueryType,
+		unicastResponse: false,
+		handler:         nil,
 	}
 	for _, opt := range opts {
 		opt(q)
 	}
 	return q
+}
+
+// Name returns the full question name of the query.
+func (q *queryImp) Name() string {
+	if 0 < len(q.name) {
+		return q.name
+	}
+	labels := []string{}
+	if 0 < len(q.subtype) {
+		labels = append(labels, q.subtype, Subtype)
+	}
+	if 0 < len(q.service) {
+		labels = append(labels, q.service)
+	}
+	labels = append(labels, q.domain)
+	return dns.NewNameWithStrings(labels...)
 }
 
 // Subtype returns the subtype of the query.
@@ -85,6 +140,16 @@ func (q *queryImp) Domain() string {
 	return q.domain
 }
 
+// Type returns the question record type of the query.
+func (q *queryImp) Type() Type {
+	return q.typ
+}
+
+// UnicastResponse returns true if the query requests a unicast response.
+func (q *queryImp) UnicastResponse() bool {
+	return q.unicastResponse
+}
+
 // MessageHandler returns the message handler of the query if set.
 func (q *queryImp) MessageHandler() (MessageHandler, bool) {
 	if q.handler == nil {
@@ -95,13 +160,5 @@ func (q *queryImp) MessageHandler() (MessageHandler, bool) {
 
 // String returns the string representation of the query.
 func (q *queryImp) String() string {
-	labels := []string{}
-	if 0 < len(q.subtype) {
-		labels = append(labels, q.subtype, Subtype)
-	}
-	if 0 < len(q.service) {
-		labels = append(labels, q.service)
-	}
-	labels = append(labels, q.domain)
-	return dns.NewNameWithStrings(labels...)
+	return q.Name()
 }

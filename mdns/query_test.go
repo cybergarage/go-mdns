@@ -22,6 +22,79 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
+// The query message is built from the query options.
+func TestQueryMessage(t *testing.T) {
+	tests := []struct {
+		name            string
+		query           Query
+		expectedName    string
+		expectedType    Type
+		expectedUnicast bool
+	}{
+		{
+			name: "default",
+			query: NewQuery(
+				WithQueryService("_matterc._udp"),
+			),
+			// RFC 6763 browses a service type with a PTR query, and
+			// RFC 6762 (5.4) does not set the unicast response bit by
+			// default so that the other nodes can update their caches.
+			expectedName:    "_matterc._udp.local",
+			expectedType:    PTR,
+			expectedUnicast: false,
+		},
+		{
+			name: "subtype",
+			query: NewQuery(
+				WithQuerySubtype("_S3"),
+				WithQueryService("_matterc._udp"),
+			),
+			expectedName:    "_S3._sub._matterc._udp.local",
+			expectedType:    PTR,
+			expectedUnicast: false,
+		},
+		{
+			name: "instance",
+			query: NewQuery(
+				WithQueryName("DD200C20D25AE5F7._matterc._udp.local"),
+				WithQueryType(SRV),
+				WithQueryUnicastResponse(true),
+			),
+			expectedName:    "DD200C20D25AE5F7._matterc._udp.local",
+			expectedType:    SRV,
+			expectedUnicast: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if test.query.Name() != test.expectedName {
+				t.Errorf("name %s != %s", test.query.Name(), test.expectedName)
+			}
+
+			msg := NewRequestWithQuery(test.query)
+			questions := msg.Questions()
+			if len(questions) != 1 {
+				t.Fatalf("question count %d != 1", len(questions))
+			}
+
+			q := questions[0]
+			if !q.IsName(test.expectedName) {
+				t.Errorf("question name %s != %s", q.Name(), test.expectedName)
+			}
+			if q.Type() != test.expectedType {
+				t.Errorf("question type %s != %s", q.Type(), test.expectedType)
+			}
+			if q.IsUnicastResponse() != test.expectedUnicast {
+				t.Errorf("unicast response %t != %t", q.IsUnicastResponse(), test.expectedUnicast)
+			}
+			if !q.Class().Equal(dns.IN) {
+				t.Errorf("question class %d is not IN", q.Class())
+			}
+		})
+	}
+}
+
 // nolint: gocyclo
 func TestQuery(t *testing.T) {
 	tests := []struct {
