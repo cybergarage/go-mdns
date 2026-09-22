@@ -52,7 +52,7 @@ func (cache *serviceCache) Update(service Service) (ServiceEvent, bool) {
 
 	key := service.FullName()
 	if len(key) == 0 {
-		return ServiceEvent{}, false // nolint: exhaustruct
+		return ServiceEvent{}, false // nolint: exhaustruct,exhaustruct_v5
 	}
 
 	ttl := service.TTL()
@@ -61,7 +61,7 @@ func (cache *serviceCache) Update(service Service) (ServiceEvent, bool) {
 	// A record with a TTL of zero means that the record is no longer valid.
 	if ttl <= 0 {
 		if _, ok := cache.entries[key]; !ok {
-			return ServiceEvent{}, false // nolint: exhaustruct
+			return ServiceEvent{}, false // nolint: exhaustruct,exhaustruct_v5
 		}
 		delete(cache.entries, key)
 		return ServiceEvent{
@@ -87,7 +87,7 @@ func (cache *serviceCache) Update(service Service) (ServiceEvent, bool) {
 	entry.expiredAt = time.Now().Add(ttl)
 
 	if !isUpdated {
-		return ServiceEvent{}, false // nolint: exhaustruct
+		return ServiceEvent{}, false // nolint: exhaustruct,exhaustruct_v5
 	}
 
 	return ServiceEvent{

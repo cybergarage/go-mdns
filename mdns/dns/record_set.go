@@ -219,7 +219,7 @@ func (records RecordSet) String() string {
 	for n, r := range lines {
 		for n, s := range r {
 			sfmt := "%-" + strconv.Itoa(maxRecordLen[n]) + "s"
-			str.WriteString(fmt.Sprintf(sfmt, s))
+			fmt.Fprintf(&str, sfmt, s)
 			if n < len(r)-1 {
 				str.WriteString(" ")
 			}

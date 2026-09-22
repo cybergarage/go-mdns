@@ -49,7 +49,7 @@ func (a *aaaaRecord) Address() net.IP {
 		if (n != 0) && ((n % 2) == 0) {
 			ipstr.WriteString(":")
 		}
-		ipstr.WriteString(fmt.Sprintf("%02x", b))
+		fmt.Fprintf(&ipstr, "%02x", b)
 	}
 	return net.ParseIP(ipstr.String())
 }

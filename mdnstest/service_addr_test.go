@@ -89,7 +89,7 @@ func TestServiceAddresses(t *testing.T) {
 // RFC 4007: An IPv6 link-local address is ambiguous without its zone, and the
 // zone is the interface which the response was received on.
 func TestServiceLinkLocalAddrZone(t *testing.T) {
-	testIfi := &net.Interface{ // nolint: exhaustruct
+	testIfi := &net.Interface{ // nolint: exhaustruct,exhaustruct_v5
 		Index: 1,
 		Name:  "en0",
 	}

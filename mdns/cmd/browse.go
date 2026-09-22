@@ -32,7 +32,7 @@ const (
 	durationParamStr = "duration"
 )
 
-var browseCmd = &cobra.Command{ // nolint:exhaustruct
+var browseCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   "browse [service]",
 	Short: "Browse the instances of a service type",
 	Long: `Browse the instances of a service type, and report the instances as they are

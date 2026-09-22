@@ -49,7 +49,7 @@ func newQueryTypeFromString(s string) (mdns.Type, error) {
 	return t, nil
 }
 
-var queryCmd = &cobra.Command{ // nolint:exhaustruct
+var queryCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   "query [name]",
 	Short: "Send a single question and print the answering records",
 	Long: `Send a single question to the multicast address, and print the records of

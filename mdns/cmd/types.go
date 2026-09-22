@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var typesCmd = &cobra.Command{ // nolint:exhaustruct
+var typesCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   "types",
 	Short: "List the service types which are advertised on the link",
 	Long: `List the service types which are advertised on the link.

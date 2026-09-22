@@ -30,7 +30,7 @@ func newTestTXTResponse(t *testing.T, name string, ttl uint32, attrs ...string) 
 
 	encodeName := func(name string) []byte {
 		b := []byte{}
-		for _, label := range strings.Split(name, ".") {
+		for label := range strings.SplitSeq(name, ".") {
 			b = append(b, byte(len(label)))
 			b = append(b, []byte(label)...)
 		}

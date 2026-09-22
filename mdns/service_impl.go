@@ -210,7 +210,7 @@ func (srv *serviceImpl) Addrs() []*net.UDPAddr {
 
 	addrs := make([]*net.UDPAddr, 0, len(srv.addrs))
 	for _, ip := range srv.addrs {
-		udpAddr := &net.UDPAddr{ // nolint: exhaustruct
+		udpAddr := &net.UDPAddr{ // nolint: exhaustruct,exhaustruct_v5
 			IP:   ip,
 			Port: srv.port,
 		}

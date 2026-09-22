@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var resolveCmd = &cobra.Command{ // nolint:exhaustruct
+var resolveCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   "resolve <instance>",
 	Short: "Resolve a service instance to its host, port and attributes",
 	Long: `Resolve a service instance name to its host, port, addresses and TXT

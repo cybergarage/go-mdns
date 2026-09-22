@@ -49,7 +49,7 @@ func allSupportedFamilies() []string {
 	}
 }
 
-var rootCmd = &cobra.Command{ // nolint:exhaustruct
+var rootCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   ProgramName,
 	Short: "Browse and resolve mDNS (DNS-SD) services on the local link",
 	Long: `mdnslookup browses and resolves the Multicast DNS (RFC 6762) and

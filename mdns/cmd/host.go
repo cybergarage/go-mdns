@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var hostCmd = &cobra.Command{ // nolint:exhaustruct
+var hostCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   "host <hostname>",
 	Short: "Resolve a host name to its addresses",
 	Long: `Resolve a host name to its addresses with Multicast DNS (RFC 6762).

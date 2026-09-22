@@ -29,7 +29,7 @@ const (
 	rawParamStr = "raw"
 )
 
-var decodeCmd = &cobra.Command{ // nolint:exhaustruct
+var decodeCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   "decode <file>",
 	Short: "Decode a recorded mDNS message",
 	Long: `Decode a recorded mDNS message, and print its records. The file is a hex dump

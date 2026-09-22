@@ -64,7 +64,7 @@ func (sock *UnicastUDPSocket) Bind(ifi *net.Interface, ifaddr string, port int) 
 		}
 	}
 
-	listenConfig := net.ListenConfig{ // nolint: exhaustruct
+	listenConfig := net.ListenConfig{ // nolint: exhaustruct,exhaustruct_v5
 		Control: func(network, address string, c syscall.RawConn) error {
 			var ctrlErr error
 			if err := c.Control(func(fd uintptr) {

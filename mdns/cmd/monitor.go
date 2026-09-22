@@ -30,7 +30,7 @@ const (
 	responsesParamStr = "responses"
 )
 
-var monitorCmd = &cobra.Command{ // nolint:exhaustruct
+var monitorCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   "monitor",
 	Short: "Watch the mDNS messages on the link",
 	Long: `Listen on the mDNS multicast address, and print every message which is sent

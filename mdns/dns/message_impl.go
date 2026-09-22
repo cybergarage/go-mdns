@@ -198,7 +198,7 @@ func (msg *message) Additions() ResourceRecordSet {
 
 // RecordSet returns all records which includes questions, answers, name servers, and additions.
 func (msg *message) RecordSet() RecordSet {
-	records := RecordSet{}
+	records := make(RecordSet, 0, len(msg.questions)+len(msg.answers)+len(msg.nameServers)+len(msg.additions))
 	for _, r := range msg.questions {
 		records = append(records, r)
 	}
@@ -210,7 +210,7 @@ func (msg *message) RecordSet() RecordSet {
 
 // ResourceRecordSet returns only all resource records in the message without questions.
 func (msg *message) ResourceRecordSet() ResourceRecordSet {
-	records := ResourceRecordSet{}
+	records := make(ResourceRecordSet, 0, len(msg.answers)+len(msg.nameServers)+len(msg.additions))
 	records = append(records, msg.answers...)
 	records = append(records, msg.nameServers...)
 	records = append(records, msg.additions...)

@@ -191,7 +191,7 @@ func (r *record) Content() string {
 	for n := range r.data {
 		rb := rune(r.data[n])
 		if unicode.IsPrint(rb) {
-			c.WriteString(fmt.Sprintf("%c", rb))
+			fmt.Fprintf(&c, "%c", rb)
 		} else {
 			c.WriteString(LabelSeparator)
 		}

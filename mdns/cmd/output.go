@@ -54,13 +54,15 @@ func addrString(addr *net.UDPAddr) string {
 }
 
 func newServiceObject(service mdns.Service) serviceObject {
-	addrs := make([]string, 0)
-	for _, addr := range service.Addrs() {
+	serviceAddrs := service.Addrs()
+	addrs := make([]string, 0, len(serviceAddrs))
+	for _, addr := range serviceAddrs {
 		addrs = append(addrs, addrString(addr))
 	}
 
-	attrs := make([]string, 0)
-	for _, attr := range service.ResourceAttributes() {
+	serviceAttrs := service.ResourceAttributes()
+	attrs := make([]string, 0, len(serviceAttrs))
+	for _, attr := range serviceAttrs {
 		attrs = append(attrs, attr.String())
 	}
 
