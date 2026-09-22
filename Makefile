@@ -64,7 +64,7 @@ lint: format
 	golangci-lint run ${PKG_SRC_DIR}/... ${TEST_PKG_DIR}/...
 
 test: lint
-	go test -v -p 1 -timeout 10m -cover -coverpkg=${PKG}/... -coverprofile=${PKG_COVER}.out ${PKG}/... ${TEST_PKG}/...
+	go test -v -race -p 1 -timeout 10m -cover -coverpkg=${PKG}/... -coverprofile=${PKG_COVER}.out ${PKG}/... ${TEST_PKG}/...
 	go tool cover -html=${PKG_COVER}.out -o ${PKG_COVER}.html
 
 install:
@@ -72,9 +72,8 @@ install:
 	${GOBIN}/${BIN_LOOKUP} doc > ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md
 	@git diff --quiet -- ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md || \
 		git commit ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md -m "docs: update ${BIN_LOOKUP} command reference"
-	${GOBIN}/${BIN_SERVER} doc > ${DOCS_ROOT_DIR}/${BIN_SERVER}.md
-	@git diff --quiet -- ${DOCS_ROOT_DIR}/${BIN_SERVER}.md || \
-		git commit ${DOCS_ROOT_DIR}/${BIN_SERVER}.md -m "docs: update ${BIN_SERVER} command reference"
+# ${BIN_SERVER} is under development, and it has no doc command yet, so
+# ${DOCS_ROOT_DIR}/${BIN_SERVER}.md is maintained by hand.
 
 clean:
 	go clean -i ${PKG} ${TEST_PKG} ${BINS}

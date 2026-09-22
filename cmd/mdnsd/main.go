@@ -13,15 +13,21 @@
 // limitations under the License.
 
 /*
-mdns-server is a generic server for mDNS protocol.
+mdnsd is a Multicast DNS responder.
 
 	NAME
-	mdns-server
+	mdnsd
 
 	SYNOPSIS
-	mdns-server [OPTIONS]
+	mdnsd [OPTIONS]
 
-	mdns-serveru is a generic server for mDNS protocol.
+	DESCRIPTION
+	mdnsd is under development. The responder side of go-mdns is not
+	implemented yet, so the command only listens for the mDNS messages on
+	the link. It registers no service, and it answers no query.
+
+	Use mdnslookup to browse and resolve the services which the other
+	responders advertise.
 
 	RETURN VALUE
 	  Return EXIT_SUCCESS or EXIT_FAILURE
@@ -29,8 +35,12 @@ mdns-server is a generic server for mDNS protocol.
 package main
 
 import (
+	"context"
 	"flag"
-	"time"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/cybergarage/go-logger/log"
 )
@@ -39,13 +49,12 @@ func main() {
 	verbose := flag.Bool("v", false, "Enable verbose output")
 	flag.Parse()
 
-	// Setup logger
-
 	if *verbose {
 		log.SetSharedLogger(log.NewStdoutLogger(log.LevelTrace))
 	}
 
-	// Start a controller for Echonet Lite node
+	fmt.Fprintln(os.Stderr, "mdnsd is under development: it registers no service and answers no query.")
+	fmt.Fprintln(os.Stderr, "Use mdnslookup to browse and resolve the services on the link.")
 
 	server := NewServer()
 
@@ -53,21 +62,18 @@ func main() {
 		server.RegisterMessageHandler(server.MessageReceived)
 	}
 
-	err := server.Start()
-	if err != nil {
-		return
+	if err := server.Start(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
-	// Wait node responses in the local network
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-	time.Sleep(time.Second * 1)
+	<-ctx.Done()
 
-	// Output all found nodes
-
-	// Stop the controller
-
-	err = server.Stop()
-	if err != nil {
-		return
+	if err := server.Stop(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }

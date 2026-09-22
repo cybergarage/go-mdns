@@ -22,6 +22,12 @@ import (
 )
 
 // Server represents a server node instance.
+//
+// The responder side is under development. The server listens for the mDNS
+// messages and passes them to the registered handlers, but it registers no
+// service, and it answers no query. Registering, probing, announcing and
+// answering a query are planned for v1.0.0. Use Client to browse and resolve
+// the services which the other responders advertise.
 type Server struct {
 	sync.Mutex
 	*transport.MessageManager
