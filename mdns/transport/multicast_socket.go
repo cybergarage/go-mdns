@@ -56,9 +56,14 @@ func (sock *MulticastSocket) Bind(ifi *net.Interface, ifaddr string) error {
 		return fmt.Errorf("%w (%s)", err, ifi.Name)
 	}
 
-	sock.Conn.SetReadBuffer(sock.GetReadBufferSize())
+	conn := sock.Conn()
+	if conn == nil {
+		return errSocketClosed
+	}
 
-	rawConn, err := sock.Conn.SyscallConn()
+	conn.SetReadBuffer(sock.GetReadBufferSize())
+
+	rawConn, err := conn.SyscallConn()
 	if err != nil {
 		return err
 	}

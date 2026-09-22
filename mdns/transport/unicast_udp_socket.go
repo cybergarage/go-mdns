@@ -87,7 +87,7 @@ func (sock *UnicastUDPSocket) Bind(ifi *net.Interface, ifaddr string, port int) 
 		return fmt.Errorf("invalid udp packet connection: %T", pc)
 	}
 
-	sock.Conn = conn
+	sock.SetConn(conn)
 
 	sock.SetListenStatus(ifi, ifaddr, port)
 

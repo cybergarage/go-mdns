@@ -19,6 +19,7 @@ import (
 	"io"
 	"net"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/cybergarage/go-logger/log"
@@ -26,9 +27,12 @@ import (
 )
 
 // A UDPSocket represents a socket for UDP.
+// The connection is guarded by the mutex because the socket is closed from the
+// caller goroutine while the listener goroutine is reading the connection.
 type UDPSocket struct {
 	*Socket
-	Conn           *net.UDPConn
+	connMutex      sync.RWMutex
+	conn           *net.UDPConn
 	ReadBufferSize int
 	ReadBuffer     []byte
 	dns.Transport
@@ -38,13 +42,28 @@ type UDPSocket struct {
 func NewUDPSocket(transport dns.Transport) *UDPSocket {
 	sock := &UDPSocket{
 		Socket:         NewSocket(),
-		Conn:           nil,
+		connMutex:      sync.RWMutex{},
+		conn:           nil,
 		ReadBufferSize: MaxPacketSize,
 		ReadBuffer:     make([]byte, 0),
 		Transport:      transport,
 	}
 	sock.SetReadBufferSize(MaxPacketSize)
 	return sock
+}
+
+// SetConn sets the UDP connection.
+func (sock *UDPSocket) SetConn(conn *net.UDPConn) {
+	sock.connMutex.Lock()
+	defer sock.connMutex.Unlock()
+	sock.conn = conn
+}
+
+// Conn returns the current UDP connection.
+func (sock *UDPSocket) Conn() *net.UDPConn {
+	sock.connMutex.RLock()
+	defer sock.connMutex.RUnlock()
+	return sock.conn
 }
 
 // SetReadBufferSize sets the read buffer size.
@@ -60,11 +79,14 @@ func (sock *UDPSocket) GetReadBufferSize() int {
 
 // Close closes the current opened socket.
 func (sock *UDPSocket) Close() error {
-	conn := sock.Conn
+	sock.connMutex.Lock()
+	conn := sock.conn
+	sock.conn = nil
+	sock.connMutex.Unlock()
+
 	if conn == nil {
 		return nil
 	}
-	sock.Conn = nil
 
 	conn.SetDeadline(time.Now().Add(-time.Second))
 	return conn.Close()
@@ -75,6 +97,11 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (
 	toUDPAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(toAddr, strconv.Itoa(toPort)))
 	if err != nil {
 		return 0, err
+	}
+
+	conn := sock.Conn()
+	if conn == nil {
+		return 0, errSocketClosed
 	}
 
 	msgBytes := msg.Bytes()
@@ -88,16 +115,17 @@ func (sock *UDPSocket) SendMessage(toAddr string, toPort int, msg dns.Message) (
 	)
 	log.HexDebug(msgBytes)
 
-	return sock.Conn.WriteToUDP(msgBytes, toUDPAddr)
+	return conn.WriteToUDP(msgBytes, toUDPAddr)
 }
 
 // ReadMessage reads a message from the current opened socket.
 func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
-	if sock.Conn == nil {
+	conn := sock.Conn()
+	if conn == nil {
 		return nil, fmt.Errorf("%w: %w", io.EOF, errSocketClosed)
 	}
 
-	n, fromAddr, err := sock.Conn.ReadFromUDP(sock.ReadBuffer)
+	n, fromAddr, err := conn.ReadFromUDP(sock.ReadBuffer)
 	if err != nil {
 		return nil, err
 	}
