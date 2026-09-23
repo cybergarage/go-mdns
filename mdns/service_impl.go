@@ -271,20 +271,29 @@ func (srv *serviceImpl) parseAddressRecords(records ResourceRecordSet) {
 	// RFC 6763: 5. Service Instance Resolution
 	// The SRV record target names the host, and only the address records of
 	// that host belong to this service. A single mDNS response may carry the
-	// records of multiple services and hosts, so the address records must not
-	// be collected without matching the target name.
+	// records of multiple services and hosts, so the address records of the
+	// target are preferred over the rest.
 	if 0 < len(srv.host) {
+		hasTargetAddress := false
 		for _, record := range records {
 			if !record.IsName(srv.host) {
 				continue
 			}
-			appendAddress(record)
+			if appendAddress(record) {
+				hasTargetAddress = true
+			}
 		}
-		return
+		if hasTargetAddress {
+			return
+		}
+		// The message holds no address record of the target, which a
+		// responder that abbreviates the names of its records produces.
+		// The address records are then collected as they are, because
+		// dropping them would leave the service unreachable.
 	}
 
-	// No SRV record is included in the message. The address records are
-	// collected as they are, because there is no target name to match.
+	// No SRV record is included in the message, or none of the address
+	// records names its target.
 	for _, record := range records {
 		appendAddress(record)
 	}

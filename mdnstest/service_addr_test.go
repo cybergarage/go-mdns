@@ -125,3 +125,39 @@ func TestServiceLinkLocalAddrZone(t *testing.T) {
 		t.Errorf("zoned address count %d != 1", zonedAddrCount)
 	}
 }
+
+// A responder which abbreviates the names of its records answers with address
+// records whose name does not match the SRV target. Dropping them would leave
+// the service without an address, so they are collected as they are.
+func TestServiceAddressesWithoutTargetName(t *testing.T) {
+	service := newTestServiceFromDump(t, matterSpec12043113DNSSD)
+
+	expectedHost := "macmini.local"
+	if service.Host() != expectedHost {
+		t.Errorf("host %s != %s", service.Host(), expectedHost)
+	}
+
+	expectedAddrs := []string{
+		"192.168.100.53",
+		"fe80::46d:889b:988:3dfc",
+		"2400:2410:b242:bf00:1845:f0cb:41af:b6fb",
+	}
+
+	addrs := service.Addresses()
+	if len(addrs) != len(expectedAddrs) {
+		t.Fatalf("addresses %v != %v", addrs, expectedAddrs)
+	}
+	for _, expectedAddr := range expectedAddrs {
+		expectedIP := net.ParseIP(expectedAddr)
+		found := false
+		for _, addr := range addrs {
+			if addr.Equal(expectedIP) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("%s is not found in %v", expectedAddr, addrs)
+		}
+	}
+}
