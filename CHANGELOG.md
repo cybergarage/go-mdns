@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2026-09-23
+
+### Fixed
+
+- A service lost its addresses when the response which carried it abbreviated the names of its records. The address records are selected by the SRV target name, so that a response which holds more than one instance does not report the addresses of the other hosts, and a responder which answers with records whose name does not match the target, such as the example of the Matter specification (1.2, 4.3.1.13), left the service without an address at all. The records of the target are still preferred, and the rest are collected only when none of them names the target.
+- `make version` overwrote `version.go` with the next patch of the latest tag, so a minor release which was prepared by hand before its tag was made was lost on the next build, and a repository with no tag at all got a version of `..1`. `version.gen` now fails instead of writing a version it cannot derive, and the version is kept when the generated one is not newer.
+
 ## [0.9.0] - 2026-09-22
 
 The first release with a client API which covers browsing, resolving and host lookup. The responder side is still under development, and it is planned for v1.0.0.
