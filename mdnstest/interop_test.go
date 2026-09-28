@@ -113,9 +113,9 @@ func isRequired(client string) bool {
 	return false
 }
 
-// skipOrFail skips the test, or fails it when GO_MDNS_TEST_REQUIRE lists
+// skipOrFailf skips the test, or fails it when GO_MDNS_TEST_REQUIRE lists
 // client.
-func skipOrFail(t *testing.T, client string, format string, args ...any) {
+func skipOrFailf(t *testing.T, client string, format string, args ...any) {
 	t.Helper()
 	if isRequired(client) {
 		t.Fatalf("%s is required by %s: "+format, append([]any{client, requireEnv}, args...)...)
@@ -132,7 +132,7 @@ func requireTool(t *testing.T, client string, name string) {
 	}
 	path, err := exec.LookPath(name)
 	if err != nil {
-		skipOrFail(t, client, "%s is not installed", name)
+		skipOrFailf(t, client, "%s is not installed", name)
 	}
 	t.Logf("running %s (%s)", name, path)
 }
@@ -156,7 +156,7 @@ func requireAvahiDaemon(t *testing.T) {
 	t.Helper()
 	requireTool(t, clientAvahi, "avahi-browse")
 	if err := avahiDaemonError(); err != nil {
-		skipOrFail(t, clientAvahi, "avahi-daemon is not reachable: %v", err)
+		skipOrFailf(t, clientAvahi, "avahi-daemon is not reachable: %v", err)
 	}
 }
 

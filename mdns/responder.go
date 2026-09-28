@@ -16,6 +16,7 @@ package mdns
 
 import (
 	"net"
+	"slices"
 	"strings"
 	"sync"
 
@@ -75,11 +76,9 @@ func (r *responder) deregister(svc *LocalService) (*LocalService, bool) {
 func (r *responder) ifRegistered(svc *LocalService, fn func()) bool {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
-	for _, s := range r.services {
-		if s == svc {
-			fn()
-			return true
-		}
+	if slices.Contains(r.services, svc) {
+		fn()
+		return true
 	}
 	return false
 }

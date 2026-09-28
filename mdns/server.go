@@ -163,9 +163,7 @@ func (server *Server) announce(svc *LocalService) {
 		return
 	}
 	done := server.done
-	server.wg.Add(1)
-	go func() {
-		defer server.wg.Done()
+	server.wg.Go(func() {
 		for i := range announceCount {
 			if 0 < i {
 				select {
@@ -184,7 +182,7 @@ func (server *Server) announce(svc *LocalService) {
 				return
 			}
 		}
-	}()
+	})
 }
 
 // sendAnnouncement sends the records of svc, or its goodbye records, from
