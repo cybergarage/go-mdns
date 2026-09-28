@@ -204,6 +204,11 @@ func (header *Header) setNumberOfEntries(n uint, offset int) {
 	header.bytes[offset+1] = bytes[1]
 }
 
+// setID sets the query identifier.
+func (header *Header) setID(id uint) {
+	header.setNumberOfEntries(id, 0)
+}
+
 // setQD sets the specified number to the QD field.
 func (header *Header) setQD(n uint) {
 	header.setNumberOfEntries(n, 4)

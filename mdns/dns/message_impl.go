@@ -56,10 +56,57 @@ func WithMessageQuestions(questions ...Question) MessageOption {
 	}
 }
 
+// WithMessageAnswers returns a message option with the specified answer
+// records.
+func WithMessageAnswers(answers ...Answer) MessageOption {
+	return func(msg *message) error {
+		for _, a := range answers {
+			msg.AddAnswer(a)
+		}
+		return nil
+	}
+}
+
+// WithMessageNameServers returns a message option with the specified
+// authority records, which a probe carries (RFC 6762, 8.2).
+func WithMessageNameServers(nameServers ...NameServer) MessageOption {
+	return func(msg *message) error {
+		for _, ns := range nameServers {
+			msg.AddNameServer(ns)
+		}
+		return nil
+	}
+}
+
+// WithMessageAdditions returns a message option with the specified
+// additional records.
+func WithMessageAdditions(additions ...Addition) MessageOption {
+	return func(msg *message) error {
+		for _, a := range additions {
+			msg.AddAddition(a)
+		}
+		return nil
+	}
+}
+
 // WithMessageFrom returns a message option with the specified source address.
 func WithMessageFrom(addr Addr) MessageOption {
 	return func(msg *message) error {
 		msg.from = addr
+		return nil
+	}
+}
+
+// WithMessageID sets the query identifier. A multicast message carries 0,
+// and a response to a legacy unicast query echoes the query's identifier
+// (RFC 6762, 6.7 and 18.1). The option applies to a message created with
+// NewRequestMessage or NewResponseMessage.
+func WithMessageID(id uint) MessageOption {
+	return func(msg *message) error {
+		if msg.Header == nil || len(msg.Header.bytes) < 2 {
+			return ErrNil
+		}
+		msg.setID(id)
 		return nil
 	}
 }
