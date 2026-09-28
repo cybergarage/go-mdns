@@ -20,11 +20,7 @@ import (
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
 
-// Server is a Multicast DNS responder.
-//
-// The responder side of go-mdns is under development, so the server only
-// listens for the messages on the link. It registers no service, and it answers
-// no query.
+// Server is a Multicast DNS responder which prints the queries it receives.
 type Server struct {
 	*mdns.Server
 }
@@ -36,7 +32,7 @@ func NewServer() *Server {
 	return server
 }
 
-// MessageReceived is called when a message is received on the link.
+// MessageReceived is called when a query is received on the link.
 func (server *Server) MessageReceived(msg dns.Message) {
 	log.Infof("%s", msg.String())
 }
