@@ -21,6 +21,12 @@ package mdnstest
 // mdns.Server, runs the client, and checks what it prints. A test is
 // skipped when its client, or the daemon the client talks to, is not
 // available, and with -short.
+//
+// GO_MDNS_TEST_REQUIRE lists the clients which must be available, such as
+// "avahi" or "avahi,dns-sd". A listed client which is missing fails its
+// tests instead of skipping them, so that a CI job which installs a client
+// cannot pass without running it. TestInteropClients logs which clients
+// were found, so a verbose log shows which tests really ran.
 
 import (
 	"bufio"
@@ -28,6 +34,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"fmt"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -37,6 +45,13 @@ import (
 	"time"
 
 	"github.com/cybergarage/go-mdns/mdns"
+)
+
+// Clients as GO_MDNS_TEST_REQUIRE names them.
+const (
+	clientAvahi = "avahi"
+	clientDNSSD = "dns-sd"
+	requireEnv  = "GO_MDNS_TEST_REQUIRE"
 )
 
 const (
@@ -88,29 +103,101 @@ func randomSuffix(t *testing.T) string {
 	return hex.EncodeToString(b)
 }
 
-// requireTool skips the test when name is not installed, and with -short.
-func requireTool(t *testing.T, name string) {
+// isRequired reports whether GO_MDNS_TEST_REQUIRE lists client.
+func isRequired(client string) bool {
+	for name := range strings.SplitSeq(os.Getenv(requireEnv), ",") {
+		if strings.TrimSpace(name) == client {
+			return true
+		}
+	}
+	return false
+}
+
+// skipOrFail skips the test, or fails it when GO_MDNS_TEST_REQUIRE lists
+// client.
+func skipOrFail(t *testing.T, client string, format string, args ...any) {
+	t.Helper()
+	if isRequired(client) {
+		t.Fatalf("%s is required by %s: "+format, append([]any{client, requireEnv}, args...)...)
+	}
+	t.Skipf(format, args...)
+}
+
+// requireTool skips the test when the command name of client is not
+// installed, and with -short. It logs the command it runs.
+func requireTool(t *testing.T, client string, name string) {
 	t.Helper()
 	if testing.Short() {
 		t.Skip("the interoperability tests use the network; skipped with -short")
 	}
-	if _, err := exec.LookPath(name); err != nil {
-		t.Skipf("%s is not installed", name)
+	path, err := exec.LookPath(name)
+	if err != nil {
+		skipOrFail(t, client, "%s is not installed", name)
 	}
+	t.Logf("running %s (%s)", name, path)
 }
 
-// requireAvahiDaemon skips the test when avahi-daemon is not reachable,
-// which is common where the Avahi tools are installed without the daemon
-// running, such as on macOS or in a container.
-func requireAvahiDaemon(t *testing.T) {
-	t.Helper()
-	requireTool(t, "avahi-browse")
+// avahiDaemonError returns why avahi-daemon cannot be reached, or nil. The
+// Avahi tools are sometimes installed without the daemon running, such as
+// in a container.
+func avahiDaemonError() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	out, err := exec.CommandContext(ctx, "avahi-browse", "--all", "--terminate", "--parsable", "--no-db-lookup").CombinedOutput()
 	if err != nil {
-		t.Skipf("avahi-daemon is not reachable: %v: %s", err, strings.TrimSpace(string(out)))
+		return fmt.Errorf("%w: %s", err, strings.TrimSpace(string(out)))
 	}
+	return nil
+}
+
+// requireAvahiDaemon skips the test when avahi-browse is not installed or
+// avahi-daemon is not reachable.
+func requireAvahiDaemon(t *testing.T) {
+	t.Helper()
+	requireTool(t, clientAvahi, "avahi-browse")
+	if err := avahiDaemonError(); err != nil {
+		skipOrFail(t, clientAvahi, "avahi-daemon is not reachable: %v", err)
+	}
+}
+
+// TestInteropClients logs which mDNS clients the interoperability tests
+// find, and their versions, so that a verbose log shows which of the tests
+// below ran and which were skipped.
+func TestInteropClients(t *testing.T) {
+	version := func(name string, args ...string) string {
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		out, _ := exec.CommandContext(ctx, name, args...).CombinedOutput()
+		return strings.TrimSpace(strings.SplitN(string(out), "\n", 2)[0])
+	}
+	report := func(client, name string, check func() string) {
+		path, err := exec.LookPath(name)
+		switch {
+		case err != nil:
+			t.Logf("%-14s not installed: its tests are skipped", name)
+			if isRequired(client) {
+				t.Errorf("%s is required by %s but %s is not installed", client, requireEnv, name)
+			}
+		default:
+			t.Logf("%-14s %s: %s", name, path, check())
+		}
+	}
+	report(clientDNSSD, "dns-sd", func() string {
+		return version("dns-sd", "-V")
+	})
+	report(clientAvahi, "avahi-browse", func() string {
+		v := version("avahi-browse", "--version")
+		if err := avahiDaemonError(); err != nil {
+			if isRequired(clientAvahi) {
+				t.Errorf("%s is required by %s but avahi-daemon is not reachable: %v", clientAvahi, requireEnv, err)
+			}
+			return v + ", avahi-daemon not reachable: its tests are skipped"
+		}
+		return v + ", avahi-daemon running"
+	})
+	report(clientAvahi, "avahi-resolve", func() string {
+		return "installed"
+	})
 }
 
 // toolRun is a client process whose output is read line by line.
@@ -286,7 +373,7 @@ func TestAvahiBrowseAndResolve(t *testing.T) {
 
 func TestAvahiResolveHost(t *testing.T) {
 	requireAvahiDaemon(t)
-	requireTool(t, "avahi-resolve")
+	requireTool(t, clientAvahi, "avahi-resolve")
 	s := startInteropService(t)
 
 	out := runTool(t, "avahi-resolve", "--name", s.svc.HostName())
@@ -317,7 +404,7 @@ func TestAvahiSeesGoodbye(t *testing.T) {
 // dns-sd
 
 func TestDNSSDBrowse(t *testing.T) {
-	requireTool(t, "dns-sd")
+	requireTool(t, clientDNSSD, "dns-sd")
 	s := startInteropService(t)
 
 	for _, browseType := range []string{interopServiceType, interopServiceType + "," + interopSubtype} {
@@ -332,7 +419,7 @@ func TestDNSSDBrowse(t *testing.T) {
 }
 
 func TestDNSSDResolve(t *testing.T) {
-	requireTool(t, "dns-sd")
+	requireTool(t, clientDNSSD, "dns-sd")
 	s := startInteropService(t)
 
 	// "go-mdns-test-0a1b2c3d._gomdnstest._tcp.local. can be reached at
@@ -349,7 +436,7 @@ func TestDNSSDResolve(t *testing.T) {
 }
 
 func TestDNSSDResolveHost(t *testing.T) {
-	requireTool(t, "dns-sd")
+	requireTool(t, clientDNSSD, "dns-sd")
 	s := startInteropService(t)
 
 	// "... Add  2  4 go-mdns-test-0a1b2c3d.local.  192.0.2.2  120"
@@ -360,7 +447,7 @@ func TestDNSSDResolveHost(t *testing.T) {
 }
 
 func TestDNSSDSeesGoodbye(t *testing.T) {
-	requireTool(t, "dns-sd")
+	requireTool(t, clientDNSSD, "dns-sd")
 	s := startInteropService(t)
 
 	run := startTool(t, "dns-sd", "-B", interopServiceType, "local.")
