@@ -303,3 +303,28 @@ func TestServerRegisterAndDeregister(t *testing.T) {
 		t.Fatal("Register() of an empty service = nil error")
 	}
 }
+
+// TestResponderIfRegistered guards against a regression where the second
+// announcement of a service deregistered right after it was registered
+// followed its goodbye records and published it again.
+func TestResponderIfRegistered(t *testing.T) {
+	r := newResponder()
+	svc := testLocalService()
+	r.register(svc)
+
+	called := false
+	if !r.ifRegistered(svc, func() { called = true }) || !called {
+		t.Fatal("ifRegistered did not run for a registered service")
+	}
+
+	replacement := testLocalService()
+	r.register(replacement)
+	if r.ifRegistered(svc, func() { t.Error("ran for a replaced copy") }) {
+		t.Error("ifRegistered reported a replaced copy as registered")
+	}
+
+	r.deregister(replacement)
+	if r.ifRegistered(replacement, func() { t.Error("ran for a deregistered service") }) {
+		t.Error("ifRegistered reported a deregistered service as registered")
+	}
+}

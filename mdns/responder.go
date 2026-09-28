@@ -68,6 +68,22 @@ func (r *responder) deregister(svc *LocalService) (*LocalService, bool) {
 	return nil, false
 }
 
+// ifRegistered calls fn while svc, this very copy, is registered, and
+// reports whether it did. fn runs under the read lock, so a service being
+// deregistered or replaced waits for it, and nothing fn sends can follow
+// the goodbye records of a deregistration.
+func (r *responder) ifRegistered(svc *LocalService, fn func()) bool {
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
+	for _, s := range r.services {
+		if s == svc {
+			fn()
+			return true
+		}
+	}
+	return false
+}
+
 func (r *responder) localServices() []*LocalService {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()

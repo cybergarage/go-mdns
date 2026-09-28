@@ -174,7 +174,15 @@ func (server *Server) announce(svc *LocalService) {
 				case <-time.After(announceInterval):
 				}
 			}
-			server.sendAnnouncement(svc, false)
+			// A service deregistered or replaced since stops being
+			// announced; otherwise a late announcement would follow its
+			// goodbye records and publish it again.
+			announced := server.ifRegistered(svc, func() {
+				server.sendAnnouncement(svc, false)
+			})
+			if !announced {
+				return
+			}
 		}
 	}()
 }
