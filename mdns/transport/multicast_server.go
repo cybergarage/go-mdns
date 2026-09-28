@@ -74,7 +74,47 @@ func handleMulticastRequestMessage(server *MulticastServer, reqMsg dns.Message) 
 	if err != nil || resMsg == nil {
 		return
 	}
-	server.AnnounceMessage(resMsg)
+	if addr, port, ok := unicastResponseAddr(reqMsg); ok {
+		if _, err := server.SendMessage(addr, port, resMsg); err != nil {
+			log.Debugf("Failed to send unicast response: %s", err)
+		}
+		return
+	}
+	if err := server.AnnounceMessage(resMsg); err != nil {
+		log.Debugf("Failed to send multicast response: %s", err)
+	}
+}
+
+// unicastResponseAddr returns where the response to reqMsg is sent directly
+// rather than multicast: to the source of a legacy unicast query, sent from
+// a port other than 5353 (RFC 6762, 6.7), and to the source of a query
+// whose questions all ask for a unicast response (5.4).
+func unicastResponseAddr(reqMsg dns.Message) (string, int, bool) {
+	from := reqMsg.From()
+	if from == nil || from.IP() == nil {
+		return "", 0, false
+	}
+	if from.Port() == Port && !allQuestionsUnicast(reqMsg) {
+		return "", 0, false
+	}
+	addr := from.IP().String()
+	if zone := from.Zone(); zone != "" {
+		addr += "%" + zone
+	}
+	return addr, from.Port(), true
+}
+
+func allQuestionsUnicast(msg dns.Message) bool {
+	questions := msg.Questions()
+	if len(questions) == 0 {
+		return false
+	}
+	for _, q := range questions {
+		if !q.UnicastResponse() {
+			return false
+		}
+	}
+	return true
 }
 
 func handleMulticastConnection(server *MulticastServer, cancel chan any) {
