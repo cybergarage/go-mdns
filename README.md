@@ -186,6 +186,17 @@ Every command takes `--format table|json|csv`, and the common `--interface`, `--
 $ mdnsd -name demo -service _http._tcp -port 8080 -txt path=/
 ```
 
+## Testing
+
+`make test` runs the unit tests and the tests on the network. When the mDNS clients of the operating system are installed, the tests in `mdnstest/interop_test.go` also publish a service with the responder and check that the clients find it:
+
+| Client | Checked |
+| --- | --- |
+| `dns-sd` (Bonjour: macOS, Windows) | `-B` by type and by subtype, `-L`, `-G`, and the removal after a goodbye |
+| `avahi-browse`, `avahi-resolve` (Avahi: Linux) | `--resolve` by type and by subtype, `--name`, and the removal after a goodbye |
+
+A test is skipped when its client is not installed or, for Avahi, when `avahi-daemon` is not running. `go test -short` skips them all.
+
 # User Guides
 
 - Operation
