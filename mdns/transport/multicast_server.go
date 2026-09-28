@@ -98,7 +98,9 @@ func unicastResponseAddr(reqMsg dns.Message) (string, int, bool) {
 		return "", 0, false
 	}
 	addr := from.IP().String()
-	if zone := from.Zone(); zone != "" {
+	// A received address carries the interface as its zone, which only an
+	// IPv6 address can use.
+	if zone := from.Zone(); zone != "" && from.IP().To4() == nil {
 		addr += "%" + zone
 	}
 	return addr, from.Port(), true

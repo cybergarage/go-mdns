@@ -22,14 +22,14 @@ import (
 )
 
 func TestUnicastResponseAddr(t *testing.T) {
-	query := func(port int, zone string, qu bool) dns.Message {
+	query := func(port int, zone string, qu bool, v6 bool) dns.Message {
 		cls := dns.IN
 		if qu {
 			cls |= dns.QU
 		}
 		q := dns.NewQuestion(dns.WithQuestionName("_http._tcp.local"), dns.WithQuestionType(dns.PTR), dns.WithQuestionClass(cls))
 		ip := net.IPv4(192, 168, 0, 20)
-		if zone != "" {
+		if v6 {
 			ip = net.ParseIP("fe80::20")
 		}
 		from := dns.NewAddr(dns.WithAddrIP(ip), dns.WithAddrPort(port), dns.WithAddrZone(zone))
@@ -40,16 +40,21 @@ func TestUnicastResponseAddr(t *testing.T) {
 		return msg
 	}
 
-	if _, _, ok := unicastResponseAddr(query(Port, "", false)); ok {
+	if _, _, ok := unicastResponseAddr(query(Port, "", false, false)); ok {
 		t.Error("a multicast query from port 5353 is answered by unicast")
 	}
-	if addr, port, ok := unicastResponseAddr(query(50000, "", false)); !ok || addr != "192.168.0.20" || port != 50000 {
+	if addr, port, ok := unicastResponseAddr(query(50000, "", false, false)); !ok || addr != "192.168.0.20" || port != 50000 {
 		t.Errorf("legacy unicast query: (%q, %d, %v), want the source address and port", addr, port, ok)
 	}
-	if addr, port, ok := unicastResponseAddr(query(Port, "", true)); !ok || addr != "192.168.0.20" || port != Port {
+	if addr, port, ok := unicastResponseAddr(query(Port, "", true, false)); !ok || addr != "192.168.0.20" || port != Port {
 		t.Errorf("QU query: (%q, %d, %v), want the source on port 5353", addr, port, ok)
 	}
-	if addr, _, ok := unicastResponseAddr(query(Port, "en0", true)); !ok || addr != "fe80::20%en0" {
+	if addr, _, ok := unicastResponseAddr(query(Port, "en0", true, true)); !ok || addr != "fe80::20%en0" {
 		t.Errorf("QU query from a link-local address: %q, %v, want the zone kept", addr, ok)
+	}
+	// A received IPv4 address carries its interface as the zone too, which
+	// must not reach the destination address.
+	if addr, _, ok := unicastResponseAddr(query(Port, "eth0", true, false)); !ok || addr != "192.168.0.20" {
+		t.Errorf("QU query from IPv4 with an interface zone: %q, %v, want no zone", addr, ok)
 	}
 }
