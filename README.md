@@ -195,7 +195,17 @@ $ mdnsd -name demo -service _http._tcp -port 8080 -txt path=/
 | `dns-sd` (Bonjour: macOS, Windows) | `-B` by type and by subtype, `-L`, `-G`, and the removal after a goodbye |
 | `avahi-browse`, `avahi-resolve` (Avahi: Linux) | `--resolve` by type and by subtype, `--name`, and the removal after a goodbye |
 
-A test is skipped when its client is not installed or, for Avahi, when `avahi-daemon` is not running. `go test -short` skips them all.
+A test is skipped when its client is not installed or, for Avahi, when `avahi-daemon` is not running. `go test -short` skips them all. `TestInteropClients` logs which clients were found, so the verbose log shows which of the tests ran:
+
+```
+$ make test-interop
+    interop_test.go:177: dns-sd         /usr/bin/dns-sd: Currently running daemon (system service) is version mDNSResponder-...
+    interop_test.go:177: avahi-browse   not installed: its tests are skipped
+```
+
+Set `GO_MDNS_TEST_REQUIRE` to the clients which must be available, such as `avahi` or `avahi,dns-sd`, to fail instead of skipping the tests of a missing one. The GitHub Actions workflow installs Avahi on Ubuntu and sets `GO_MDNS_TEST_REQUIRE=avahi`. The Homebrew `avahi` formula is Linux only, so on macOS the tests use `dns-sd`.
+
+`go test` caches the results, and a cached result does not run the clients again; use `make test`, `make test-interop` or `go test -count=1`.
 
 # User Guides
 

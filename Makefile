@@ -45,7 +45,7 @@ BINS=\
 
 DOCS_ROOT_DIR=doc
 
-.PHONY: format vet lint clean
+.PHONY: format vet lint test test-interop clean
 .IGNORE: lint
 
 all: test
@@ -77,9 +77,18 @@ vet: format
 lint: format
 	golangci-lint run ${PKG_SRC_DIR}/... ${TEST_PKG_DIR}/...
 
+# -count=1 runs the tests every time: the tests on the network and the
+# interoperability tests depend on the host, which the test cache does not
+# see, so a cached result could report a client test which did not run.
 test: lint
-	go test -v -race -p 1 -timeout 10m -cover -coverpkg=${PKG}/... -coverprofile=${PKG_COVER}.out ${PKG}/... ${TEST_PKG}/...
+	go test -v -race -p 1 -count=1 -timeout 10m -cover -coverpkg=${PKG}/... -coverprofile=${PKG_COVER}.out ${PKG}/... ${TEST_PKG}/...
 	go tool cover -html=${PKG_COVER}.out -o ${PKG_COVER}.html
+
+# test-interop runs only the tests against the mDNS clients of the host,
+# dns-sd and Avahi, and logs which of them were found. Set
+# GO_MDNS_TEST_REQUIRE=avahi,dns-sd to fail instead of skipping a missing one.
+test-interop:
+	go test -v -count=1 -run 'TestInteropClients|TestDNSSD|TestAvahi' ${TEST_PKG}
 
 install:
 	go install ${BINS}

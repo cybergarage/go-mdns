@@ -21,7 +21,19 @@ jobs:
     - name: Set up golangci-lint
       run: sudo snap install golangci-lint --classic
 
+    # The interoperability tests in mdnstest check the responder with
+    # avahi-browse and avahi-resolve, which need avahi-daemon running.
+    - name: Set up Avahi
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y avahi-daemon avahi-utils
+        sudo systemctl start avahi-daemon
+        avahi-browse --all --terminate --parsable --no-db-lookup
+
     - name: Test
+      env:
+        # Fail, rather than skip, the Avahi tests if Avahi is not usable.
+        GO_MDNS_TEST_REQUIRE: avahi
       run: make test
 
     - name: Upload coverage reports to Codecov
