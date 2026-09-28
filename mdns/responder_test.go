@@ -71,7 +71,7 @@ func reparse(t *testing.T, res dns.Message) dns.Message {
 }
 
 func recordTypes(records dns.ResourceRecordSet) []dns.Type {
-	types := []dns.Type{}
+	types := make([]dns.Type, 0, len(records))
 	for _, r := range records {
 		types = append(types, r.Type())
 	}

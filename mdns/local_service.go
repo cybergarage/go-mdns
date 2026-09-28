@@ -123,7 +123,7 @@ func (svc *LocalService) SubtypeNames() []string {
 	return names
 }
 
-// ServiceTypeEnumerationName returns the name which lists the service types
+// serviceTypeEnumerationName returns the name which lists the service types
 // of the service's domain, "_services._dns-sd._udp.local".
 func (svc *LocalService) serviceTypeEnumerationName() string {
 	return dns.NewNameWithStrings(ServiceTypeEnumerationName, svc.domain())
@@ -166,7 +166,14 @@ func (r *localServiceRecords) all() []dns.ResourceRecord {
 // given TTLs; a zero TTL builds the goodbye records (RFC 6762, 10.1).
 func (svc *LocalService) records(ifi *net.Interface, otherTTL, hostTTL uint) (*localServiceRecords, error) {
 	var err error
-	r := &localServiceRecords{}
+	r := &localServiceRecords{
+		ptr:      nil,
+		subtypes: make([]dns.ResourceRecord, 0, len(svc.Subtypes)),
+		enum:     nil,
+		srv:      nil,
+		txt:      nil,
+		addrs:    []dns.ResourceRecord{},
+	}
 
 	if r.ptr, err = dns.NewPTRResourceRecord(svc.ServiceName(), svc.FullName(), otherTTL); err != nil {
 		return nil, err
@@ -205,17 +212,18 @@ func (svc *LocalService) records(ifi *net.Interface, otherTTL, hostTTL uint) (*l
 // interfaceAddresses returns the unicast addresses of ifi, or of every
 // interface which is up and not a loopback when ifi is nil.
 func interfaceAddresses(ifi *net.Interface) []net.IP {
-	ifis := []net.Interface{}
+	var ifis []net.Interface
 	if ifi != nil {
-		ifis = append(ifis, *ifi)
+		ifis = []net.Interface{*ifi}
 	} else if all, err := net.Interfaces(); err == nil {
+		ifis = make([]net.Interface, 0, len(all))
 		for _, i := range all {
 			if i.Flags&net.FlagUp != 0 && i.Flags&net.FlagLoopback == 0 {
 				ifis = append(ifis, i)
 			}
 		}
 	}
-	ips := []net.IP{}
+	ips := make([]net.IP, 0, 2*len(ifis))
 	for _, i := range ifis {
 		addrs, err := i.Addrs()
 		if err != nil {

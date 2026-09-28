@@ -18,6 +18,7 @@ import (
 	"errors"
 	"math/rand/v2"
 	"net"
+	"slices"
 	"sync"
 	"time"
 
@@ -226,8 +227,8 @@ func (server *Server) MessageReceived(msg dns.Message) (dns.Message, error) {
 
 func copyLocalService(svc *LocalService) *LocalService {
 	copied := *svc
-	copied.Subtypes = append([]string(nil), svc.Subtypes...)
-	copied.TXT = append([]string(nil), svc.TXT...)
-	copied.Addresses = append([]net.IP(nil), svc.Addresses...)
+	copied.Subtypes = slices.Clone(svc.Subtypes)
+	copied.TXT = slices.Clone(svc.TXT)
+	copied.Addresses = slices.Clone(svc.Addresses)
 	return &copied
 }

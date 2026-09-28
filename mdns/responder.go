@@ -85,10 +85,10 @@ func isLegacyUnicastQuery(query dns.Message) bool {
 }
 
 // answer builds the response to query, which was received on ifi. It
-// returns nil when no registered service answers any question. shared
-// reports whether the answers include a shared record, which a multicast
-// response delays (RFC 6762, 6).
-func (r *responder) answer(query dns.Message, ifi *net.Interface) (res dns.Message, shared bool) {
+// returns nil when no registered service answers any question. The second
+// result reports whether the answers include a shared record, which a
+// multicast response delays (RFC 6762, 6).
+func (r *responder) answer(query dns.Message, ifi *net.Interface) (dns.Message, bool) {
 	if query == nil || !query.IsQuery() || query.ResponseCode() != 0 {
 		return nil, false
 	}
