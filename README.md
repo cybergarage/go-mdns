@@ -13,16 +13,16 @@ go-mdns is a Go library for Multicast DNS (mDNS) and DNS Service Discovery (DNS-
 
 ## Status
 
-go-mdns is a **client (querier)** library. It browses, resolves and looks up the services and the hosts which other responders advertise.
+go-mdns is a **client (querier)** and a **server (responder)** library. The client browses, resolves and looks up the services and the hosts which other responders advertise, and the server publishes the services of this node.
 
-**The server (responder) side is under development.** `mdns.Server` and the `mdnsd` command are included, but they only listen for the messages: they do not register a service, answer a query or announce anything yet. Do not use them to advertise a service. The responder is planned for v1.0.0.
+**The responder does not probe for name conflicts yet** (RFC 6762, 8.1 and 9): a registered instance name and host name are assumed to be unique on the link. Probing and conflict resolution are planned for v1.0.0.
 
 | | Status |
 | --- | --- |
 | Browsing, resolving and host lookup (querier) | Supported |
-| Registering and announcing a service (responder) | **Under development** |
+| Registering, announcing and answering for a service (responder) | Supported, without probing |
 | `mdnslookup` command | Supported |
-| `mdnsd` command | **Under development** |
+| `mdnsd` command | Supported |
 
 ### What the client supports
 
@@ -36,14 +36,24 @@ go-mdns is a **client (querier)** library. It browses, resolves and looks up the
 - Goodbye packets and the TTL expiration of the cached services (RFC 6762, 10.1)
 - Selecting the network interfaces and the address families to listen on
 
+### What the server supports
+
+- Registering and deregistering a service with its subtypes, host, port and TXT strings (RFC 6763)
+- Answering the PTR queries for the service type, its subtypes and the service type enumeration, the SRV and TXT queries for the instance, the A and AAAA queries for the host, and ANY; a PTR answer carries the SRV, TXT and address records as additional records (RFC 6763, 12)
+- Publishing the addresses of the interface a query arrives on, unless the service is given its own
+- Announcing a service twice when it is registered or the server starts, and sending goodbye records when it is deregistered or the server stops (RFC 6762, 8.3 and 10.1)
+- Known-Answer suppression of the answers the querier already holds (RFC 6762, 7.1)
+- Unicast responses to QU queries (RFC 6762, 5.4) and to legacy unicast queries from a port other than 5353 (6.7)
+- The cache-flush bit on the unique records, and a random 20-120 ms delay of a multicast response with shared records (RFC 6762, 6 and 10.2)
+
 ### What is not supported yet
 
-- Registering, probing, announcing and answering a query (the responder side)
+- Probing and conflict resolution of the registered names (RFC 6762, 8.1 and 9)
+- Negative responses with NSEC records (RFC 6762, 6.1)
 - Name compression when a message is written (the compression pointers are resolved when a message is read)
 - Truncated messages (the TC bit) and the Known-Answer list continuation (RFC 6762, 7.2)
-- Known-Answer suppression and duplicate question suppression (RFC 6762, 7.1 - 7.4)
-- Legacy unicast queries from a source port other than 5353 (RFC 6762, 6.7)
-- Following the interface changes, such as a link going up or down, while the client is running
+- Known-Answer lists in the client's own queries, and duplicate question suppression (RFC 6762, 7.1 - 7.4)
+- Following the interface changes, such as a link going up or down, while the client or the server is running
 
 The `mdns/dns` package is exported so that the records of a message can be read, but its API is not stable until v1.0.0.
 
@@ -118,6 +128,29 @@ if attr, ok := service.LookupResourceAttribute("CM"); ok {
 addrs, err := client.LookupHost(context.Background(), "macmini.local")
 ```
 
+### Publishing a service
+
+`Server.Register` publishes a service: the server announces it, answers the queries for it, and withdraws it with goodbye records when it is deregistered or the server stops.
+
+```go
+server := mdns.NewServer()
+if err := server.Start(); err != nil {
+	return err
+}
+defer server.Stop()
+
+err := server.Register(&mdns.LocalService{
+	Instance: "665F6E75B5D3A9C2",
+	Service:  "_matterc._udp",
+	Subtypes: []string{"_L3840", "_S15", "_V65521", "_CM"},
+	Host:     "B75AFB458ECD6D6F",
+	Port:     5540,
+	TXT:      []string{"D=3840", "CM=1", "VP=65521+32769"},
+})
+```
+
+Without `Addresses`, the host name resolves to the addresses of the interface a query arrives on. Register the service again to update it, such as its TXT strings.
+
 ### Selecting the interfaces
 
 ```go
@@ -147,11 +180,17 @@ $ mdnslookup decode mdnstest/dumps/matter-answer-01.dump
 
 Every command takes `--format table|json|csv`, and the common `--interface`, `--family` and `--timeout` flags. `decode` needs no network, so a message which was captured elsewhere can be analyzed offline.
 
+`mdnsd` publishes a service from a terminal until it is interrupted.
+
+```
+$ mdnsd -name demo -service _http._tcp -port 8080 -txt path=/
+```
+
 # User Guides
 
 - Operation
   - [mdnslookup](doc/mdnslookup.md)
-  - [mdnsd](doc/mdnsd.md) (under development)
+  - [mdnsd](doc/mdnsd.md)
 
 ## References
 

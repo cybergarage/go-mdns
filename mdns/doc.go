@@ -14,14 +14,15 @@
 
 /*
 Package mdns implements a Multicast DNS (RFC 6762) and DNS-Based Service
-Discovery (RFC 6763) client.
+Discovery (RFC 6763) client and server.
 
 # Status
 
-The package is a client (querier). It browses, resolves and looks up the
-services and the hosts which the other responders advertise. The server
-(responder) side is under development: [Server] only listens for the messages,
-and it registers no service and answers no query yet.
+[Client] is a querier: it browses, resolves and looks up the services and the
+hosts which the other responders advertise. [Server] is a responder: it
+publishes the services registered with it. The responder does not probe for
+name conflicts yet (RFC 6762, 8.1 and 9), so a registered name is assumed to
+be unique on the link.
 
 # Browsing
 
@@ -45,6 +46,27 @@ and go. It blocks until the context is done.
 
 [Client.Query] sends a one-shot query instead, and returns the services which
 answered before the context is done.
+
+# Publishing
+
+[Server.Register] publishes a [LocalService]. The server announces it,
+answers the queries for its type, subtypes, instance and host, and sends
+goodbye records when it is deregistered or the server stops.
+
+	server := mdns.NewServer()
+	if err := server.Start(); err != nil {
+		return err
+	}
+	defer server.Stop()
+
+	err := server.Register(&mdns.LocalService{
+		Instance: "665F6E75B5D3A9C2",
+		Service:  "_matterc._udp",
+		Subtypes: []string{"_L3840", "_S15"},
+		Host:     "B75AFB458ECD6D6F",
+		Port:     5540,
+		TXT:      []string{"D=3840", "CM=1"},
+	})
 
 # Resolving
 

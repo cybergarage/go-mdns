@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+The responder. `Server` publishes services, which makes go-mdns usable to advertise, such as a Matter device advertising itself for commissioning. Probing and conflict resolution remain for v1.0.0.
+
+### Added
+
+- `Server.Register()` and `Server.Deregister()` publish and withdraw a `LocalService`: an instance, a service type, its subtypes, a host, a port, TXT strings and optionally its own addresses. `Server.LocalServices()` lists them.
+- The server answers the PTR queries for a registered service type, its subtypes and the service type enumeration, the SRV and TXT queries for the instance, the A and AAAA queries for the host, and ANY. A PTR answer carries the SRV, TXT and address records as additional records (RFC 6763, 12).
+- A registered service is announced twice when it is registered or the server starts, and goodbye records are sent when it is deregistered or the server stops (RFC 6762, 8.3 and 10.1).
+- Known-Answer suppression, the cache-flush bit on the unique records, and a random 20-120 ms delay of a multicast response with shared records (RFC 6762, 7.1, 10.2 and 6).
+- A QU query (RFC 6762, 5.4) and a legacy unicast query from a port other than 5353 (6.7) are answered by unicast; the reply to a legacy query echoes its ID and question, with TTLs of at most 10 seconds.
+- `dns.NewPTRResourceRecord()`, `dns.NewSRVResourceRecord()`, `dns.NewTXTResourceRecord()`, `dns.NewAResourceRecord()`, `dns.NewAAAAResourceRecord()` and `dns.NewAddressResourceRecord()` build records, and `dns.WithMessageID()`, `dns.WithMessageAnswers()`, `dns.WithMessageNameServers()` and `dns.WithMessageAdditions()` build messages. `dns.CacheFlush` names the cache-flush bit.
+- `mdnsd` publishes the service given by `-name`, `-service`, `-port`, `-host`, `-subtype` and `-txt`.
+
 ## [0.9.1] - 2026-09-23
 
 ### Fixed

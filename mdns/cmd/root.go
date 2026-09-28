@@ -63,7 +63,7 @@ DNS-Based Service Discovery (RFC 6763) services on the local link.
   mdnslookup monitor                         watch the mDNS messages on the link
   mdnslookup decode <file>                   decode a recorded mDNS message
 
-This tool is a client. Advertising a service is not supported yet.`,
+This tool is a client. Use mdnsd to advertise a service.`,
 	Version:           mdns.Version,
 	DisableAutoGenTag: true,
 	// The usage is not printed for a runtime error, such as a name which is
