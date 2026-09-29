@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
+	"github.com/cybergarage/go-mdns/mdns/transport"
 )
 
 // TTLs of the records a responder publishes (RFC 6762, 10): the records
@@ -210,17 +211,18 @@ func (svc *LocalService) records(ifi *net.Interface, otherTTL, hostTTL uint) (*l
 }
 
 // interfaceAddresses returns the unicast addresses of ifi, or of every
-// interface which is up and not a loopback when ifi is nil.
+// interface transport.GetAvailableInterfaces considers usable when ifi is
+// nil. Using the same selection as the one the servers bind to keeps this
+// fallback from resurfacing an address on an interface (such as Docker's
+// docker0) that the bound sockets themselves already exclude.
 func interfaceAddresses(ifi *net.Interface) []net.IP {
 	var ifis []net.Interface
 	if ifi != nil {
 		ifis = []net.Interface{*ifi}
-	} else if all, err := net.Interfaces(); err == nil {
+	} else if all, err := transport.GetAvailableInterfaces(); err == nil {
 		ifis = make([]net.Interface, 0, len(all))
 		for _, i := range all {
-			if i.Flags&net.FlagUp != 0 && i.Flags&net.FlagLoopback == 0 {
-				ifis = append(ifis, i)
-			}
+			ifis = append(ifis, *i)
 		}
 	}
 	ips := make([]net.IP, 0, 2*len(ifis))
