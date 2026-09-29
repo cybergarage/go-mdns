@@ -50,10 +50,6 @@ linters:
     - fatcontext
     - embeddedstructfieldcheck
     - predeclared
-    # Deprecated since golangci-lint v2.12.0 and v2.13.0 in favor of
-    # gomodguard_v2 and exhaustruct_v5, which "default: all" already enables.
-    - gomodguard
-    - exhaustruct
   settings:
     gocritic:
       disabled-checks:
@@ -91,7 +87,6 @@ linters:
     rules:
       - linters:
           - exhaustruct
-          - exhaustruct_v5
           - goconst
           - gosec
           - forcetypeassert
