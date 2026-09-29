@@ -21,7 +21,10 @@ import (
 )
 
 const (
-	libvirtInterfaceName = "virbr0"
+	libvirtInterfacePrefix = "virbr"
+	dockerInterfaceName    = "docker0"
+	dockerBridgePrefix     = "br-"
+	podmanInterfacePrefix  = "cni-podman"
 )
 
 // IsIPv6Address returns true whether the specified interface has a IPv6 address.
@@ -81,9 +84,27 @@ func IsCommunicableAddress(addr string) bool {
 	return true
 }
 
-// IsBridgeInterface returns true when the specified interface is a bridege interface, otherwise false.
+// IsBridgeInterface returns true when the specified interface is a bridge
+// created by a container runtime or a hypervisor, otherwise false. Such a
+// bridge (e.g. Docker's docker0, present by default on GitHub Actions'
+// ubuntu-latest runners) is never a path a real Matter controller reaches
+// the node over; advertising or binding to its address only produces one
+// that looks local but is unreachable, since the host's firewall rules for
+// the bridge typically drop the traffic.
 func IsBridgeInterface(ifi *net.Interface) bool {
-	return ifi.Name == libvirtInterfaceName
+	if strings.HasPrefix(ifi.Name, libvirtInterfacePrefix) {
+		return true
+	}
+	if ifi.Name == dockerInterfaceName {
+		return true
+	}
+	if strings.HasPrefix(ifi.Name, dockerBridgePrefix) {
+		return true
+	}
+	if strings.HasPrefix(ifi.Name, podmanInterfacePrefix) {
+		return true
+	}
+	return false
 }
 
 // IsVirtualInterface returns true when the specified interface is a virtual interface, otherwise false.

@@ -15,6 +15,7 @@
 package transport
 
 import (
+	"net"
 	"testing"
 )
 
@@ -109,6 +110,34 @@ func TestLocalAddresses(t *testing.T) {
 	for n, addr := range badAddrs {
 		if IsLoopbackAddress(addr) {
 			t.Errorf("[%d] %s", n, addr)
+		}
+	}
+}
+
+func TestIsBridgeInterface(t *testing.T) {
+	bridgeNames := []string{
+		"virbr0",
+		"virbr1",
+		"docker0",
+		"br-1234567890ab",
+		"cni-podman0",
+	}
+	for _, name := range bridgeNames {
+		ifi := &net.Interface{Name: name}
+		if !IsBridgeInterface(ifi) {
+			t.Errorf("IsBridgeInterface(%q) = false, want true", name)
+		}
+	}
+
+	nonBridgeNames := []string{
+		"eth0",
+		"en0",
+		"wlan0",
+	}
+	for _, name := range nonBridgeNames {
+		ifi := &net.Interface{Name: name}
+		if IsBridgeInterface(ifi) {
+			t.Errorf("IsBridgeInterface(%q) = true, want false", name)
 		}
 	}
 }
