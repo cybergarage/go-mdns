@@ -127,3 +127,23 @@ func TestMulticastServerWithInterface(t *testing.T) {
 		})
 	}
 }
+
+// TestMulticastServerSetMessageProcessorWhileReceiving sets the processor
+// while the server hands it received messages, as MulticastManager.Start
+// did after starting a server; run with -race.
+func TestMulticastServerSetMessageProcessorWhileReceiving(t *testing.T) {
+	server := NewMulticastServer()
+	processor := func(dns.Message) (dns.Message, error) { return nil, nil }
+	msg := dns.NewRequestMessage()
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for range 100 {
+			handleMulticastRequestMessage(server, msg)
+		}
+	}()
+	for range 100 {
+		server.SetMessageProcessor(processor)
+	}
+	<-done
+}

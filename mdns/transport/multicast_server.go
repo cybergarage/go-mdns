@@ -18,6 +18,7 @@ import (
 	"errors"
 	"io"
 	"net"
+	"sync"
 
 	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns/dns"
@@ -27,8 +28,9 @@ import (
 type MulticastServer struct {
 	*Server
 	*MulticastSocket
-	channel   chan any
-	processor dns.MessageProcessor
+	channel        chan any
+	processorMutex sync.RWMutex
+	processor      dns.MessageProcessor
 }
 
 // NewMulticastServer returns a new MulticastServer.
@@ -37,14 +39,25 @@ func NewMulticastServer() *MulticastServer {
 		Server:          NewServer(),
 		MulticastSocket: NewMulticastSocket(),
 		channel:         nil,
+		processorMutex:  sync.RWMutex{},
 		processor:       nil,
 	}
 	return server
 }
 
-// SetMessageProcessor sets the message processor.
+// SetMessageProcessor sets the message processor. It may be called while
+// the server receives messages.
 func (server *MulticastServer) SetMessageProcessor(processor dns.MessageProcessor) {
+	server.processorMutex.Lock()
+	defer server.processorMutex.Unlock()
 	server.processor = processor
+}
+
+// messageProcessor returns the message processor.
+func (server *MulticastServer) messageProcessor() dns.MessageProcessor {
+	server.processorMutex.RLock()
+	defer server.processorMutex.RUnlock()
+	return server.processor
 }
 
 // Start starts this server.
@@ -67,10 +80,11 @@ func (server *MulticastServer) Stop() error {
 }
 
 func handleMulticastRequestMessage(server *MulticastServer, reqMsg dns.Message) {
-	if server.processor == nil {
+	processor := server.messageProcessor()
+	if processor == nil {
 		return
 	}
-	resMsg, err := server.processor(reqMsg)
+	resMsg, err := processor(reqMsg)
 	if err != nil || resMsg == nil {
 		return
 	}

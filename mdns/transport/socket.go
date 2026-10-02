@@ -19,11 +19,15 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"sync"
 	"syscall"
 )
 
 // A Socket represents a socket.
+// The listen status is guarded by the mutex because the socket is closed
+// from the listener goroutine while response goroutines still read it.
 type Socket struct {
+	mutex           sync.RWMutex
 	listenInterface *net.Interface
 	listenPort      int
 	listenAddress   string
@@ -32,6 +36,7 @@ type Socket struct {
 // NewSocket returns a new UDPSocket.
 func NewSocket() *Socket {
 	sock := &Socket{
+		mutex:           sync.RWMutex{},
 		listenInterface: nil,
 		listenPort:      0,
 		listenAddress:   "",
@@ -42,6 +47,8 @@ func NewSocket() *Socket {
 
 // Close initialize this socket.
 func (sock *Socket) Close() {
+	sock.mutex.Lock()
+	defer sock.mutex.Unlock()
 	sock.listenInterface = nil
 	sock.listenAddress = ""
 	sock.listenPort = 0
@@ -49,6 +56,8 @@ func (sock *Socket) Close() {
 
 // SetListenStatus sets the listening interface, port, and address.
 func (sock *Socket) SetListenStatus(i *net.Interface, addr string, port int) {
+	sock.mutex.Lock()
+	defer sock.mutex.Unlock()
 	sock.listenInterface = i
 	sock.listenAddress = addr
 	sock.listenPort = port
@@ -56,12 +65,16 @@ func (sock *Socket) SetListenStatus(i *net.Interface, addr string, port int) {
 
 // IsListening returns true whether the socket is listening, otherwise false.
 func (sock *Socket) IsListening() bool {
+	sock.mutex.RLock()
+	defer sock.mutex.RUnlock()
 	return sock.listenPort != 0
 }
 
 // ListenPort returns the listening port.
 func (sock *Socket) ListenPort() (int, error) {
-	if !sock.IsListening() {
+	sock.mutex.RLock()
+	defer sock.mutex.RUnlock()
+	if sock.listenPort == 0 {
 		return 0, errSocketClosed
 	}
 	return sock.listenPort, nil
@@ -69,7 +82,9 @@ func (sock *Socket) ListenPort() (int, error) {
 
 // ListenInterface returns the listening interface.
 func (sock *Socket) ListenInterface() (*net.Interface, error) {
-	if !sock.IsListening() {
+	sock.mutex.RLock()
+	defer sock.mutex.RUnlock()
+	if sock.listenPort == 0 {
 		return nil, errSocketClosed
 	}
 	return sock.listenInterface, nil
@@ -77,10 +92,11 @@ func (sock *Socket) ListenInterface() (*net.Interface, error) {
 
 // ListenAddr returns the listening address.
 func (sock *Socket) ListenAddr() (string, error) {
-	if !sock.IsListening() {
+	sock.mutex.RLock()
+	defer sock.mutex.RUnlock()
+	if sock.listenPort == 0 {
 		return "", errSocketClosed
 	}
-
 	return sock.listenAddress, nil
 }
 

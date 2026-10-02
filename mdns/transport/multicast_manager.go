@@ -65,7 +65,9 @@ func (mgr *MulticastManager) AnnounceMessage(msg dns.Message) error {
 // startWithInterface starts this server on the specified interface.
 func (mgr *MulticastManager) startWithInterface(ifi *net.Interface, ifaddr string) (*MulticastServer, error) {
 	server := NewMulticastServer()
-	server.processor = mgr.processor
+	// The processor is set before the server starts receiving, which
+	// may hand it a message right away.
+	server.SetMessageProcessor(mgr.processor)
 	if err := server.Start(ifi, ifaddr); err != nil {
 		return nil, err
 	}
@@ -94,7 +96,6 @@ func (mgr *MulticastManager) Start() error {
 			if err != nil {
 				continue
 			}
-			server.SetMessageProcessor(mgr.processor)
 			mgr.Servers = append(mgr.Servers, server)
 		}
 	}

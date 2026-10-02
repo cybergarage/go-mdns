@@ -6,6 +6,7 @@ package transport
 
 import (
 	"net"
+	"sync"
 
 	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns/dns"
@@ -20,26 +21,39 @@ type UnicastServer struct {
 	TCPChannel chan any
 	UDPSocket  *UnicastUDPSocket
 	UDPChannel chan any
-	processor  dns.MessageProcessor
+
+	processorMutex sync.RWMutex
+	processor      dns.MessageProcessor
 }
 
 // NewUnicastServer returns a new UnicastServer.
 func NewUnicastServer() *UnicastServer {
 	server := &UnicastServer{
-		UnicastConfig: NewDefaultUnicastConfig(),
-		Server:        NewServer(),
-		TCPSocket:     NewUnicastTCPSocket(),
-		TCPChannel:    nil,
-		UDPSocket:     NewUnicastUDPSocket(),
-		UDPChannel:    nil,
-		processor:     nil,
+		UnicastConfig:  NewDefaultUnicastConfig(),
+		Server:         NewServer(),
+		TCPSocket:      NewUnicastTCPSocket(),
+		TCPChannel:     nil,
+		UDPSocket:      NewUnicastUDPSocket(),
+		UDPChannel:     nil,
+		processorMutex: sync.RWMutex{},
+		processor:      nil,
 	}
 	return server
 }
 
-// SetMessageProcessor sets the message processor.
+// SetMessageProcessor sets the message processor. It may be called while
+// the server receives messages.
 func (server *UnicastServer) SetMessageProcessor(processor dns.MessageProcessor) {
+	server.processorMutex.Lock()
+	defer server.processorMutex.Unlock()
 	server.processor = processor
+}
+
+// messageProcessor returns the message processor.
+func (server *UnicastServer) messageProcessor() dns.MessageProcessor {
+	server.processorMutex.RLock()
+	defer server.processorMutex.RUnlock()
+	return server.processor
 }
 
 // SendMessage send a message to the destination address.
@@ -105,11 +119,12 @@ func (server *UnicastServer) Stop() error {
 }
 
 func handleUnicastUDPRequestMessage(server *UnicastServer, reqMsg dns.Message) {
-	if server.processor == nil {
+	processor := server.messageProcessor()
+	if processor == nil {
 		return
 	}
 
-	resMsg, err := server.processor(reqMsg)
+	resMsg, err := processor(reqMsg)
 	if err != nil {
 		log.Error(err)
 	}
@@ -146,11 +161,12 @@ func handleUnicastTCPConnection(server *UnicastServer, conn *net.TCPConn) {
 		return
 	}
 
-	if server.processor == nil {
+	processor := server.messageProcessor()
+	if processor == nil {
 		return
 	}
 
-	resMsg, err := server.processor(reqMsg)
+	resMsg, err := processor(reqMsg)
 	if err != nil {
 		log.Error(err)
 		return
