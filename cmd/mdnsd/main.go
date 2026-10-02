@@ -108,9 +108,10 @@ func main() {
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-
 	<-ctx.Done()
+	// The default handling returns, so a second signal ends a stop which
+	// hangs.
+	stop()
 
 	if err := server.Stop(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
