@@ -29,16 +29,19 @@ import (
 const legacyUnicastTTL = 10
 
 // responder holds the services this node publishes and answers the queries
-// for them.
+// for them. A service whose names are being probed is held as a probe, and
+// it is not answered for until the probe finds its names unique.
 type responder struct {
 	mutex    sync.RWMutex
 	services []*LocalService
+	probing  []*probe
 }
 
 func newResponder() *responder {
 	return &responder{
 		mutex:    sync.RWMutex{},
 		services: []*LocalService{},
+		probing:  []*probe{},
 	}
 }
 
@@ -46,6 +49,10 @@ func newResponder() *responder {
 func (r *responder) register(svc *LocalService) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+	r.registerLocked(svc)
+}
+
+func (r *responder) registerLocked(svc *LocalService) {
 	for i, s := range r.services {
 		if strings.EqualFold(s.FullName(), svc.FullName()) {
 			r.services[i] = svc
@@ -56,10 +63,11 @@ func (r *responder) register(svc *LocalService) {
 }
 
 // deregister removes the service with the instance name of svc, and
-// returns the removed one.
+// returns the removed one. A probe of the instance is canceled.
 func (r *responder) deregister(svc *LocalService) (*LocalService, bool) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+	r.cancelProbesLocked(svc.FullName(), ErrDeregistered)
 	for i, s := range r.services {
 		if strings.EqualFold(s.FullName(), svc.FullName()) {
 			r.services = append(r.services[:i], r.services[i+1:]...)
@@ -67,6 +75,126 @@ func (r *responder) deregister(svc *LocalService) (*LocalService, bool) {
 		}
 	}
 	return nil, false
+}
+
+// hostHeldLocked reports whether a published service holds host.
+func (r *responder) hostHeldLocked(host string) bool {
+	for _, s := range r.services {
+		if strings.EqualFold(s.HostName(), host) {
+			return true
+		}
+	}
+	return false
+}
+
+// namesToProbe returns the names of svc which this node does not hold yet:
+// a name which a published service holds is not probed again, such as when
+// a service is registered again to update its TXT strings.
+func (r *responder) namesToProbe(svc *LocalService) []string {
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
+	names := []string{}
+	held := slices.ContainsFunc(r.services, func(s *LocalService) bool {
+		return strings.EqualFold(s.FullName(), svc.FullName())
+	})
+	if !held {
+		names = append(names, svc.FullName())
+	}
+	if !r.hostHeldLocked(svc.HostName()) {
+		names = append(names, svc.HostName())
+	}
+	return names
+}
+
+func (r *responder) cancelProbesLocked(fullName string, err error) {
+	r.probing = slices.DeleteFunc(r.probing, func(p *probe) bool {
+		if strings.EqualFold(p.svc.FullName(), fullName) {
+			p.cancel(err)
+			return true
+		}
+		return false
+	})
+}
+
+// addProbe adds p, canceling an earlier probe of the same instance, which a
+// later registration replaces.
+func (r *responder) addProbe(p *probe) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.cancelProbesLocked(p.svc.FullName(), ErrDeregistered)
+	r.probing = append(r.probing, p)
+}
+
+// removeProbe removes p.
+func (r *responder) removeProbe(p *probe) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.probing = slices.DeleteFunc(r.probing, func(q *probe) bool { return q == p })
+}
+
+// establish publishes the service of p, whose names were found unique. It
+// reports false when p was canceled meanwhile.
+func (r *responder) establish(p *probe) bool {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if !slices.Contains(r.probing, p) {
+		return false
+	}
+	r.probing = slices.DeleteFunc(r.probing, func(q *probe) bool { return q == p })
+	r.registerLocked(p.svc)
+	return true
+}
+
+// beginReprobe stops answering for svc, this very copy, and returns a probe
+// of its names, such as after a conflicting record is received (RFC 6762, 9)
+// or when the server starts again. It reports false when svc is not
+// published.
+func (r *responder) beginReprobe(svc *LocalService) (*probe, bool) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if !slices.Contains(r.services, svc) {
+		return nil, false
+	}
+	r.services = slices.DeleteFunc(r.services, func(s *LocalService) bool { return s == svc })
+	names := []string{svc.FullName()}
+	if !r.hostHeldLocked(svc.HostName()) {
+		names = append(names, svc.HostName())
+	}
+	p := newProbe(svc, names)
+	r.probing = append(r.probing, p)
+	return p, true
+}
+
+// restore puts the service of p back without publishing it again, such as
+// when the server stops while it probes a registered service: the service
+// is probed again when the server starts.
+func (r *responder) restore(p *probe) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	if !slices.Contains(r.probing, p) {
+		return
+	}
+	r.probing = slices.DeleteFunc(r.probing, func(q *probe) bool { return q == p })
+	r.registerLocked(p.svc)
+}
+
+// probes returns the probes in progress.
+func (r *responder) probes() []*probe {
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
+	return slices.Clone(r.probing)
+}
+
+// allServices returns the published services and the services being
+// probed.
+func (r *responder) allServices() []*LocalService {
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
+	services := slices.Clone(r.services)
+	for _, p := range r.probing {
+		services = append(services, p.svc)
+	}
+	return services
 }
 
 // ifRegistered calls fn while svc, this very copy, is registered, and

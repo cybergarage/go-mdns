@@ -1,8 +1,8 @@
 # Using go-mdns
 
-go-mdns is a client (querier) library for Multicast DNS ([RFC 6762](https://www.rfc-editor.org/rfc/rfc6762)) and DNS-Based Service Discovery ([RFC 6763](https://www.rfc-editor.org/rfc/rfc6763)). This guide covers the four things a client does: enumerating the service types, browsing a service type, resolving an instance, and resolving a host name.
+go-mdns is a client (querier) and server (responder) library for Multicast DNS ([RFC 6762](https://www.rfc-editor.org/rfc/rfc6762)) and DNS-Based Service Discovery ([RFC 6763](https://www.rfc-editor.org/rfc/rfc6763)). This guide covers the four things a client does: enumerating the service types, browsing a service type, resolving an instance, and resolving a host name.
 
-The responder side is under development, so go-mdns cannot advertise a service yet. See the [README](../README.md#status) for the current status.
+`Server` publishes the services of this node; see the [README](../README.md#publishing-a-service) for the responder.
 
 ## The client
 

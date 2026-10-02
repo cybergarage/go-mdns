@@ -1,6 +1,6 @@
 # mdnsd
 
-`mdnsd` is a Multicast DNS responder. It publishes one DNS-SD service on the link: it announces the service, answers the queries for it, and withdraws it with goodbye records when it is interrupted.
+`mdnsd` is a Multicast DNS responder. It publishes one DNS-SD service on the link: it probes the instance name and the host name, announces the service, answers the queries for it, and withdraws it with goodbye records when it is interrupted.
 
 Use [mdnslookup](mdnslookup.md) to browse and resolve the services.
 
@@ -37,4 +37,15 @@ $ mdnsd -name 665F6E75B5D3A9C2 -service _matterc._udp -port 5540 -host B75AFB458
     -subtype _L3840 -subtype _S15 -subtype _CM -txt D=3840 -txt CM=1 -txt VP=65521+32769
 ```
 
-The host name resolves to the addresses of the interface each query arrives on. `mdnsd` does not probe for name conflicts yet, so choose a name no other node on the link uses.
+The host name resolves to the addresses of the interface each query arrives on.
+
+## Name conflicts
+
+`mdnsd` does not rename the service as `dns-sd -R` and `avahi-publish-service` do. It exits with an error when another node on the link holds the instance name or the host name, when it starts or later:
+
+```
+$ mdnsd -name demo -service _http._tcp -port 8080
+mdns: name conflict: demo._http._tcp.local
+```
+
+Run it again with another `-name` or `-host`.

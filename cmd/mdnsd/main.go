@@ -22,9 +22,14 @@ mdnsd is a Multicast DNS responder.
 	mdnsd [OPTIONS]
 
 	DESCRIPTION
-	mdnsd publishes a DNS-SD service on the link: it announces the service,
-	answers the queries for it, and withdraws it when it is stopped. With
-	-v it also prints the queries it receives.
+	mdnsd publishes a DNS-SD service on the link: it probes the instance
+	name and the host name, announces the service, answers the queries for
+	it, and withdraws it when it is stopped. With -v it also prints the
+	queries it receives.
+
+	mdnsd does not rename the service: it exits with an error when another
+	node on the link holds the instance name or the host name, when it
+	starts or later.
 
 	Use mdnslookup to browse and resolve the services which the other
 	responders advertise.
@@ -57,6 +62,13 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	verbose := flag.Bool("v", false, "Print the received queries")
 	name := flag.String("name", "", "Service instance name")
 	service := flag.String("service", "", "Service type, such as _http._tcp")
@@ -77,10 +89,23 @@ func main() {
 		log.SetSharedLogger(log.NewStdoutLogger(log.LevelTrace))
 	}
 
-	server := NewServer()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	conflicts := make(chan *mdns.ConflictError, 1)
+	server := NewServer(mdns.WithServerConflictHandler(func(err *mdns.ConflictError) {
+		select {
+		case conflicts <- err:
+		default:
+		}
+	}))
 
 	if *verbose {
 		server.RegisterMessageHandler(server.MessageReceived)
+	}
+
+	if err := server.Start(); err != nil {
+		return err
 	}
 
 	if *service != "" {
@@ -95,28 +120,27 @@ func main() {
 		if svc.Host == "" {
 			svc.Host = localHostName()
 		}
-		if err := server.Register(svc); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+		if err := server.Register(ctx, svc); err != nil {
+			_ = server.Stop()
+			return err
 		}
 		fmt.Fprintf(os.Stderr, "Publishing %s on %s:%d\n", svc.FullName(), svc.HostName(), svc.Port)
 	}
 
-	if err := server.Start(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+	var conflict error
+	select {
+	case <-ctx.Done():
+	case err := <-conflicts:
+		conflict = err
 	}
-
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	<-ctx.Done()
 	// The default handling returns, so a second signal ends a stop which
 	// hangs.
 	stop()
 
 	if err := server.Stop(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
+	return conflict
 }
 
 // localHostName returns the first label of this host's name.

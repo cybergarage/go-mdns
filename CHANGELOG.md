@@ -6,18 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-The responder. `Server` publishes services, which makes go-mdns usable to advertise, such as a Matter device advertising itself for commissioning. Probing and conflict resolution remain for v1.0.0.
+The responder. `Server` publishes services, which makes go-mdns usable to advertise, such as a Matter device advertising itself for commissioning, and it probes their names for conflicts with the other nodes on the link.
 
 ### Added
 
-- `Server.Register()` and `Server.Deregister()` publish and withdraw a `LocalService`: an instance, a service type, its subtypes, a host, a port, TXT strings and optionally its own addresses. `Server.LocalServices()` lists them.
+- The server probes the instance name and the host name of a service before it publishes the service (RFC 6762, 8.1): three probes 250 ms apart after a random delay, with the proposed records in the Authority section. A simultaneous probe of another node is resolved by the tiebreak of RFC 6762, 8.2, the published names are defended by answering the probes of the other nodes, and fifteen conflicts within ten seconds delay the next probe by five seconds.
+- A published service whose names another node claims later is probed again, and it is withdrawn without goodbye records when the other node holds them (RFC 6762, 9). A service is also probed again when the server starts after `Stop`.
+- The server does not rename a service: `ConflictError` reports the conflicting name, wraps `ErrConflict`, and tells an instance conflict from a host conflict with `IsInstanceConflict()` and `IsHostConflict()`, so that the application chooses the new name. `WithServerConflictHandler()` is called when a published service is withdrawn.
+- `ErrNotRunning` and `ErrDeregistered` report a registration which ends without publishing the service.
+- `Server.Register()` and `Server.Deregister()` publish and withdraw a `LocalService`: an instance, a service type, its subtypes, a host, a port, TXT strings and optionally its own addresses. `Register()` takes a context and returns when the service is published after its names are probed, and the server must be started first. `Server.LocalServices()` lists the published services. `NewServer()` takes `ServerOption`s.
 - The server answers the PTR queries for a registered service type, its subtypes and the service type enumeration, the SRV and TXT queries for the instance, the A and AAAA queries for the host, and ANY. A PTR answer carries the SRV, TXT and address records as additional records (RFC 6763, 12).
-- A registered service is announced twice when it is registered or the server starts, and goodbye records are sent when it is deregistered or the server stops (RFC 6762, 8.3 and 10.1).
+- A registered service is announced twice when it is published, and goodbye records are sent when it is deregistered or the server stops (RFC 6762, 8.3 and 10.1).
 - Known-Answer suppression, the cache-flush bit on the unique records, and a random 20-120 ms delay of a multicast response with shared records (RFC 6762, 7.1, 10.2 and 6).
 - A QU query (RFC 6762, 5.4) and a legacy unicast query from a port other than 5353 (6.7) are answered by unicast; the reply to a legacy query echoes its ID and question, with TTLs of at most 10 seconds.
 - `dns.NewPTRResourceRecord()`, `dns.NewSRVResourceRecord()`, `dns.NewTXTResourceRecord()`, `dns.NewAResourceRecord()`, `dns.NewAAAAResourceRecord()` and `dns.NewAddressResourceRecord()` build records, and `dns.WithMessageID()`, `dns.WithMessageAnswers()`, `dns.WithMessageNameServers()` and `dns.WithMessageAdditions()` build messages. `dns.CacheFlush` names the cache-flush bit.
 - Interoperability tests in `mdnstest` check the responder against `dns-sd` (Bonjour) and `avahi-browse`/`avahi-resolve` (Avahi) when they are installed: browsing by type and subtype, resolving, host lookup, and goodbye. They are skipped when a client or its daemon is missing, and with `-short`.
-- `mdnsd` publishes the service given by `-name`, `-service`, `-port`, `-host`, `-subtype` and `-txt`.
+- `mdnsd` publishes the service given by `-name`, `-service`, `-port`, `-host`, `-subtype` and `-txt`, and exits with an error when another node holds the instance name or the host name.
 
 ## [0.9.1] - 2026-09-23
 

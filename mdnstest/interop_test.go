@@ -88,7 +88,7 @@ func startInteropService(t *testing.T) *interopService {
 		t.Skipf("the server cannot bind the mDNS sockets here: %v", err)
 	}
 	t.Cleanup(func() { _ = server.Stop() })
-	if err := server.Register(svc); err != nil {
+	if err := server.Register(context.Background(), svc); err != nil {
 		t.Fatal(err)
 	}
 	return &interopService{server: server, svc: svc}

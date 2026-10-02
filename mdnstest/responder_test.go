@@ -40,7 +40,7 @@ func TestResponder(t *testing.T) {
 		Port:     5540,
 		TXT:      []string{"D=3840", "CM=1", "VP=65521+32769"},
 	}
-	if err := server.Register(svc); err != nil {
+	if err := server.Register(context.Background(), svc); err != nil {
 		t.Fatal(err)
 	}
 

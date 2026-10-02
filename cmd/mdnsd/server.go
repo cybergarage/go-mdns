@@ -25,9 +25,9 @@ type Server struct {
 	*mdns.Server
 }
 
-func NewServer() *Server {
+func NewServer(opts ...mdns.ServerOption) *Server {
 	server := &Server{
-		Server: mdns.NewServer(),
+		Server: mdns.NewServer(opts...),
 	}
 	return server
 }

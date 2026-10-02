@@ -15,9 +15,12 @@
 package mdns
 
 import (
+	"context"
+	"errors"
 	"net"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
 	"github.com/cybergarage/go-mdns/mdns/transport"
@@ -271,8 +274,13 @@ func TestLocalServiceValidate(t *testing.T) {
 
 func TestServerRegisterAndDeregister(t *testing.T) {
 	server := NewServer()
+	if err := server.Register(context.Background(), testLocalService()); !errors.Is(err, ErrNotRunning) {
+		t.Fatalf("Register() before Start = %v, want ErrNotRunning", err)
+	}
+
+	server = startTestServer(t)
 	svc := testLocalService()
-	if err := server.Register(svc); err != nil {
+	if err := server.Register(context.Background(), svc); err != nil {
 		t.Fatal(err)
 	}
 	// The server keeps its own copy.
@@ -283,11 +291,16 @@ func TestServerRegisterAndDeregister(t *testing.T) {
 		t.Fatalf("LocalServices() = %+v, want the service as registered", registered)
 	}
 
-	// Registering the same instance again replaces it.
+	// Registering the same instance again replaces it without probing its
+	// names, which the server already holds.
 	updated := testLocalService()
 	updated.TXT = []string{"D=3840", "CM=0"}
-	if err := server.Register(updated); err != nil {
+	start := time.Now()
+	if err := server.Register(context.Background(), updated); err != nil {
 		t.Fatal(err)
+	}
+	if elapsed := time.Since(start); probeInterval <= elapsed {
+		t.Errorf("an update took %s, want no probe", elapsed)
 	}
 	if registered := server.LocalServices(); len(registered) != 1 || registered[0].TXT[1] != "CM=0" {
 		t.Fatalf("LocalServices() after an update = %+v", registered)
@@ -299,7 +312,7 @@ func TestServerRegisterAndDeregister(t *testing.T) {
 	if n := len(server.LocalServices()); n != 0 {
 		t.Fatalf("%d services after Deregister, want 0", n)
 	}
-	if err := server.Register(&LocalService{}); err == nil {
+	if err := server.Register(context.Background(), &LocalService{}); err == nil {
 		t.Fatal("Register() of an empty service = nil error")
 	}
 }

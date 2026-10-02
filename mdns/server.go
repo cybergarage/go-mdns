@@ -15,6 +15,7 @@
 package mdns
 
 import (
+	"context"
 	"errors"
 	"math/rand/v2"
 	"net"
@@ -39,41 +40,73 @@ const (
 // Server represents a server node instance.
 //
 // A server is a responder. It publishes the services registered with
-// Register: it answers the queries for them, announces them when they are
-// registered or the server starts, and withdraws them when they are
-// deregistered or the server stops. It also passes every received message to
-// the registered message handlers.
+// Register: it probes their names, answers the queries for them, announces
+// them, and withdraws them when they are deregistered or the server stops. It
+// also passes every received message to the registered message handlers.
 //
-// The responder does not probe for name conflicts yet (RFC 6762, 8.1 and
-// 9): a registered name is assumed to be unique on the link.
+// Before a service is published, its instance name and host name are probed
+// to check that no other node on the link holds them (RFC 6762, 8.1), and a
+// published service whose names another node claims later is probed again
+// (RFC 6762, 9). The server does not rename a service on a conflict: Register
+// returns a *ConflictError, and a conflict found later is reported to the
+// handler given by WithServerConflictHandler, so that the application chooses
+// a new name.
 type Server struct {
 	sync.Mutex
 	*transport.MessageManager
 	*serviceSet
 	*msgHandler
 	*responder
-	running bool
-	done    chan struct{}
-	wg      sync.WaitGroup
+	running         bool
+	done            chan struct{}
+	wg              sync.WaitGroup
+	conflictHandler ConflictHandler
+	conflictMutex   sync.Mutex
+	conflicts       []time.Time
+}
+
+// ConflictHandler is called when a published service is withdrawn because
+// another node holds one of its names (RFC 6762, 9).
+type ConflictHandler func(err *ConflictError)
+
+// ServerOption configures a server.
+type ServerOption func(*Server)
+
+// WithServerConflictHandler sets the handler which is called when a published
+// service is withdrawn because another node holds one of its names. The
+// handler runs on its own goroutine, so it may register the service again
+// with a new name.
+func WithServerConflictHandler(handler ConflictHandler) ServerOption {
+	return func(server *Server) {
+		server.conflictHandler = handler
+	}
 }
 
 // NewServer returns a new server instance.
-func NewServer() *Server {
+func NewServer(opts ...ServerOption) *Server {
 	server := &Server{
-		Mutex:          sync.Mutex{},
-		MessageManager: transport.NewMessageManager(),
-		serviceSet:     newServiceSet(),
-		msgHandler:     newMessageHandler(),
-		responder:      newResponder(),
-		running:        false,
-		done:           nil,
-		wg:             sync.WaitGroup{},
+		Mutex:           sync.Mutex{},
+		MessageManager:  transport.NewMessageManager(),
+		serviceSet:      newServiceSet(),
+		msgHandler:      newMessageHandler(),
+		responder:       newResponder(),
+		running:         false,
+		done:            nil,
+		wg:              sync.WaitGroup{},
+		conflictHandler: nil,
+		conflictMutex:   sync.Mutex{},
+		conflicts:       []time.Time{},
+	}
+	for _, opt := range opts {
+		opt(server)
 	}
 	server.SetMessageProcessor(server.MessageReceived)
 	return server
 }
 
-// Start starts the server instance, and announces the registered services.
+// Start starts the server instance. The services which stay registered
+// after Stop are probed again and published in the background, and a
+// conflict is reported to the conflict handler.
 func (server *Server) Start() error {
 	if err := server.Stop(); err != nil {
 		return err
@@ -86,23 +119,26 @@ func (server *Server) Start() error {
 	server.done = make(chan struct{})
 	server.Unlock()
 	for _, svc := range server.localServices() {
-		server.announce(svc)
+		server.reprobe(svc)
 	}
 	return nil
 }
 
-// Stop withdraws the registered services and stops the server instance.
+// Stop withdraws the published services and stops the server instance. The
+// services stay registered, and they are published again by Start.
 func (server *Server) Stop() error {
 	server.Lock()
 	running := server.running
+	var published []*LocalService
 	if running {
 		server.running = false
 		close(server.done)
+		published = server.localServices()
 	}
 	server.Unlock()
 	if running {
 		server.wg.Wait()
-		for _, svc := range server.localServices() {
+		for _, svc := range published {
 			server.sendAnnouncement(svc, true)
 		}
 	}
@@ -117,21 +153,114 @@ func (server *Server) Restart() error {
 	return server.Start()
 }
 
-// Register publishes svc. A service with the same instance name is
-// replaced. The server keeps a copy of svc, so later changes to svc are
-// published only by registering it again.
-func (server *Server) Register(svc *LocalService) error {
+// Register publishes svc, and returns when it is published. A service with
+// the same instance name is replaced. The server keeps a copy of svc, so
+// later changes to svc are published only by registering it again.
+//
+// The instance name and the host name of svc are probed first (RFC 6762,
+// 8.1), which takes about a second; a name which a published service of this
+// server already holds is not probed again, so registering a service again to
+// update its TXT strings returns at once. Register returns a *ConflictError,
+// which wraps ErrConflict, when another node holds one of the names: the
+// service is not published, and the caller registers it again with a new
+// name. It returns ErrNotRunning when the server is not running or stops,
+// ErrDeregistered when the service is deregistered or registered again
+// meanwhile, and the error of ctx when ctx is done.
+func (server *Server) Register(ctx context.Context, svc *LocalService) error {
 	if err := svc.Validate(); err != nil {
 		return err
 	}
 	copied := copyLocalService(svc)
-	server.responder.register(copied)
+
+	server.Lock()
+	running, done := server.running, server.done
+	server.Unlock()
+	if !running {
+		return ErrNotRunning
+	}
+
+	names := server.responder.namesToProbe(copied)
+	if len(names) == 0 {
+		server.responder.register(copied)
+		server.announce(copied)
+		return nil
+	}
+
+	p := newProbe(copied, names)
+	server.responder.addProbe(p)
+	if err := server.runProbe(ctx, done, p); err != nil {
+		server.responder.removeProbe(p)
+		return err
+	}
+	if err := server.establish(p); err != nil {
+		server.responder.removeProbe(p)
+		return err
+	}
 	server.announce(copied)
 	return nil
 }
 
+// establish publishes the service of p unless the server stopped or p was
+// canceled meanwhile.
+func (server *Server) establish(p *probe) error {
+	server.Lock()
+	defer server.Unlock()
+	if !server.running {
+		return ErrNotRunning
+	}
+	if !server.responder.establish(p) {
+		if p.cancelErr != nil {
+			return p.cancelErr
+		}
+		return ErrDeregistered
+	}
+	return nil
+}
+
+// reprobe probes the names of svc, a published service, again in the
+// background (RFC 6762, 9). The service is published again when its names
+// are found unique, and it is withdrawn and reported to the conflict handler
+// when another node holds one of them.
+func (server *Server) reprobe(svc *LocalService) {
+	server.Lock()
+	defer server.Unlock()
+	if !server.running {
+		return
+	}
+	p, ok := server.responder.beginReprobe(svc)
+	if !ok {
+		return
+	}
+	done := server.done
+	server.wg.Go(func() {
+		err := server.runProbe(context.Background(), done, p)
+		switch {
+		case err == nil:
+			if err := server.establish(p); err == nil {
+				server.announce(p.svc)
+			} else if errors.Is(err, ErrNotRunning) {
+				// The server stopped after the probe: keep the service
+				// for the next start.
+				server.responder.restore(p)
+			}
+		case errors.Is(err, ErrNotRunning):
+			server.responder.restore(p)
+		default:
+			server.responder.removeProbe(p)
+			var conflict *ConflictError
+			if errors.As(err, &conflict) {
+				log.Warnf("mdns: %s is withdrawn: %s", svc.FullName(), err)
+				if handler := server.conflictHandler; handler != nil {
+					go handler(conflict)
+				}
+			}
+		}
+	})
+}
+
 // Deregister withdraws the service with the instance name of svc, sending
-// goodbye records if the server is running.
+// goodbye records if it is published and the server is running. A probe of
+// the service is canceled, and its Register returns ErrDeregistered.
 func (server *Server) Deregister(svc *LocalService) error {
 	if svc == nil {
 		return errors.New("mdns: nil service")
@@ -149,7 +278,8 @@ func (server *Server) Deregister(svc *LocalService) error {
 	return nil
 }
 
-// LocalServices returns the registered services.
+// LocalServices returns the published services. A service whose names are
+// being probed is not included.
 func (server *Server) LocalServices() []*LocalService {
 	return server.localServices()
 }
@@ -208,10 +338,12 @@ func (server *Server) sendAnnouncement(svc *LocalService, goodbye bool) {
 // response to it for the registered services, or nil.
 func (server *Server) MessageReceived(msg dns.Message) (dns.Message, error) {
 	if msg.IsResponse() {
+		server.checkResponse(msg)
 		return nil, nil
 	}
 
 	server.processMessageHandlers(msg)
+	server.checkProbe(msg)
 
 	var ifi *net.Interface
 	if from := msg.From(); from != nil {

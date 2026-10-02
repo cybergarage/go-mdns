@@ -15,12 +15,10 @@ go-mdns is a Go library for Multicast DNS (mDNS) and DNS Service Discovery (DNS-
 
 go-mdns is a **client (querier)** and a **server (responder)** library. The client browses, resolves and looks up the services and the hosts which other responders advertise, and the server publishes the services of this node.
 
-**The responder does not probe for name conflicts yet** (RFC 6762, 8.1 and 9): a registered instance name and host name are assumed to be unique on the link. Probing and conflict resolution are planned for v1.0.0.
-
 | | Status |
 | --- | --- |
 | Browsing, resolving and host lookup (querier) | Supported |
-| Registering, announcing and answering for a service (responder) | Supported, without probing |
+| Registering, probing, announcing and answering for a service (responder) | Supported |
 | `mdnslookup` command | Supported |
 | `mdnsd` command | Supported |
 
@@ -39,6 +37,8 @@ go-mdns is a **client (querier)** and a **server (responder)** library. The clie
 ### What the server supports
 
 - Registering and deregistering a service with its subtypes, host, port and TXT strings (RFC 6763)
+- Probing the instance name and the host name before a service is published, the tiebreak of simultaneous probes, and defending the published names (RFC 6762, 8.1 and 8.2)
+- Detecting a conflict with another node after a service is published, probing it again, and withdrawing it when the other node holds the name (RFC 6762, 9)
 - Answering the PTR queries for the service type, its subtypes and the service type enumeration, the SRV and TXT queries for the instance, the A and AAAA queries for the host, and ANY; a PTR answer carries the SRV, TXT and address records as additional records (RFC 6763, 12)
 - Publishing the addresses of the interface a query arrives on, unless the service is given its own
 - Announcing a service twice when it is registered or the server starts, and sending goodbye records when it is deregistered or the server stops (RFC 6762, 8.3 and 10.1)
@@ -48,7 +48,7 @@ go-mdns is a **client (querier)** and a **server (responder)** library. The clie
 
 ### What is not supported yet
 
-- Probing and conflict resolution of the registered names (RFC 6762, 8.1 and 9)
+- Renaming a service on a name conflict: the server reports the conflict, and the application chooses a new name (see [Name conflicts](#name-conflicts))
 - Negative responses with NSEC records (RFC 6762, 6.1)
 - Name compression when a message is written (the compression pointers are resolved when a message is read)
 - Truncated messages (the TC bit) and the Known-Answer list continuation (RFC 6762, 7.2)
@@ -63,10 +63,11 @@ The `mdns/dns` package is exported so that the records of a message can be read,
 go get -u github.com/cybergarage/go-mdns
 ```
 
-The `mdnslookup` command is installed with:
+The `mdnslookup` and `mdnsd` commands are installed with:
 
 ```
 go install github.com/cybergarage/go-mdns/cmd/mdnslookup@latest
+go install github.com/cybergarage/go-mdns/cmd/mdnsd@latest
 ```
 
 ## Usage
@@ -130,7 +131,7 @@ addrs, err := client.LookupHost(context.Background(), "macmini.local")
 
 ### Publishing a service
 
-`Server.Register` publishes a service: the server announces it, answers the queries for it, and withdraws it with goodbye records when it is deregistered or the server stops.
+`Server.Register` publishes a service: the server probes its instance name and host name, announces it, answers the queries for it, and withdraws it with goodbye records when it is deregistered or the server stops. `Register` returns when the service is published, which takes about a second for the probes, and the server must be started first.
 
 ```go
 server := mdns.NewServer()
@@ -139,7 +140,7 @@ if err := server.Start(); err != nil {
 }
 defer server.Stop()
 
-err := server.Register(&mdns.LocalService{
+err := server.Register(ctx, &mdns.LocalService{
 	Instance: "665F6E75B5D3A9C2",
 	Service:  "_matterc._udp",
 	Subtypes: []string{"_L3840", "_S15", "_V65521", "_CM"},
@@ -149,7 +150,32 @@ err := server.Register(&mdns.LocalService{
 })
 ```
 
-Without `Addresses`, the host name resolves to the addresses of the interface a query arrives on. Register the service again to update it, such as its TXT strings.
+Without `Addresses`, the host name resolves to the addresses of the interface a query arrives on. Register the service again to update it, such as its TXT strings; the names the server already holds are not probed again, so an update returns at once.
+
+### Name conflicts
+
+The server does not rename a service whose name another node on the link holds, because the naming rules depend on the service: a Matter commissionable node chooses a new random instance name, while a conflicting operational instance name means a duplicated node ID, which must not be renamed at all. `Register` returns a `*mdns.ConflictError`, which wraps `mdns.ErrConflict`, and the service is not published:
+
+```go
+err := server.Register(ctx, svc)
+var conflict *mdns.ConflictError
+switch {
+case errors.As(err, &conflict) && conflict.IsInstanceConflict():
+	// Register the service again with a new instance name.
+case errors.As(err, &conflict) && conflict.IsHostConflict():
+	// Register the service again with a new host name.
+}
+```
+
+A published service whose names another node claims later is probed again, and when the other node holds them, the service is withdrawn and reported to the handler:
+
+```go
+server := mdns.NewServer(
+	mdns.WithServerConflictHandler(func(err *mdns.ConflictError) {
+		// Register err.Service again with a new name.
+	}),
+)
+```
 
 ### Selecting the interfaces
 
@@ -180,7 +206,7 @@ $ mdnslookup decode mdnstest/dumps/matter-answer-01.dump
 
 Every command takes `--format table|json|csv`, and the common `--interface`, `--family` and `--timeout` flags. `decode` needs no network, so a message which was captured elsewhere can be analyzed offline.
 
-`mdnsd` publishes a service from a terminal until it is interrupted.
+`mdnsd` publishes a service from a terminal until it is interrupted. It exits with an error when another node holds the instance name or the host name.
 
 ```
 $ mdnsd -name demo -service _http._tcp -port 8080 -txt path=/

@@ -20,9 +20,8 @@ Discovery (RFC 6763) client and server.
 
 [Client] is a querier: it browses, resolves and looks up the services and the
 hosts which the other responders advertise. [Server] is a responder: it
-publishes the services registered with it. The responder does not probe for
-name conflicts yet (RFC 6762, 8.1 and 9), so a registered name is assumed to
-be unique on the link.
+publishes the services registered with it, after it probes their names for
+conflicts with the other nodes on the link (RFC 6762, 8.1 and 9).
 
 # Browsing
 
@@ -49,9 +48,10 @@ answered before the context is done.
 
 # Publishing
 
-[Server.Register] publishes a [LocalService]. The server announces it,
-answers the queries for its type, subtypes, instance and host, and sends
-goodbye records when it is deregistered or the server stops.
+[Server.Register] publishes a [LocalService]. The server probes its instance
+name and host name, announces it, answers the queries for its type,
+subtypes, instance and host, and sends goodbye records when it is
+deregistered or the server stops. The server must be started first.
 
 	server := mdns.NewServer()
 	if err := server.Start(); err != nil {
@@ -59,7 +59,7 @@ goodbye records when it is deregistered or the server stops.
 	}
 	defer server.Stop()
 
-	err := server.Register(&mdns.LocalService{
+	err := server.Register(ctx, &mdns.LocalService{
 		Instance: "665F6E75B5D3A9C2",
 		Service:  "_matterc._udp",
 		Subtypes: []string{"_L3840", "_S15"},
@@ -67,6 +67,23 @@ goodbye records when it is deregistered or the server stops.
 		Port:     5540,
 		TXT:      []string{"D=3840", "CM=1"},
 	})
+
+# Name conflicts
+
+The server does not rename a service whose name another node holds: the
+application chooses the new name, since its naming rules depend on the
+service, such as a new random instance name for a Matter commissionable node.
+[Server.Register] returns a [*ConflictError] which wraps [ErrConflict] when
+the probe finds a name held, and the service is not published:
+
+	var conflict *mdns.ConflictError
+	if errors.As(err, &conflict) && conflict.IsInstanceConflict() {
+		// Register the service again with a new instance name.
+	}
+
+A published service whose names another node claims later is probed again,
+and when the other node holds them, it is withdrawn and reported to the
+handler given by [WithServerConflictHandler].
 
 # Resolving
 
