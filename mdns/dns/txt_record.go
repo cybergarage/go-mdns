@@ -14,6 +14,8 @@
 
 package dns
 
+// TXTRecord is a TXT record, which holds the attributes of a service
+// instance in DNS-SD (RFC 6763, 6).
 type TXTRecord interface {
 	Record
 	// Strings returns the resource text strings.

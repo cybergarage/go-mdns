@@ -26,46 +26,53 @@ import (
 var docCmd = &cobra.Command{ // nolint:exhaustruct,exhaustruct_v5
 	Use:   "doc",
 	Short: "Generate markdown documentation to stdout",
+	Long: `Generate the markdown reference of the commands to stdout, as one page in
+which each command links to the sections of the others.`,
+	// The reference is generated for the repository, not for the users.
+	Hidden: true,
+	Args:   cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		emptyLinkHandler := func(name string) string {
-			return ""
+		md, err := generateMarkdown(rootCmd)
+		if err != nil {
+			return err
 		}
-
-		var appendMarkdown func(cmd *cobra.Command, buf *bytes.Buffer)
-		appendMarkdown = func(cmd *cobra.Command, buf *bytes.Buffer) {
-			doc.GenMarkdownCustom(cmd, buf, emptyLinkHandler)
-			for _, c := range cmd.Commands() {
-				appendMarkdown(c, buf)
-			}
-		}
-
-		removeEmptySeeAlsoSections := func(md string) string {
-			lines := strings.Split(md, "\n")
-			var out []string
-			for i := 0; i < len(lines); i++ {
-				// Check for start of a meaningless SEE ALSO section (only an empty link follows)
-				// ### SEE ALSO
-				//
-				// * [mdnslookup]()	 -
-				if i < len(lines)-2 && strings.HasPrefix(lines[i], "### SEE ALSO") {
-					// Skip these two lines as they do not provide any meaningful information
-					i += 2 // skip the next two lines
-					continue
-				}
-				out = append(out, lines[i])
-			}
-			return strings.Join(out, "\n")
-		}
-
-		var buf bytes.Buffer
-		appendMarkdown(rootCmd, &buf)
-		// ---- Post-process: Remove meaningless SEE ALSO sections ----
-		docStr := buf.String()
-		filteredDocStr := removeEmptySeeAlsoSections(docStr)
-		fmt.Print(filteredDocStr)
-
+		fmt.Fprint(cmd.OutOrStdout(), md)
 		return nil
 	},
+}
+
+// generateMarkdown returns the markdown reference of root and its available
+// subcommands as one page.
+func generateMarkdown(root *cobra.Command) (string, error) {
+	var buf bytes.Buffer
+	var appendMarkdown func(cmd *cobra.Command) error
+	appendMarkdown = func(cmd *cobra.Command) error {
+		if err := doc.GenMarkdownCustom(cmd, &buf, sectionLink); err != nil {
+			return err
+		}
+		for _, c := range cmd.Commands() {
+			if !c.IsAvailableCommand() || c.IsAdditionalHelpTopicCommand() {
+				continue
+			}
+			if err := appendMarkdown(c); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	if err := appendMarkdown(root); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+// sectionLink returns the link to the section of a command in the page,
+// such as "#mdnslookup-browse" for "mdnslookup_browse.md", which cobra
+// gives as the file of the command.
+func sectionLink(name string) string {
+	anchor := strings.TrimSuffix(name, ".md")
+	anchor = strings.ReplaceAll(anchor, "_", "-")
+	return "#" + strings.ToLower(anchor)
 }
 
 func init() {

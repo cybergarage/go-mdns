@@ -16,6 +16,8 @@ package dns
 
 import "net"
 
+// AAAARecord is an AAAA record, which holds a host's IPv6 address
+// (RFC 3596).
 type AAAARecord interface {
 	Record
 	// Address returns the resource ip address.

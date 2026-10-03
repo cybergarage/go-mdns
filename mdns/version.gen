@@ -41,6 +41,7 @@ cat <<EOF
 package mdns
 
 const (
+	// Version is the version of go-mdns.
 	Version = "$next_version"
 )
 EOF

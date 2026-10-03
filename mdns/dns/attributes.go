@@ -18,6 +18,7 @@ import (
 	"strings"
 )
 
+// Attributes are the key/value pairs of a TXT record (RFC 6763, 6).
 type Attributes []Attribute
 
 // NewAttributes returns a new attributes instance.

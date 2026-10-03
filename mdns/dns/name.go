@@ -19,6 +19,7 @@ import (
 )
 
 const (
+	// LabelSeparator separates the labels of a domain name.
 	LabelSeparator        = "."
 	nameIsCompressionMask = uint8(0xC0)
 	nameLenMask           = uint8(0x3F)

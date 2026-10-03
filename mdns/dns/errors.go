@@ -19,6 +19,13 @@ import (
 	"fmt"
 )
 
-var ErrNil = errors.New("nil")
-var ErrInvalid = errors.New("invalid")
-var ErrNilReader = fmt.Errorf("reader is %w", ErrNil)
+var (
+	// ErrNil indicates that a required value is nil.
+	ErrNil = errors.New("nil")
+	// ErrInvalid indicates that a value is invalid, such as a malformed
+	// message or a name which cannot be encoded.
+	ErrInvalid = errors.New("invalid")
+	// ErrNilReader indicates that a record has no reader to parse its data
+	// with. It wraps ErrNil.
+	ErrNilReader = fmt.Errorf("reader is %w", ErrNil)
+)

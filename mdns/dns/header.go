@@ -31,30 +31,49 @@ const (
 	headerSize = 12
 )
 
+// QR tells a query from a response (RFC 1035, 4.1.1).
 type QR uint
 
+// The values of QR.
 const (
-	Query    QR = 0
+	// Query is a query message.
+	Query QR = 0
+	// Response is a response message.
 	Response QR = 1
 )
 
+// Opcode is the kind of query (RFC 1035, 4.1.1). mDNS uses only OpQuery
+// (RFC 6762, 18.3).
 type Opcode int
 
+// The values of Opcode.
 const (
-	OpQuery  Opcode = 0
+	// OpQuery is a standard query.
+	OpQuery Opcode = 0
+	// OpIQuery is an inverse query, obsoleted by RFC 3425.
 	OpIQuery Opcode = 1
+	// OpStatus is a server status request.
 	OpStatus Opcode = 2
 )
 
+// ResponseCode is the result of a query (RFC 1035, 4.1.1). mDNS responses
+// carry NoError (RFC 6762, 18.11).
 type ResponseCode byte
 
+// The values of ResponseCode.
 const (
-	NoError        ResponseCode = 0
-	FormatError    ResponseCode = 1
-	ServerFailure  ResponseCode = 2
-	NameError      ResponseCode = 3
+	// NoError means that no error occurred.
+	NoError ResponseCode = 0
+	// FormatError means that the server could not interpret the query.
+	FormatError ResponseCode = 1
+	// ServerFailure means that the server could not process the query.
+	ServerFailure ResponseCode = 2
+	// NameError means that the queried name does not exist.
+	NameError ResponseCode = 3
+	// NotImplemented means that the server does not support the query.
 	NotImplemented ResponseCode = 4
-	Refused        ResponseCode = 5
+	// Refused means that the server refused the query.
+	Refused ResponseCode = 5
 )
 
 // Header represents a protocol header.

@@ -22,17 +22,26 @@ import (
 // Format represents the output format.
 type Format int
 
+// The output formats.
 const (
+	// FormatTable prints the results as an aligned table.
 	FormatTable Format = iota
+	// FormatJSON prints the results as JSON, one object a line.
 	FormatJSON
+	// FormatCSV prints the results as CSV with a header line.
 	FormatCSV
 )
 
-var (
+// The --format flag and its values.
+const (
+	// FormatParamStr is the name of the flag which selects the format.
 	FormatParamStr = "format"
+	// FormatTableStr selects FormatTable.
 	FormatTableStr = "table"
-	FormatJSONStr  = "json"
-	FormatCSVStr   = "csv"
+	// FormatJSONStr selects FormatJSON.
+	FormatJSONStr = "json"
+	// FormatCSVStr selects FormatCSV.
+	FormatCSVStr = "csv"
 )
 
 func allSupportedFormats() []string {

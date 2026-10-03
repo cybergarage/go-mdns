@@ -95,8 +95,8 @@ install:
 	${GOBIN}/${BIN_LOOKUP} doc > ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md
 	@git diff --quiet -- ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md || \
 		git commit ${DOCS_ROOT_DIR}/${BIN_LOOKUP}.md -m "docs: update ${BIN_LOOKUP} command reference"
-# ${BIN_SERVER} is under development, and it has no doc command yet, so
-# ${DOCS_ROOT_DIR}/${BIN_SERVER}.md is maintained by hand.
+# ${BIN_SERVER} has no doc command, so ${DOCS_ROOT_DIR}/${BIN_SERVER}.md is
+# maintained by hand.
 
 clean:
 	go clean -i ${PKG} ${TEST_PKG} ${BINS}

@@ -115,9 +115,10 @@ func (sock *Socket) ListenIPAddr() (string, error) {
 	return net.JoinHostPort(addr, strconv.Itoa(port)), nil
 }
 
-// SetMulticastLoop sets a flag to IP_MULTICAST_LOOP.
+// SetMulticastLoopFd sets IP_MULTICAST_LOOP (IPv4) or IPV6_MULTICAST_LOOP
+// (IPv6) of the socket file descriptor fd, which decides whether this host
+// receives the multicast messages it sends.
 // nolint: nosnakecase
-
 func (sock *Socket) SetMulticastLoopFd(fd uintptr, addr string, flag bool) error {
 	opt := 0
 	if flag {

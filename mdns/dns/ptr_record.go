@@ -14,6 +14,8 @@
 
 package dns
 
+// PTRRecord is a PTR record, which points to a domain name: a service
+// instance for a service type in DNS-SD (RFC 6763, 4).
 type PTRRecord interface {
 	Record
 	// DomainName returns the domain name pointed to by this PTR record.

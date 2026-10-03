@@ -29,14 +29,15 @@ This tool is a client. Use mdnsd to advertise a service.
       --verbose             enable verbose output
 ```
 
-* [mdnslookup completion]()	 - Generate the autocompletion script for the specified shell
-* [mdnslookup decode]()	 - Decode a recorded mDNS message
-* [mdnslookup doc]()	 - Generate markdown documentation to stdout
-* [mdnslookup host]()	 - Resolve a host name to its addresses
-* [mdnslookup monitor]()	 - Watch the mDNS messages on the link
-* [mdnslookup query]()	 - Send a single question and print the answering records
-* [mdnslookup resolve]()	 - Resolve a service instance to its host, port and attributes
-* [mdnslookup types]()	 - List the service types which are advertised on the link
+### SEE ALSO
+
+* [mdnslookup browse](#mdnslookup-browse)	 - Browse the instances of a service type
+* [mdnslookup decode](#mdnslookup-decode)	 - Decode a recorded mDNS message
+* [mdnslookup host](#mdnslookup-host)	 - Resolve a host name to its addresses
+* [mdnslookup monitor](#mdnslookup-monitor)	 - Watch the mDNS messages on the link
+* [mdnslookup query](#mdnslookup-query)	 - Send a single question and print the answering records
+* [mdnslookup resolve](#mdnslookup-resolve)	 - Resolve a service instance to its host, port and attributes
+* [mdnslookup types](#mdnslookup-types)	 - List the service types which are advertised on the link
 
 ## mdnslookup browse
 
@@ -46,7 +47,13 @@ Browse the instances of a service type
 
 Browse the instances of a service type, and report the instances as they are
 added, updated and removed. The browse runs until it is interrupted, or until
-the duration elapses when --duration is set.
+the duration elapses when --duration is set. Without a service type, it browses
+the service types which are advertised on the link.
+
+A responder usually answers a browse with the host, the port and the addresses
+of each instance, but one may answer only with the instance names. With
+--resolve, such an instance is resolved before it is reported, as
+avahi-browse --resolve does.
 
 ```
 mdnslookup browse [service] [flags]
@@ -57,7 +64,9 @@ mdnslookup browse [service] [flags]
 ```
   mdnslookup browse _matterc._udp
   mdnslookup browse --subtype _S3 _matterc._udp
+  mdnslookup browse --resolve _http._tcp
   mdnslookup browse --duration 10s --format json _matter._tcp
+  mdnslookup browse
 ```
 
 ### Options
@@ -66,6 +75,7 @@ mdnslookup browse [service] [flags]
       --domain string       domain to browse (default "local")
       --duration duration   browse duration (0 means until interrupted)
   -h, --help                help for browse
+      --resolve             resolve an instance which is reported without its host, port or addresses
       --subtype string      service subtype to browse (_S3, _L840, ...)
       --unicast             request unicast responses (QU)
 ```
@@ -81,254 +91,9 @@ mdnslookup browse [service] [flags]
       --verbose             enable verbose output
 ```
 
+### SEE ALSO
 
-## mdnslookup completion
-
-Generate the autocompletion script for the specified shell
-
-### Synopsis
-
-Generate the autocompletion script for mdnslookup for the specified shell.
-See each sub-command's help for details on how to use the generated script.
-
-
-### Options
-
-```
-  -h, --help   help for completion
-```
-
-### Options inherited from parent commands
-
-```
-      --debug               enable debug output
-      --family string       address family to use: all|ipv4|ipv6 (default "all")
-      --format string       output format: table|json|csv (default "table")
-  -i, --interface strings   network interfaces to use (all available interfaces by default)
-  -t, --timeout duration    query timeout (default 5s)
-      --verbose             enable verbose output
-```
-
-* [mdnslookup completion bash]()	 - Generate the autocompletion script for bash
-* [mdnslookup completion fish]()	 - Generate the autocompletion script for fish
-* [mdnslookup completion powershell]()	 - Generate the autocompletion script for powershell
-* [mdnslookup completion zsh]()	 - Generate the autocompletion script for zsh
-
-## mdnslookup completion bash
-
-Generate the autocompletion script for bash
-
-### Synopsis
-
-Generate the autocompletion script for the bash shell.
-
-This script depends on the 'bash-completion' package.
-If it is not installed already, you can install it via your OS's package manager.
-
-To load completions in your current shell session:
-
-	source <(mdnslookup completion bash)
-
-To load completions for every new session, execute once:
-
-#### Linux:
-
-	mdnslookup completion bash > /etc/bash_completion.d/mdnslookup
-
-#### macOS:
-
-	mdnslookup completion bash > $(brew --prefix)/etc/bash_completion.d/mdnslookup
-
-You will need to start a new shell for this setup to take effect.
-
-
-```
-mdnslookup completion bash
-```
-
-### Options
-
-```
-  -h, --help              help for bash
-      --no-descriptions   disable completion descriptions
-```
-
-### Options inherited from parent commands
-
-```
-      --debug               enable debug output
-      --family string       address family to use: all|ipv4|ipv6 (default "all")
-      --format string       output format: table|json|csv (default "table")
-  -i, --interface strings   network interfaces to use (all available interfaces by default)
-  -t, --timeout duration    query timeout (default 5s)
-      --verbose             enable verbose output
-```
-
-
-## mdnslookup completion fish
-
-Generate the autocompletion script for fish
-
-### Synopsis
-
-Generate the autocompletion script for the fish shell.
-
-To load completions in your current shell session:
-
-	mdnslookup completion fish | source
-
-To load completions for every new session, execute once:
-
-	mdnslookup completion fish > ~/.config/fish/completions/mdnslookup.fish
-
-You will need to start a new shell for this setup to take effect.
-
-
-```
-mdnslookup completion fish [flags]
-```
-
-### Options
-
-```
-  -h, --help              help for fish
-      --no-descriptions   disable completion descriptions
-```
-
-### Options inherited from parent commands
-
-```
-      --debug               enable debug output
-      --family string       address family to use: all|ipv4|ipv6 (default "all")
-      --format string       output format: table|json|csv (default "table")
-  -i, --interface strings   network interfaces to use (all available interfaces by default)
-  -t, --timeout duration    query timeout (default 5s)
-      --verbose             enable verbose output
-```
-
-
-## mdnslookup completion help
-
-Help about any command
-
-### Synopsis
-
-Help provides help for any command in the application.
-Simply type completion help [path to command] for full details.
-
-```
-mdnslookup completion help [command] [flags]
-```
-
-### Options
-
-```
-  -h, --help   help for help
-```
-
-### Options inherited from parent commands
-
-```
-      --debug               enable debug output
-      --family string       address family to use: all|ipv4|ipv6 (default "all")
-      --format string       output format: table|json|csv (default "table")
-  -i, --interface strings   network interfaces to use (all available interfaces by default)
-  -t, --timeout duration    query timeout (default 5s)
-      --verbose             enable verbose output
-```
-
-
-## mdnslookup completion powershell
-
-Generate the autocompletion script for powershell
-
-### Synopsis
-
-Generate the autocompletion script for powershell.
-
-To load completions in your current shell session:
-
-	mdnslookup completion powershell | Out-String | Invoke-Expression
-
-To load completions for every new session, add the output of the above command
-to your powershell profile.
-
-
-```
-mdnslookup completion powershell [flags]
-```
-
-### Options
-
-```
-  -h, --help              help for powershell
-      --no-descriptions   disable completion descriptions
-```
-
-### Options inherited from parent commands
-
-```
-      --debug               enable debug output
-      --family string       address family to use: all|ipv4|ipv6 (default "all")
-      --format string       output format: table|json|csv (default "table")
-  -i, --interface strings   network interfaces to use (all available interfaces by default)
-  -t, --timeout duration    query timeout (default 5s)
-      --verbose             enable verbose output
-```
-
-
-## mdnslookup completion zsh
-
-Generate the autocompletion script for zsh
-
-### Synopsis
-
-Generate the autocompletion script for the zsh shell.
-
-If shell completion is not already enabled in your environment you will need
-to enable it.  You can execute the following once:
-
-	echo "autoload -U compinit; compinit" >> ~/.zshrc
-
-To load completions in your current shell session:
-
-	source <(mdnslookup completion zsh)
-
-To load completions for every new session, execute once:
-
-#### Linux:
-
-	mdnslookup completion zsh > "${fpath[1]}/_mdnslookup"
-
-#### macOS:
-
-	mdnslookup completion zsh > $(brew --prefix)/share/zsh/site-functions/_mdnslookup
-
-You will need to start a new shell for this setup to take effect.
-
-
-```
-mdnslookup completion zsh [flags]
-```
-
-### Options
-
-```
-  -h, --help              help for zsh
-      --no-descriptions   disable completion descriptions
-```
-
-### Options inherited from parent commands
-
-```
-      --debug               enable debug output
-      --family string       address family to use: all|ipv4|ipv6 (default "all")
-      --format string       output format: table|json|csv (default "table")
-  -i, --interface strings   network interfaces to use (all available interfaces by default)
-  -t, --timeout duration    query timeout (default 5s)
-      --verbose             enable verbose output
-```
-
+* [mdnslookup](#mdnslookup)	 - Browse and resolve mDNS (DNS-SD) services on the local link
 
 ## mdnslookup decode
 
@@ -373,63 +138,9 @@ mdnslookup decode <file> [flags]
       --verbose             enable verbose output
 ```
 
+### SEE ALSO
 
-## mdnslookup doc
-
-Generate markdown documentation to stdout
-
-```
-mdnslookup doc [flags]
-```
-
-### Options
-
-```
-  -h, --help   help for doc
-```
-
-### Options inherited from parent commands
-
-```
-      --debug               enable debug output
-      --family string       address family to use: all|ipv4|ipv6 (default "all")
-      --format string       output format: table|json|csv (default "table")
-  -i, --interface strings   network interfaces to use (all available interfaces by default)
-  -t, --timeout duration    query timeout (default 5s)
-      --verbose             enable verbose output
-```
-
-
-## mdnslookup help
-
-Help about any command
-
-### Synopsis
-
-Help provides help for any command in the application.
-Simply type mdnslookup help [path to command] for full details.
-
-```
-mdnslookup help [command] [flags]
-```
-
-### Options
-
-```
-  -h, --help   help for help
-```
-
-### Options inherited from parent commands
-
-```
-      --debug               enable debug output
-      --family string       address family to use: all|ipv4|ipv6 (default "all")
-      --format string       output format: table|json|csv (default "table")
-  -i, --interface strings   network interfaces to use (all available interfaces by default)
-  -t, --timeout duration    query timeout (default 5s)
-      --verbose             enable verbose output
-```
-
+* [mdnslookup](#mdnslookup)	 - Browse and resolve mDNS (DNS-SD) services on the local link
 
 ## mdnslookup host
 
@@ -470,6 +181,9 @@ mdnslookup host <hostname> [flags]
       --verbose             enable verbose output
 ```
 
+### SEE ALSO
+
+* [mdnslookup](#mdnslookup)	 - Browse and resolve mDNS (DNS-SD) services on the local link
 
 ## mdnslookup monitor
 
@@ -512,6 +226,9 @@ mdnslookup monitor [flags]
       --verbose             enable verbose output
 ```
 
+### SEE ALSO
+
+* [mdnslookup](#mdnslookup)	 - Browse and resolve mDNS (DNS-SD) services on the local link
 
 ## mdnslookup query
 
@@ -556,6 +273,9 @@ mdnslookup query [name] [flags]
       --verbose             enable verbose output
 ```
 
+### SEE ALSO
+
+* [mdnslookup](#mdnslookup)	 - Browse and resolve mDNS (DNS-SD) services on the local link
 
 ## mdnslookup resolve
 
@@ -598,6 +318,9 @@ mdnslookup resolve <instance> [flags]
       --verbose             enable verbose output
 ```
 
+### SEE ALSO
+
+* [mdnslookup](#mdnslookup)	 - Browse and resolve mDNS (DNS-SD) services on the local link
 
 ## mdnslookup types
 
@@ -638,4 +361,7 @@ mdnslookup types [flags]
       --verbose             enable verbose output
 ```
 
+### SEE ALSO
+
+* [mdnslookup](#mdnslookup)	 - Browse and resolve mDNS (DNS-SD) services on the local link
 

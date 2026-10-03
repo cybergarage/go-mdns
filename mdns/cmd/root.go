@@ -25,19 +25,31 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	ProgramName = "mdnslookup"
+// ProgramName is the name of the command, which is also the prefix of the
+// environment variables which set its flags, such as MDNSLOOKUP_TIMEOUT.
+const ProgramName = "mdnslookup"
 
-	VerboseParamStr   = "verbose"
-	DebugParamStr     = "debug"
+// The names of the flags which every command takes.
+const (
+	// VerboseParamStr enables the verbose output.
+	VerboseParamStr = "verbose"
+	// DebugParamStr enables the debug output.
+	DebugParamStr = "debug"
+	// InterfaceParamStr selects the network interfaces to use.
 	InterfaceParamStr = "interface"
-	FamilyParamStr    = "family"
-	TimeoutParamStr   = "timeout"
+	// FamilyParamStr selects the address family to use.
+	FamilyParamStr = "family"
+	// TimeoutParamStr sets the query timeout.
+	TimeoutParamStr = "timeout"
 )
 
+// The values of the --family flag.
 const (
-	FamilyAllStr  = "all"
+	// FamilyAllStr uses both IPv4 and IPv6.
+	FamilyAllStr = "all"
+	// FamilyIPv4Str uses only IPv4.
 	FamilyIPv4Str = "ipv4"
+	// FamilyIPv6Str uses only IPv6.
 	FamilyIPv6Str = "ipv6"
 )
 
@@ -89,15 +101,21 @@ This tool is a client. Use mdnsd to advertise a service.`,
 	},
 }
 
+// GetRootCommand returns the root command of mdnslookup, such as for
+// generating its documentation or its shell completion.
 func GetRootCommand() *cobra.Command {
 	return rootCmd
 }
 
+// Execute runs mdnslookup with the command line arguments.
 func Execute() error {
 	return rootCmd.Execute()
 }
 
 func init() {
+	// The shell completion is not a part of the command reference.
+	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+
 	viper.SetEnvPrefix(ProgramName)
 
 	viper.SetDefault(FormatParamStr, FormatTableStr)

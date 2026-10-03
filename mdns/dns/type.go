@@ -18,23 +18,39 @@ import (
 	"fmt"
 )
 
-// Type represents a message type.
+// Type represents the type of a resource record or a question (RFC 1035,
+// 3.2.2 and 3.2.3).
 type Type uint
 
+// The record and question types.
 const (
-	A     Type = 0x0001
-	NS    Type = 0x0002
+	// A is a host's IPv4 address (RFC 1035).
+	A Type = 0x0001
+	// NS is an authoritative name server (RFC 1035).
+	NS Type = 0x0002
+	// CNAME is the canonical name of an alias (RFC 1035).
 	CNAME Type = 0x0005
-	TXT   Type = 0x0010
-	SRV   Type = 0x0021
-	OPT   Type = 0x0029
-	PTR   Type = 0x000C
+	// TXT holds text strings, the attributes of a DNS-SD service (RFC 6763, 6).
+	TXT Type = 0x0010
+	// SRV is the host and the port of a service (RFC 2782).
+	SRV Type = 0x0021
+	// OPT is the EDNS(0) pseudo record (RFC 6891).
+	OPT Type = 0x0029
+	// PTR points to a domain name, a service instance in DNS-SD (RFC 6763, 4).
+	PTR Type = 0x000C
+	// HINFO is the host information (RFC 1035).
 	HINFO Type = 0x000D
-	MX    Type = 0x000F
-	AAAA  Type = 0x001C
-	AXFR  Type = 0x00FC
-	NSEC  Type = 0x002F
-	ANY   Type = 0x00FF
+	// MX is a mail exchange (RFC 1035).
+	MX Type = 0x000F
+	// AAAA is a host's IPv6 address (RFC 3596).
+	AAAA Type = 0x001C
+	// AXFR asks for a zone transfer (RFC 1035).
+	AXFR Type = 0x00FC
+	// NSEC lists the record types a name has, which mDNS uses for the
+	// negative responses (RFC 6762, 6.1).
+	NSEC Type = 0x002F
+	// ANY asks for the records of every type (RFC 1035).
+	ANY Type = 0x00FF
 )
 
 // Equal returns true if the type matches the specified one.

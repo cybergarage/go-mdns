@@ -30,13 +30,17 @@ The responder. `Server` publishes services, which makes go-mdns usable to advert
 
 ### Changed
 
+- Every exported identifier is documented.
 - From v1.0.0, the exported API of every package, `mdns/dns`, `mdns/transport`, `mdns/encoding` and `mdns/cmd` included, follows Semantic Versioning.
 - `transport.DefaultConnectimeTimeOut` is renamed `transport.DefaultConnectTimeout`.
 - `Client.UnRegisterMessageHandler()` is renamed `UnregisterMessageHandler()`, and so is the method of `Server`.
+- The `--format` flag names and values of `mdns/cmd`, such as `FormatParamStr`, are constants instead of variables.
+- The `doc` and `completion` commands of `mdnslookup` are hidden: they are for the repository and the shell, not a part of the command reference.
 
 ### Fixed
 
 - A browse answered with the PTR record alone, as a responder may answer it, was taken for a goodbye, so the instance was never reported: `Service.TTL()` looked only at the records named by the instance and its host, and a PTR record names the instance in its data. `mdnslookup browse` without a service type reported nothing for the same reason.
+- `doc/mdnslookup.md` left out `browse`, since the generator dropped the first line after each "SEE ALSO" heading, and its links were empty. The commands now link to their sections.
 - A query without a service asked for the domain itself, `local`, so `mdnslookup browse` without a service type found nothing. It now asks for the service types, `_services._dns-sd._udp.local` (RFC 6763, 9).
 
 ## [0.9.1] - 2026-09-23

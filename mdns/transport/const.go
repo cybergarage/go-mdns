@@ -16,22 +16,36 @@ package transport
 
 import "time"
 
+// The mDNS addresses (RFC 6762, 3).
 const (
-	Port                 = 5353
-	UDPPort              = Port
-	TCPPort              = Port
+	// Port is the mDNS port.
+	Port = 5353
+	// UDPPort is the UDP port the servers bind by default.
+	UDPPort = Port
+	// TCPPort is the TCP port the servers bind by default.
+	TCPPort = Port
+	// MulticastIPv4Address is the mDNS IPv4 multicast address.
 	MulticastIPv4Address = "224.0.0.251"
+	// MulticastIPv6Address is the mDNS IPv6 multicast address.
 	MulticastIPv6Address = "ff02::fb"
-	MaxPacketSize        = 1500
+	// MaxPacketSize is the size of a message the sockets read at most, the
+	// Ethernet MTU (RFC 6762, 17).
+	MaxPacketSize = 1500
 )
 
+// The defaults of the socket configuration.
 const (
-	DefaultConnectTimeout    = (time.Millisecond * 5000)
-	DefaultRequestTimeout    = (time.Millisecond * 5000)
-	DefaultBindRetryCount    = 5
+	// DefaultConnectTimeout is the timeout to connect a TCP socket.
+	DefaultConnectTimeout = (time.Millisecond * 5000)
+	// DefaultRequestTimeout is the timeout to wait for a reply on a socket.
+	DefaultRequestTimeout = (time.Millisecond * 5000)
+	// DefaultBindRetryCount is how many times a socket is bound again when
+	// its port is in use.
+	DefaultBindRetryCount = 5
+	// DefaultBindRetryWaitTime is the interval of the bind retries.
 	DefaultBindRetryWaitTime = (time.Millisecond * 500)
 )
 
-const (
-	UDPPortRange = 100
-)
+// UDPPortRange is how many ports above the configured one a unicast server
+// tries when the automatic port binding is enabled.
+const UDPPortRange = 100
