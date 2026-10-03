@@ -124,3 +124,20 @@ func TestQuery(t *testing.T) {
 		})
 	}
 }
+
+func TestQueryDefaultName(t *testing.T) {
+	for _, tc := range []struct {
+		query Query
+		want  string
+	}{
+		{NewQuery(), "_services._dns-sd._udp.local"},
+		{NewQuery(WithQueryDomain("example.local")), "_services._dns-sd._udp.example.local"},
+		{NewQuery(WithQueryService("_matterc._udp")), "_matterc._udp.local"},
+		{NewQuery(WithQueryService("_matterc._udp"), WithQuerySubtype("_S3")), "_S3._sub._matterc._udp.local"},
+		{NewQuery(WithQueryName("host.local")), "host.local"},
+	} {
+		if got := tc.query.Name(); got != tc.want {
+			t.Errorf("Name() = %q, want %q", got, tc.want)
+		}
+	}
+}

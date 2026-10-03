@@ -109,7 +109,9 @@ func NewQuery(opts ...QueryOption) Query {
 	return q
 }
 
-// Name returns the full question name of the query.
+// Name returns the full question name of the query. A query without a
+// name, a service and a subtype asks for the service type enumeration,
+// "_services._dns-sd._udp.local".
 func (q *queryImp) Name() string {
 	if 0 < len(q.name) {
 		return q.name
@@ -118,8 +120,13 @@ func (q *queryImp) Name() string {
 	if 0 < len(q.subtype) {
 		labels = append(labels, q.subtype, Subtype)
 	}
-	if 0 < len(q.service) {
+	switch {
+	case 0 < len(q.service):
 		labels = append(labels, q.service)
+	case len(q.subtype) == 0:
+		// A query without a service asks for the service types, rather
+		// than for the domain itself (RFC 6763, 9).
+		labels = append(labels, DefaultQueryService)
 	}
 	labels = append(labels, q.domain)
 	return dns.NewNameWithStrings(labels...)

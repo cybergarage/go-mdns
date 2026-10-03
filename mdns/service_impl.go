@@ -145,6 +145,11 @@ func (srv *serviceImpl) TTL() time.Duration {
 		if !isServiceRecord && 0 < len(srv.host) {
 			isServiceRecord = record.IsName(srv.host)
 		}
+		// A browse may be answered with the PTR record alone, which names
+		// the instance in its data rather than in its name (RFC 6763, 4.1).
+		if ptr, ok := record.(dns.PTRRecord); !isServiceRecord && ok {
+			isServiceRecord = strings.EqualFold(strings.TrimSuffix(ptr.DomainName(), dns.LabelSeparator), fullName)
+		}
 		if !isServiceRecord {
 			continue
 		}

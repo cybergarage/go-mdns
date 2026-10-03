@@ -22,6 +22,9 @@ The responder. `Server` publishes services, which makes go-mdns usable to advert
 - `dns.NewPTRResourceRecord()`, `dns.NewSRVResourceRecord()`, `dns.NewTXTResourceRecord()`, `dns.NewAResourceRecord()`, `dns.NewAAAAResourceRecord()` and `dns.NewAddressResourceRecord()` build records, and `dns.WithMessageID()`, `dns.WithMessageAnswers()`, `dns.WithMessageNameServers()` and `dns.WithMessageAdditions()` build messages. `dns.CacheFlush` names the cache-flush bit.
 - Interoperability tests in `mdnstest` check the responder against `dns-sd` (Bonjour) and `avahi-browse`/`avahi-resolve` (Avahi) when they are installed: browsing by type and subtype, resolving, host lookup, and goodbye. They are skipped when a client or its daemon is missing, and with `-short`.
 - `mdnsd` publishes the service given by `-name`, `-service`, `-port`, `-host`, `-subtype` and `-txt`, and exits with an error when another node holds the instance name or the host name.
+- `WithServerInterfaces()`, `WithServerIPv4Enabled()` and `WithServerIPv6Enabled()` select the network interfaces and the address families the server listens and publishes on, as the client options do.
+- `mdnslookup browse --resolve` resolves an instance which a responder reports without its host, port or addresses, as `avahi-browse --resolve` does.
+- `mdnsd` takes `--address`, `-i`/`--interface`, `--family`, `--verbose` and `--version`, with the same meaning as the flags of `mdnslookup`.
 - `LocalService.Host` takes the host name with or without the domain: `HostName()` adds the domain unless the host already ends with it, so `host.local` is no longer published as `host.local.local`. `Validate()` rejects a host in another domain.
 - `LocalService.Validate()` rejects a subtype which is not a single label, such as `_printer._sub._http._tcp` as `avahi-publish-service` takes it, which was published under a doubled name, and an empty subtype or one longer than 63 bytes.
 
@@ -30,6 +33,11 @@ The responder. `Server` publishes services, which makes go-mdns usable to advert
 - From v1.0.0, the exported API of every package, `mdns/dns`, `mdns/transport`, `mdns/encoding` and `mdns/cmd` included, follows Semantic Versioning.
 - `transport.DefaultConnectimeTimeOut` is renamed `transport.DefaultConnectTimeout`.
 - `Client.UnRegisterMessageHandler()` is renamed `UnregisterMessageHandler()`, and so is the method of `Server`.
+
+### Fixed
+
+- A browse answered with the PTR record alone, as a responder may answer it, was taken for a goodbye, so the instance was never reported: `Service.TTL()` looked only at the records named by the instance and its host, and a PTR record names the instance in its data. `mdnslookup browse` without a service type reported nothing for the same reason.
+- A query without a service asked for the domain itself, `local`, so `mdnslookup browse` without a service type found nothing. It now asks for the service types, `_services._dns-sd._udp.local` (RFC 6763, 9).
 
 ## [0.9.1] - 2026-09-23
 

@@ -82,6 +82,30 @@ func WithServerConflictHandler(handler ConflictHandler) ServerOption {
 	}
 }
 
+// WithServerInterfaces sets the network interfaces the server listens and
+// publishes on. All available interfaces are used when none is set.
+func WithServerInterfaces(ifis ...*net.Interface) ServerOption {
+	return func(server *Server) {
+		server.SetInterfaces(ifis)
+	}
+}
+
+// WithServerIPv4Enabled sets whether the server listens on the IPv4
+// addresses.
+func WithServerIPv4Enabled(flag bool) ServerOption {
+	return func(server *Server) {
+		server.SetIPv4Enabled(flag)
+	}
+}
+
+// WithServerIPv6Enabled sets whether the server listens on the IPv6
+// addresses.
+func WithServerIPv6Enabled(flag bool) ServerOption {
+	return func(server *Server) {
+		server.SetIPv6Enabled(flag)
+	}
+}
+
 // NewServer returns a new server instance.
 func NewServer(opts ...ServerOption) *Server {
 	server := &Server{

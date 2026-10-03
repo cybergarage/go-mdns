@@ -149,3 +149,41 @@ func TestServiceCacheExpiration(t *testing.T) {
 		t.Errorf("the expired service should be removed: %v", cache.Services())
 	}
 }
+
+// TestServiceTTLWithPTROnly guards against a regression where a browse which
+// was answered with the PTR record alone was taken for a goodbye, since the
+// PTR record names the instance in its data, and the instance was dropped.
+func TestServiceTTLWithPTROnly(t *testing.T) {
+	newPTRService := func(ttl uint) Service {
+		t.Helper()
+		ptr, err := dns.NewPTRResourceRecord("_http._tcp.local", "printer._http._tcp.local", ttl)
+		if err != nil {
+			t.Fatal(err)
+		}
+		msg, err := dns.NewMessageWithBytes(dns.NewResponseMessage(dns.WithMessageAnswers(ptr)).Bytes())
+		if err != nil {
+			t.Fatal(err)
+		}
+		service, err := NewService(WithServiceMessage(msg))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return service
+	}
+
+	service := newPTRService(4500)
+	if service.FullName() != "printer._http._tcp.local" {
+		t.Fatalf("FullName() = %q", service.FullName())
+	}
+	if got := service.TTL(); got != 4500*time.Second {
+		t.Errorf("TTL() of a PTR answer = %s, want 4500s", got)
+	}
+
+	cache := newServiceCache()
+	if event, ok := cache.Update(service); !ok || event.Type != ServiceAdded {
+		t.Fatalf("Update() of a PTR answer = %v, %v; want an added event", event, ok)
+	}
+	if event, ok := cache.Update(newPTRService(0)); !ok || event.Type != ServiceRemoved {
+		t.Fatalf("Update() of a PTR goodbye = %v, %v; want a removed event", event, ok)
+	}
+}

@@ -49,6 +49,7 @@ From v1.0.0, the exported API of every package follows [Semantic Versioning](htt
 - Known-Answer suppression of the answers the querier already holds (RFC 6762, 7.1)
 - Unicast responses to QU queries (RFC 6762, 5.4) and to legacy unicast queries from a port other than 5353 (6.7)
 - The cache-flush bit on the unique records, and a random 20-120 ms delay of a multicast response with shared records (RFC 6762, 6 and 10.2)
+- Selecting the network interfaces and the address families to listen and publish on
 
 ### What is not supported yet
 
@@ -199,6 +200,7 @@ client := mdns.NewClient(
 $ mdnslookup types
 $ mdnslookup browse _matterc._udp
 $ mdnslookup browse --subtype _S3 --duration 10s _matterc._udp
+$ mdnslookup browse --resolve _http._tcp
 $ mdnslookup resolve DD200C20D25AE5F7._matterc._udp.local
 $ mdnslookup host macmini.local
 $ mdnslookup query --type SRV DD200C20D25AE5F7._matterc._udp.local
@@ -211,7 +213,7 @@ Every command takes `--format table|json|csv`, and the common `--interface`, `--
 `mdnsd` publishes a service from a terminal until it is interrupted. It exits with an error when another node holds the instance name or the host name.
 
 ```
-$ mdnsd -name demo -service _http._tcp -port 8080 -txt path=/
+$ mdnsd --name demo --service _http._tcp --port 8080 --txt path=/
 ```
 
 ## Testing
