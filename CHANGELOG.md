@@ -6,7 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-The responder. `Server` publishes services, which makes go-mdns usable to advertise, such as a Matter device advertising itself for commissioning, and it probes their names for conflicts with the other nodes on the link.
+## [1.0.0] - 2026-10-03
+
+The first stable release. The exported API of every package follows Semantic Versioning from this release.
+
+It adds the responder: `Server` publishes services, which makes go-mdns usable to advertise, such as a Matter device advertising itself for commissioning, and it probes their names for conflicts with the other nodes on the link. It does not rename a service on a conflict, but reports it, so that the application chooses the new name.
 
 ### Added
 

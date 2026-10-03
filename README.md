@@ -58,6 +58,8 @@ From v1.0.0, the exported API of every package follows [Semantic Versioning](htt
 - Truncated messages (the TC bit) and the Known-Answer list continuation (RFC 6762, 7.2)
 - Known-Answer lists in the client's own queries, and duplicate question suppression (RFC 6762, 7.1 - 7.4)
 - Following the interface changes, such as a link going up or down, while the client or the server is running
+- Handling a name conflict for each interface: a conflict found on one interface withdraws the service from all of them
+- Telling a service's own announcement which arrives late from another node's record: a TXT update right after a registration may be taken for a conflict, and the service is then probed again for about a second before it is published again
 
 ## Install
 
