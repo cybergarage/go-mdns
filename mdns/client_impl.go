@@ -199,7 +199,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 	handler, ok := q.MessageHandler()
 	if ok {
 		client.RegisterMessageHandler(handler)
-		defer client.UnRegisterMessageHandler(handler)
+		defer client.UnregisterMessageHandler(handler)
 	}
 
 	queryMsg := NewRequestWithQuery(q)
@@ -231,7 +231,7 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 		log.Debugf("mDNS Service responded: %s (added=%t)", newService.String(), added)
 	}
 	client.RegisterMessageHandler(queryResponseHandler)
-	defer client.UnRegisterMessageHandler(queryResponseHandler)
+	defer client.UnregisterMessageHandler(queryResponseHandler)
 
 	if err := client.queryUntilDone(ctx, queryMsg); err != nil {
 		return []Service{}, err

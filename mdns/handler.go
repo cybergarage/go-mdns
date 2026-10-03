@@ -46,8 +46,8 @@ func (msg *msgHandler) RegisterMessageHandler(handler MessageHandler) {
 	msg.handlers = append(msg.handlers, handler)
 }
 
-// UnRegisterMessageHandler removes a message handler from the server.
-func (msg *msgHandler) UnRegisterMessageHandler(handler MessageHandler) {
+// UnregisterMessageHandler removes a message handler from the server.
+func (msg *msgHandler) UnregisterMessageHandler(handler MessageHandler) {
 	msg.Lock()
 	defer msg.Unlock()
 	// Use reflection to compare function pointers

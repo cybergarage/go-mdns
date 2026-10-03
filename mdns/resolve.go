@@ -85,7 +85,7 @@ func (client *clientImpl) queryUntilAnswered(ctx context.Context, queryMsg Messa
 	}
 
 	client.RegisterMessageHandler(responseHandler)
-	defer client.UnRegisterMessageHandler(responseHandler)
+	defer client.UnregisterMessageHandler(responseHandler)
 
 	return client.queryUntilDone(answeredCtx, queryMsg)
 }

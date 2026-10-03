@@ -29,6 +29,7 @@ The responder. `Server` publishes services, which makes go-mdns usable to advert
 
 - From v1.0.0, the exported API of every package, `mdns/dns`, `mdns/transport`, `mdns/encoding` and `mdns/cmd` included, follows Semantic Versioning.
 - `transport.DefaultConnectimeTimeOut` is renamed `transport.DefaultConnectTimeout`.
+- `Client.UnRegisterMessageHandler()` is renamed `UnregisterMessageHandler()`, and so is the method of `Server`.
 
 ## [0.9.1] - 2026-09-23
 

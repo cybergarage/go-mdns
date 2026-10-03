@@ -49,7 +49,7 @@ func (client *clientImpl) Browse(ctx context.Context, q Query, handler ServiceHa
 
 	if queryHandler, ok := q.MessageHandler(); ok {
 		client.RegisterMessageHandler(queryHandler)
-		defer client.UnRegisterMessageHandler(queryHandler)
+		defer client.UnregisterMessageHandler(queryHandler)
 	}
 
 	queryMsg := NewRequestWithQuery(q)
@@ -81,7 +81,7 @@ func (client *clientImpl) Browse(ctx context.Context, q Query, handler ServiceHa
 		notify(event)
 	}
 	client.RegisterMessageHandler(browseHandler)
-	defer client.UnRegisterMessageHandler(browseHandler)
+	defer client.UnregisterMessageHandler(browseHandler)
 
 	expirationCtx, stopExpirationChecker := context.WithCancel(ctx)
 	defer stopExpirationChecker()
