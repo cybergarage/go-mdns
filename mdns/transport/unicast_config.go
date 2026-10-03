@@ -22,7 +22,7 @@ type UnicastConfig struct {
 func NewDefaultUnicastConfig() *UnicastConfig {
 	conf := &UnicastConfig{
 		tcpEnabled:        false,
-		connectionTimeout: DefaultConnectimeTimeOut,
+		connectionTimeout: DefaultConnectTimeout,
 		requestTimeout:    DefaultRequestTimeout,
 		bindRetryCount:    DefaultBindRetryCount,
 		bindRetryWaitTime: 0,

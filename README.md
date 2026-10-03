@@ -22,6 +22,10 @@ go-mdns is a **client (querier)** and a **server (responder)** library. The clie
 | `mdnslookup` command | Supported |
 | `mdnsd` command | Supported |
 
+### API stability
+
+From v1.0.0, the exported API of every package follows [Semantic Versioning](https://semver.org/): `mdns`, and `mdns/dns`, `mdns/transport` and `mdns/encoding`, which the `mdns` package is built on, as well as `mdns/cmd`, which the `mdnslookup` command is built with. A change which breaks it is made only in a new major version, and a feature which is not supported yet is added without breaking it.
+
 ### What the client supports
 
 - Browsing a service type continuously, with the added, updated and removed changes (RFC 6763, 4)
@@ -54,8 +58,6 @@ go-mdns is a **client (querier)** and a **server (responder)** library. The clie
 - Truncated messages (the TC bit) and the Known-Answer list continuation (RFC 6762, 7.2)
 - Known-Answer lists in the client's own queries, and duplicate question suppression (RFC 6762, 7.1 - 7.4)
 - Following the interface changes, such as a link going up or down, while the client or the server is running
-
-The `mdns/dns` package is exported so that the records of a message can be read, but its API is not stable until v1.0.0.
 
 ## Install
 

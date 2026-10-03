@@ -52,10 +52,13 @@ type LocalService struct {
 	// Domain is the domain; empty means "local".
 	Domain string
 	// Subtypes are the subtype labels the service can also be browsed by,
-	// such as "_printer" (RFC 6763, 7.1).
+	// such as "_printer" (RFC 6763, 7.1). A label is given without the
+	// "._sub" suffix and the service type: "_printer", not
+	// "_printer._sub._http._tcp".
 	Subtypes []string
-	// Host is the host name without the domain, which the SRV record
-	// points to.
+	// Host is the host name which the SRV record points to, such as
+	// "host". The domain is added unless it is given, so "host.local" is
+	// the same host; a name in another domain is not valid.
 	Host string
 	// Port is the service port.
 	Port int
@@ -84,8 +87,36 @@ func (svc *LocalService) Validate() error {
 	if svc.Port <= 0 || 0xFFFF < svc.Port {
 		return fmt.Errorf("%w: port %d", dns.ErrInvalid, svc.Port)
 	}
+	if host := svc.hostLabel(); host == "" || strings.Contains(host, dns.LabelSeparator) {
+		return fmt.Errorf("%w: host %q is not a single label with or without the domain %q, such as \"host\" or \"host.%s\"", dns.ErrInvalid, svc.Host, svc.domain(), svc.domain())
+	}
+	for _, st := range svc.Subtypes {
+		if err := validateSubtype(st); err != nil {
+			return err
+		}
+	}
 	if _, err := svc.records(nil, OtherRecordTTL, HostRecordTTL); err != nil {
 		return err
+	}
+	return nil
+}
+
+// maxLabelLength is the longest label a DNS name can hold (RFC 1035, 2.3.4).
+const maxLabelLength = 63
+
+// validateSubtype reports whether st is a subtype label, such as "_printer",
+// rather than a subtype name, such as "_printer._sub._http._tcp" as
+// avahi-publish-service takes it, which would be published under a doubled
+// name (RFC 6763, 7.1).
+func validateSubtype(st string) error {
+	switch {
+	case st == "":
+		return fmt.Errorf("%w: subtype is empty", dns.ErrInvalid)
+	case strings.Contains(st, dns.LabelSeparator):
+		label, _, _ := strings.Cut(st, dns.LabelSeparator)
+		return fmt.Errorf("%w: subtype %q is not a single label, such as %q", dns.ErrInvalid, st, label)
+	case maxLabelLength < len(st):
+		return fmt.Errorf("%w: subtype %q is longer than %d bytes", dns.ErrInvalid, st, maxLabelLength)
 	}
 	return nil
 }
@@ -110,8 +141,20 @@ func (svc *LocalService) FullName() string {
 }
 
 // HostName returns the host name with its domain, such as "host.local".
+// The domain is added to Host unless Host already ends with it, so "host",
+// "host.local" and "host.local." all give "host.local".
 func (svc *LocalService) HostName() string {
-	return dns.NewNameWithStrings(svc.Host, svc.domain())
+	return dns.NewNameWithStrings(svc.hostLabel(), svc.domain())
+}
+
+// hostLabel returns Host without the service's domain and a trailing dot.
+func (svc *LocalService) hostLabel() string {
+	host := strings.TrimSuffix(svc.Host, dns.LabelSeparator)
+	suffix := dns.LabelSeparator + svc.domain()
+	if len(suffix) < len(host) && strings.EqualFold(host[len(host)-len(suffix):], suffix) {
+		host = host[:len(host)-len(suffix)]
+	}
+	return host
 }
 
 // SubtypeNames returns the names the service is browsed by as a subtype,

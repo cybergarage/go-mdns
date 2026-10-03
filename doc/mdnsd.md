@@ -16,7 +16,7 @@ mdnsd -name <instance> -service <type> -port <port> [-host <host>] [-subtype <la
   -name string       service instance name
   -service string    service type, such as _http._tcp
   -port int          service port
-  -host string       host name without the domain (default: this host)
+  -host string       host name, such as myhost or myhost.local (default: this host)
   -subtype string    subtype label, such as _printer; can be repeated
   -txt string        TXT string, such as key=value; can be repeated
   -v                 print the received queries

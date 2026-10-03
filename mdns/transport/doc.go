@@ -21,6 +21,6 @@ A server is bound to every available network interface by default.
 the interface which a message was received on is attached to the message, so
 that an IPv6 link-local address can be scoped to it.
 
-The API of this package is not stable until v1.0.0.
+Its API follows Semantic Versioning from v1.0.0.
 */
 package transport

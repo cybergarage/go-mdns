@@ -19,6 +19,7 @@ import (
 	"errors"
 	"net"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -259,6 +260,13 @@ func TestLocalServiceValidate(t *testing.T) {
 		"port":     func(s *LocalService) { s.Port = 70000 },
 		"txt":      func(s *LocalService) { s.TXT = []string{string(make([]byte, 256))} },
 		"address":  func(s *LocalService) { s.Addresses = []net.IP{{1, 2, 3}} },
+		// avahi-publish-service takes the subtype name, which would be
+		// published as "_S15._sub._matterc._udp._sub._matterc._udp.local".
+		"subtype name":  func(s *LocalService) { s.Subtypes = []string{"_S15._sub._matterc._udp"} },
+		"empty subtype": func(s *LocalService) { s.Subtypes = []string{""} },
+		"host domain":   func(s *LocalService) { s.Host = "B75AFB458ECD6D6F.example.com" },
+		"host only dot": func(s *LocalService) { s.Host = ".local" },
+		"long subtype":  func(s *LocalService) { s.Subtypes = []string{"_" + strings.Repeat("x", 63)} },
 	} {
 		svc := testLocalService()
 		mutate(svc)
@@ -269,6 +277,29 @@ func TestLocalServiceValidate(t *testing.T) {
 	var nilService *LocalService
 	if err := nilService.Validate(); err == nil {
 		t.Error("Validate() on nil = nil, want an error")
+	}
+}
+
+func TestLocalServiceHostName(t *testing.T) {
+	for _, tc := range []struct {
+		host, domain, want string
+	}{
+		{"B75AFB458ECD6D6F", "", "B75AFB458ECD6D6F.local"},
+		{"B75AFB458ECD6D6F.local", "", "B75AFB458ECD6D6F.local"},
+		{"B75AFB458ECD6D6F.local.", "", "B75AFB458ECD6D6F.local"},
+		{"B75AFB458ECD6D6F.LOCAL", "", "B75AFB458ECD6D6F.local"},
+		{"printer", "example.local", "printer.example.local"},
+		{"printer.example.local", "example.local", "printer.example.local"},
+	} {
+		svc := testLocalService()
+		svc.Host = tc.host
+		svc.Domain = tc.domain
+		if got := svc.HostName(); got != tc.want {
+			t.Errorf("Host %q, Domain %q: HostName() = %q, want %q", tc.host, tc.domain, got, tc.want)
+		}
+		if err := svc.Validate(); err != nil {
+			t.Errorf("Host %q, Domain %q: Validate() = %v", tc.host, tc.domain, err)
+		}
 	}
 }
 

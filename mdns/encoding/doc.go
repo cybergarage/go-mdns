@@ -12,15 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/*
-Package dns implements the DNS message encoding and decoding which the mDNS
-messages are built on (RFC 1035), with the Multicast DNS extensions of RFC 6762.
-
-The package reads the A, AAAA, PTR, SRV, TXT and NSEC records, and it resolves
-the compression pointers of the names. A record of an unknown type keeps its raw
-data, which [Record.Data] returns.
-
-The package is exported so that the records of a message can be read and
-built, and its API follows Semantic Versioning from v1.0.0.
-*/
-package dns
+// Package encoding converts the unsigned integers of the DNS messages to and
+// from their big-endian bytes (RFC 1035, 2.3.2).
+//
+// Its API follows Semantic Versioning from v1.0.0.
+package encoding

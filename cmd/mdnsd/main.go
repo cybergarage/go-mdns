@@ -38,7 +38,7 @@ mdnsd is a Multicast DNS responder.
 	-name string       service instance name
 	-service string    service type, such as _http._tcp
 	-port int          service port
-	-host string       host name without the domain (default: this host)
+	-host string       host name, such as myhost or myhost.local (default: this host)
 	-subtype string    subtype label, such as _printer; can be repeated
 	-txt string        TXT string, such as key=value; can be repeated
 	-v                 print the received queries
@@ -73,7 +73,7 @@ func run() error {
 	name := flag.String("name", "", "Service instance name")
 	service := flag.String("service", "", "Service type, such as _http._tcp")
 	port := flag.Int("port", 0, "Service port")
-	host := flag.String("host", "", "Host name without the domain (default: this host)")
+	host := flag.String("host", "", "Host name, such as myhost or myhost.local (default: this host)")
 	var subtypes, txt []string
 	flag.Func("subtype", "Subtype label, such as _printer; can be repeated", func(v string) error {
 		subtypes = append(subtypes, v)
