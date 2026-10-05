@@ -111,12 +111,9 @@ func probeRecords(svc *LocalService, ifi *net.Interface, names []string) ([]dns.
 	unique := append([]dns.ResourceRecord{records.srv, records.txt}, records.addrs...)
 	claimed := []dns.ResourceRecord{}
 	for _, rr := range unique {
-		for _, name := range names {
-			if rr.IsName(name) {
-				rr.SetUnicastResponse(false)
-				claimed = append(claimed, rr)
-				break
-			}
+		if slices.ContainsFunc(names, rr.IsName) {
+			rr.SetUnicastResponse(false)
+			claimed = append(claimed, rr)
 		}
 	}
 	return claimed, nil

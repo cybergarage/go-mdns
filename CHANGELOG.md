@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-10-03
+## [1.0.0] - 2026-10-05
 
 The first stable release. The exported API of every package follows Semantic Versioning from this release.
 
@@ -46,6 +46,9 @@ It adds the responder: `Server` publishes services, which makes go-mdns usable t
 - A browse answered with the PTR record alone, as a responder may answer it, was taken for a goodbye, so the instance was never reported: `Service.TTL()` looked only at the records named by the instance and its host, and a PTR record names the instance in its data. `mdnslookup browse` without a service type reported nothing for the same reason.
 - `doc/mdnslookup.md` left out `browse`, since the generator dropped the first line after each "SEE ALSO" heading, and its links were empty. The commands now link to their sections.
 - A query without a service asked for the domain itself, `local`, so `mdnslookup browse` without a service type found nothing. It now asks for the service types, `_services._dns-sd._udp.local` (RFC 6763, 9).
+- The bridges of Docker (`docker0` and `br-`) and Podman (`cni-podman`) were taken for usable interfaces, as only the libvirt bridges (`virbr`) were recognized: the server bound to them and published their addresses, which the other nodes on the link cannot reach. They are now excluded, also from the addresses a service falls back to when the interface of a query is unknown.
+- `go test -race` reported data races when a message arrived while a server or a client started or stopped: the message processor was set again after the listener had started, and the listen status of a socket was cleared while a response was being sent. Both are now guarded, and `SetMessageProcessor()` is safe while a server receives messages.
+- `mdnsd` skipped the deferred stop of its signal handling when it exited with an error. It now stops it as soon as a signal arrives, so that a second signal ends a stop which hangs.
 
 ## [0.9.1] - 2026-09-23
 
