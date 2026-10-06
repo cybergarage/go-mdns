@@ -10,8 +10,6 @@ go-mdns is a Go library for Multicast DNS (mDNS) and DNS Service Discovery (DNS-
 
 The changes of each release are listed in the [CHANGELOG](CHANGELOG.md).
 
-**Note:** 🌱 This is a spare-time hobby project, so progress may be slow and changes may appear irregular. Thank you for your patience 🙂
-
 ## Status
 
 go-mdns is a **client (querier)** and a **server (responder)** library. The client browses, resolves and looks up the services and the hosts which other responders advertise, and the server publishes the services of this node.
