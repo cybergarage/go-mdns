@@ -16,12 +16,38 @@ package mdns
 
 import (
 	"encoding/binary"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
+
+func TestDiscoveredServicesLimitAndExpiration(t *testing.T) {
+	client := NewClient().(*clientImpl)
+	for i := range maxDiscoveredServices {
+		name := fmt.Sprintf("service-%d._http._tcp.local", i)
+		if _, ok := client.discovered.Update(newTestService(t, name, 120)); !ok {
+			t.Fatalf("cache did not admit %s", name)
+		}
+	}
+	extra := newTestService(t, "extra._http._tcp.local", 120)
+	if _, ok := client.discovered.Update(extra); ok {
+		t.Fatal("cache admitted a service beyond the limit")
+	}
+	if got := len(client.Services()); got != maxDiscoveredServices {
+		t.Fatalf("Services returned %d entries, want %d", got, maxDiscoveredServices)
+	}
+	client.discovered.Update(newTestService(t, "SERVICE-0._http._tcp.local", 0))
+	if _, ok := client.discovered.Update(extra); !ok {
+		t.Fatal("cache did not admit a service after a goodbye")
+	}
+	client.discovered.RemoveExpired(time.Now().Add(121 * time.Second))
+	if got := len(client.Services()); got != 0 {
+		t.Fatalf("Services returned %d expired entries", got)
+	}
+}
 
 // newTestTXTResponse returns a response message which holds a single TXT record
 // of the specified service name, TTL and attributes.

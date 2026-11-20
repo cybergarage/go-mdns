@@ -141,7 +141,7 @@ func resolveService(ctx context.Context, client mdns.Client, service mdns.Servic
 	defer cancel()
 	resolved, err := client.Resolve(resolveCtx, service.FullName())
 	if err != nil {
-		log.Warnf("resolve %s: %s", service.FullName(), err)
+		log.Warnf("resolve %q: %q", service.FullName(), err)
 		return service
 	}
 	return resolved

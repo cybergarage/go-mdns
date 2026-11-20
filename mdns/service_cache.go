@@ -15,14 +15,23 @@
 package mdns
 
 import (
+	"strings"
 	"sync"
 	"time"
 )
+
+// At capacity, keep tracking known services and admit new ones as entries expire.
+const maxDiscoveredServices = 1024
 
 // serviceCacheEntry represents a cached service with its expiration time.
 type serviceCacheEntry struct {
 	service   Service
 	expiredAt time.Time
+}
+
+type serviceCacheKey struct {
+	name           string
+	interfaceIndex int
 }
 
 // serviceCache holds the discovered services until their records expire.
@@ -32,14 +41,14 @@ type serviceCacheEntry struct {
 // away announces its records with a TTL of zero (10.1).
 type serviceCache struct {
 	mutex   sync.Mutex
-	entries map[string]*serviceCacheEntry
+	entries map[serviceCacheKey]*serviceCacheEntry
 }
 
 // newServiceCache returns a blank service cache.
 func newServiceCache() *serviceCache {
 	return &serviceCache{
 		mutex:   sync.Mutex{},
-		entries: map[string]*serviceCacheEntry{},
+		entries: map[serviceCacheKey]*serviceCacheEntry{},
 	}
 }
 
@@ -50,9 +59,12 @@ func (cache *serviceCache) Update(service Service) (ServiceEvent, bool) {
 	cache.mutex.Lock()
 	defer cache.mutex.Unlock()
 
-	key := service.FullName()
-	if len(key) == 0 {
+	key := serviceCacheKey{name: strings.ToLower(service.FullName())}
+	if len(key.name) == 0 {
 		return ServiceEvent{}, false // nolint: exhaustruct,exhaustruct_v5
+	}
+	if ifi := service.Interface(); ifi != nil {
+		key.interfaceIndex = ifi.Index
 	}
 
 	ttl := service.TTL()
@@ -72,6 +84,9 @@ func (cache *serviceCache) Update(service Service) (ServiceEvent, bool) {
 
 	entry, ok := cache.entries[key]
 	if !ok {
+		if len(cache.entries) >= maxDiscoveredServices {
+			return ServiceEvent{}, false
+		}
 		cache.entries[key] = &serviceCacheEntry{
 			service:   service,
 			expiredAt: time.Now().Add(ttl),

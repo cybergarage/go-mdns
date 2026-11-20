@@ -40,7 +40,7 @@ func (client *clientImpl) Browse(ctx context.Context, q Query, handler ServiceHa
 	cache := newServiceCache()
 
 	notify := func(event ServiceEvent) {
-		log.Debugf("mDNS service %s", event.String())
+		log.Debugf("mDNS service %q", event.String())
 		if handler == nil {
 			return
 		}
@@ -69,16 +69,10 @@ func (client *clientImpl) Browse(ctx context.Context, q Query, handler ServiceHa
 			return
 		}
 
-		event, ok := cache.Update(service)
-		if !ok {
-			return
+		client.discovered.Update(service)
+		if event, ok := cache.Update(service); ok {
+			notify(event)
 		}
-
-		if event.Type != ServiceRemoved {
-			client.AddService(service)
-		}
-
-		notify(event)
 	}
 	client.RegisterMessageHandler(browseHandler)
 	defer client.UnregisterMessageHandler(browseHandler)
@@ -94,6 +88,7 @@ func (client *clientImpl) Browse(ctx context.Context, q Query, handler ServiceHa
 			case <-expirationCtx.Done():
 				return
 			case now := <-ticker.C:
+				client.discovered.RemoveExpired(now)
 				for _, event := range cache.RemoveExpired(now) {
 					notify(event)
 				}

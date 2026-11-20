@@ -142,6 +142,9 @@ func handleMulticastConnection(server *MulticastServer, cancel chan any) {
 		default:
 			msg, err := server.MulticastSocket.ReadMessage()
 			if err != nil {
+				if errors.Is(err, errInvalidDatagram) {
+					continue
+				}
 				if errors.Is(err, net.ErrClosed) || errors.Is(err, io.EOF) {
 					return
 				}

@@ -24,6 +24,7 @@ var ErrInvalid = errors.New("invalid")
 
 var (
 	errSocketClosed             = fmt.Errorf("%w: socket is closed", ErrInvalid)
+	errInvalidDatagram          = errors.New("invalid DNS datagram")
 	errTCPSocketDisabled        = fmt.Errorf("%w: TCP function is disabled", ErrInvalid)
 	errAvailableAddressNotFound = fmt.Errorf("%w: no available address", ErrInvalid)
 	errAvailableInterfaceFound  = fmt.Errorf("%w: no available interface", ErrInvalid)

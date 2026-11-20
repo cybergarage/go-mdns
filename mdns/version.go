@@ -16,5 +16,5 @@ package mdns
 
 const (
 	// Version is the version of go-mdns.
-	Version = "v1.0.0"
+	Version = "v1.0.1"
 )

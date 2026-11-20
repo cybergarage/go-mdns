@@ -48,6 +48,6 @@ type Client interface {
 	// and returns its addresses. The IPv6 scoped addressing zone is set for
 	// the link-local addresses.
 	LookupHost(ctx context.Context, host string) ([]*net.IPAddr, error)
-	// Services returns the services which the client has discovered.
+	// Services returns the unexpired services in the client's bounded discovery cache.
 	Services() []Service
 }
