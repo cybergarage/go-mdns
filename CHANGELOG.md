@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.1]
+
+### Security
+
+- Discard malformed DNS datagrams while keeping multicast and unicast UDP listeners active so they can process subsequent valid messages.
+- Limit optional TCP listeners to 64 concurrent connections per listener and 65,535 bytes per DNS message. Apply connection deadlines and close accepted connections on shutdown. DNS parsing also enforces label and expanded name length limits, including for compressed names.
+- Cap discovery caches and per-query results at 1,024 entries. The client refreshes cached services according to their TTL and removes them on expiration or receipt of a goodbye record.
+- Escape control characters in CLI table output and diagnostics that display received names and records.
+- Keep each parsed UDP message's raw bytes separate from the socket's reusable buffer so later receives cannot change the bytes returned by `Message.Bytes()`.
+
 ## [1.0.0] - 2026-10-05
 
 The first stable release. The exported API of every package follows Semantic Versioning from this release.
