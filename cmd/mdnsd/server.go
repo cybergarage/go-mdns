@@ -34,5 +34,5 @@ func NewServer(opts ...mdns.ServerOption) *Server {
 
 // MessageReceived is called when a query is received on the link.
 func (server *Server) MessageReceived(msg dns.Message) {
-	log.Infof("%s", msg.String())
+	log.Infof("%q", msg.String())
 }

@@ -15,7 +15,7 @@
 package transport
 
 import (
-	"bufio"
+	"fmt"
 	"io"
 	"net"
 	"strconv"
@@ -25,6 +25,10 @@ import (
 	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
+
+// DNS messages are limited to the size representable by the TCP DNS length field.
+// This transport still delimits its messages with EOF.
+const maxTCPMessageSize = 65535
 
 // A TCPSocket represents a socket for TCP.
 type TCPSocket struct {
@@ -118,10 +122,13 @@ func (sock *TCPSocket) Close() error {
 
 // ReadMessage reads a message from the current opened socket.
 func (sock *TCPSocket) ReadMessage(conn net.Conn) (dns.Message, error) {
-	bytes, err := io.ReadAll(bufio.NewReader(conn))
+	bytes, err := io.ReadAll(io.LimitReader(conn, maxTCPMessageSize+1))
 	if err != nil {
 		log.Error(err)
 		return nil, err
+	}
+	if len(bytes) > maxTCPMessageSize {
+		return nil, fmt.Errorf("%w: TCP DNS message exceeds %d bytes", ErrInvalid, maxTCPMessageSize)
 	}
 
 	addr, err := dns.NewAddrFromString(
@@ -138,7 +145,7 @@ func (sock *TCPSocket) ReadMessage(conn net.Conn) (dns.Message, error) {
 		dns.WithMessageFrom(addr),
 	)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("Failed to parse DNS message: %q", err)
 		return nil, err
 	}
 
@@ -162,6 +169,12 @@ func (sock *TCPSocket) PostMessage(addr string, port int, reqMsg dns.Message, ti
 	}
 
 	defer conn.Close()
+
+	// The peer reads one message until EOF. Finish the request while
+	// keeping the read side open for its response.
+	if err := conn.CloseWrite(); err != nil {
+		return nil, err
+	}
 
 	err = conn.SetReadDeadline(time.Now().Add(timeout))
 	if err != nil {

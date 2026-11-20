@@ -5,12 +5,17 @@
 package transport
 
 import (
+	"context"
+	"errors"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/cybergarage/go-logger/log"
 	"github.com/cybergarage/go-mdns/mdns/dns"
 )
+
+const maxUnicastTCPConnections = 64
 
 // A UnicastServer represents a unicast server.
 type UnicastServer struct {
@@ -79,20 +84,23 @@ func (server *UnicastServer) Start(ifi *net.Interface, ifaddr string, port int) 
 		server.TCPSocket.Close()
 		return err
 	}
-	server.UDPChannel = make(chan any)
-	go handleUnicastUDPConnection(server, server.UDPChannel)
-
 	if server.TCPEnabled() {
 		err := server.TCPSocket.Bind(ifi, ifaddr, port)
 		if err != nil {
+			server.UDPSocket.Close()
+			server.TCPSocket.Close()
 			return err
 		}
 		server.TCPChannel = make(chan any)
-		go handleUnicastTCPListener(server, server.TCPChannel)
 	}
 
 	server.TCPSocket.SetListenStatus(ifi, ifaddr, port)
 	server.UDPSocket.SetListenStatus(ifi, ifaddr, port)
+	server.UDPChannel = make(chan any)
+	go handleUnicastUDPConnection(server, server.UDPChannel)
+	if server.TCPChannel != nil {
+		go handleUnicastTCPListener(server, server.TCPSocket.Listener, server.TCPChannel)
+	}
 
 	return nil
 }
@@ -101,14 +109,18 @@ func (server *UnicastServer) Start(ifi *net.Interface, ifaddr string, port int) 
 func (server *UnicastServer) Stop() error {
 	var lastErr error
 
-	close(server.UDPChannel)
+	if server.UDPChannel != nil {
+		close(server.UDPChannel)
+		server.UDPChannel = nil
+	}
 	err := server.UDPSocket.Close()
 	if err != nil {
 		lastErr = err
 	}
 
-	if server.TCPEnabled() {
+	if server.TCPChannel != nil {
 		close(server.TCPChannel)
+		server.TCPChannel = nil
 		err := server.TCPSocket.Close()
 		if err != nil {
 			lastErr = err
@@ -145,6 +157,9 @@ func handleUnicastUDPConnection(server *UnicastServer, cancel chan any) {
 		default:
 			reqMsg, err := server.UDPSocket.ReadMessage()
 			if err != nil {
+				if errors.Is(err, errInvalidDatagram) {
+					continue
+				}
 				return
 			}
 
@@ -180,17 +195,41 @@ func handleUnicastTCPConnection(server *UnicastServer, conn *net.TCPConn) {
 	}
 }
 
-func handleUnicastTCPListener(server *UnicastServer, cancel chan any) {
+func handleUnicastTCPListener(server *UnicastServer, listener *net.TCPListener, cancel <-chan any) {
+	ctx, closeConnections := context.WithCancel(context.Background())
+	defer closeConnections()
+	active := make(chan struct{}, maxUnicastTCPConnections)
+	timeout := server.ConnectionTimeout()
+	if timeout <= 0 {
+		timeout = DefaultConnectTimeout
+	}
+
 	for {
 		select {
 		case <-cancel:
 			return
 		default:
-			tcpConn, err := server.TCPSocket.Listener.AcceptTCP()
+			tcpConn, err := listener.AcceptTCP()
 			if err != nil {
 				return
 			}
-			go handleUnicastTCPConnection(server, tcpConn)
+			if err := tcpConn.SetDeadline(time.Now().Add(timeout)); err != nil {
+				tcpConn.Close()
+				continue
+			}
+			select {
+			case active <- struct{}{}:
+				stop := context.AfterFunc(ctx, func() { tcpConn.Close() })
+				go func() {
+					defer func() {
+						stop()
+						<-active
+					}()
+					handleUnicastTCPConnection(server, tcpConn)
+				}()
+			default:
+				tcpConn.Close()
+			}
 		}
 	}
 }

@@ -15,6 +15,7 @@
 package transport
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net"
@@ -140,7 +141,8 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 		n,
 	)
 
-	msgBytes := sock.ReadBuffer[:n]
+	// Parsed messages retain their input past the next socket read.
+	msgBytes := bytes.Clone(sock.ReadBuffer[:n])
 
 	// The listening interface is passed to the address so that the IPv6
 	// link-local addresses of a discovered service can be scoped to the
@@ -153,8 +155,8 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 		dns.WithAddrInterface(listenIfi),
 	)
 	if err != nil {
-		log.Debugf("Failed to parse source address: %s", err)
-		return nil, err
+		log.Debugf("Failed to parse source address: %q", err)
+		return nil, fmt.Errorf("%w: %w", errInvalidDatagram, err)
 	}
 
 	msg, err := dns.NewMessageWithBytes(
@@ -162,9 +164,9 @@ func (sock *UDPSocket) ReadMessage() (dns.Message, error) {
 		dns.WithMessageFrom(add),
 	)
 	if err != nil {
-		log.Debugf("Failed to parse DNS message: %s", err)
+		log.Debugf("Failed to parse DNS message: %q", err)
 		log.HexDebug(msgBytes)
-		return nil, err
+		return nil, fmt.Errorf("%w: %w", errInvalidDatagram, err)
 	}
 
 	log.HexDebug(msgBytes)

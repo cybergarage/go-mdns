@@ -111,7 +111,7 @@ func NewServer(opts ...ServerOption) *Server {
 	server := &Server{
 		Mutex:           sync.Mutex{},
 		MessageManager:  transport.NewMessageManager(),
-		serviceSet:      newServiceSet(),
+		serviceSet:      newServiceSet(0),
 		msgHandler:      newMessageHandler(),
 		responder:       newResponder(),
 		running:         false,

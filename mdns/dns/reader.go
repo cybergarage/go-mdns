@@ -133,13 +133,15 @@ func (reader *Reader) ReadStrings() ([]string, error) {
 // to each other. The limit stops the parser from looping forever.
 const maxNameCompressionDepth = 16
 
+const maxWireNameSize = 255
+
 // ReadName returns a name from the reader with the read reader.
 func (reader *Reader) ReadName() (string, error) {
-	return reader.readName(0)
+	return reader.readName(0, maxWireNameSize)
 }
 
-// readName returns a name from the reader with the specified compression depth.
-func (reader *Reader) readName(depth int) (string, error) {
+// readName applies the same expanded-name budget through compression pointers.
+func (reader *Reader) readName(depth, remaining int) (string, error) {
 	if maxNameCompressionDepth < depth {
 		return "", fmt.Errorf("too many compression pointers : %d", depth)
 	}
@@ -165,7 +167,7 @@ func (reader *Reader) readName(depth int) (string, error) {
 			}
 			cmpReader := NewReaderWithBytes(cmpBytes[cmpOffset:])
 			cmpReader.SetCompressionBytes(cmpBytes)
-			nextName, err := cmpReader.readName(depth + 1)
+			nextName, err := cmpReader.readName(depth+1, remaining)
 			if err != nil {
 				return "", err
 			}
@@ -174,6 +176,10 @@ func (reader *Reader) readName(depth int) (string, error) {
 		}
 		if nextNameLen == 0 {
 			break
+		}
+		remaining -= 1 + int(nextNameLen)
+		if nextNameLen > nameLenMask || remaining < 1 {
+			return "", fmt.Errorf("%w: DNS name exceeds label or expanded length limit", ErrInvalid)
 		}
 		nextNameBytes := make([]byte, nextNameLen)
 		_, err = reader.Read(nextNameBytes)

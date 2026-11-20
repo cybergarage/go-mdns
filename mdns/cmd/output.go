@@ -18,12 +18,14 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"text/tabwriter"
+	"unicode/utf8"
 
 	"github.com/cybergarage/go-mdns/mdns"
 	"github.com/spf13/viper"
@@ -32,6 +34,18 @@ import (
 // outputFormat returns the configured output format.
 func outputFormat() (Format, error) {
 	return NewFormatFromString(viper.GetString(FormatParamStr))
+}
+
+// tableField keeps user-facing text readable while escaping bytes and runes
+// that can change terminal state or introduce an extra row or column.
+func tableField(value string) string {
+	if utf8.ValidString(value) && !strings.ContainsFunc(value, func(r rune) bool {
+		return !strconv.IsPrint(r)
+	}) {
+		return value
+	}
+	quoted := strconv.Quote(value)
+	return quoted[1 : len(quoted)-1]
 }
 
 // serviceObject represents a service for the JSON and the CSV output.
@@ -176,7 +190,11 @@ func (writer *serviceWriter) Write(event string, service mdns.Service) error {
 			fmt.Fprintln(writer.tabWriter, strings.Join(serviceHeader(writer.withEvent), "\t"))
 			writer.wroteHeader = true
 		}
-		fmt.Fprintln(writer.tabWriter, strings.Join(obj.record(writer.withEvent), "\t"))
+		fields := obj.record(writer.withEvent)
+		for i, value := range fields {
+			fields[i] = tableField(value)
+		}
+		fmt.Fprintln(writer.tabWriter, strings.Join(fields, "\t"))
 		writer.tabWriter.Flush()
 	}
 
@@ -257,7 +275,7 @@ func outputHostAddrs(host string, addrs []*net.IPAddr) error {
 		defer tabWriter.Flush()
 		fmt.Fprintln(tabWriter, "HOST\tADDRESS")
 		for _, addr := range addrStrs {
-			fmt.Fprintf(tabWriter, "%s\t%s\n", host, addr)
+			fmt.Fprintf(tabWriter, "%s\t%s\n", tableField(host), tableField(addr))
 		}
 	}
 
@@ -293,6 +311,14 @@ func newRecordObjects(records mdns.ResourceRecordSet) []recordObject {
 		})
 	}
 	return objs
+}
+
+func writeRecordTable(out io.Writer, records mdns.ResourceRecordSet) {
+	writer := tabwriter.NewWriter(out, 0, 0, 1, ' ', 0)
+	for _, record := range records {
+		fmt.Fprintf(writer, "%s\t%s\t%s\n", tableField(record.Name()), record.Type(), tableField(record.Content()))
+	}
+	writer.Flush()
 }
 
 // outputMessage writes the specified message in the configured format.
@@ -354,16 +380,16 @@ func outputMessage(msg mdns.Message) error {
 			kind = "RESPONSE"
 		}
 		if 0 < len(from) {
-			fmt.Fprintf(os.Stdout, "%s from %s\n", kind, from)
+			fmt.Fprintf(os.Stdout, "%s from %s\n", kind, tableField(from))
 		} else {
 			fmt.Fprintf(os.Stdout, "%s\n", kind)
 		}
 		if 0 < len(questions) {
-			fmt.Fprintf(os.Stdout, "%s\n", questions.String())
+			writeRecordTable(os.Stdout, questions)
 		}
 		records := msg.ResourceRecordSet()
 		if 0 < len(records) {
-			fmt.Fprintf(os.Stdout, "%s\n", records.String())
+			writeRecordTable(os.Stdout, records)
 		}
 		fmt.Fprintln(os.Stdout, "")
 	}

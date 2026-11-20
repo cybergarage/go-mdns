@@ -27,7 +27,7 @@ import (
 // clientImpl represents a client node instance.
 type clientImpl struct {
 	*transport.MessageManager
-	*serviceSet
+	discovered *serviceCache
 	*msgHandler
 	queryTimeout       time.Duration
 	queryInterval      time.Duration
@@ -99,7 +99,7 @@ func WithClientResolveGracePeriod(period time.Duration) ClientOption {
 func NewClient(opts ...ClientOption) Client {
 	client := &clientImpl{
 		MessageManager:     transport.NewMessageManager(),
-		serviceSet:         newServiceSet(),
+		discovered:         newServiceCache(),
 		msgHandler:         newMessageHandler(),
 		queryTimeout:       DefaultQueryTimeout,
 		queryInterval:      DefaultQueryInterval,
@@ -143,7 +143,8 @@ func (client *clientImpl) Restart() error {
 
 // Services returns the services which the client has discovered.
 func (client *clientImpl) Services() []Service {
-	return client.serviceSet.Services()
+	client.discovered.RemoveExpired(time.Now())
+	return client.discovered.Services()
 }
 
 // queryUntilDone announces the query message, and retransmits it until the
@@ -204,7 +205,8 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 
 	queryMsg := NewRequestWithQuery(q)
 
-	respondServices := newServiceSet()
+	client.discovered.RemoveExpired(time.Now())
+	respondServices := newServiceSet(maxDiscoveredServices)
 	queryResponseHandler := func(resMsg dns.Message) {
 		if !resMsg.IsResponse() {
 			return
@@ -226,9 +228,10 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 			return
 		}
 
+		client.discovered.Update(newService)
 		added := respondServices.AddService(newService)
 
-		log.Debugf("mDNS Service responded: %s (added=%t)", newService.String(), added)
+		log.Debugf("mDNS Service responded: %q (added=%t)", newService.String(), added)
 	}
 	client.RegisterMessageHandler(queryResponseHandler)
 	defer client.UnregisterMessageHandler(queryResponseHandler)
@@ -237,8 +240,5 @@ func (client *clientImpl) Query(ctx context.Context, q Query) ([]Service, error)
 		return []Service{}, err
 	}
 
-	services := respondServices.Services()
-	client.AddServices(services)
-
-	return services, nil
+	return respondServices.Services(), nil
 }

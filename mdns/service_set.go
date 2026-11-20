@@ -24,13 +24,15 @@ import (
 type serviceSet struct {
 	mutex    sync.RWMutex
 	services []Service
+	limit    int
 }
 
 // newServiceSet returns a blank service array.
-func newServiceSet() *serviceSet {
+func newServiceSet(limit int) *serviceSet {
 	return &serviceSet{
 		mutex:    sync.RWMutex{},
 		services: []Service{},
+		limit:    limit,
 	}
 }
 
@@ -63,7 +65,7 @@ func (services *serviceSet) hasService(targetService Service) bool {
 func (services *serviceSet) AddService(service Service) bool {
 	services.mutex.Lock()
 	defer services.mutex.Unlock()
-	if services.hasService(service) {
+	if (services.limit > 0 && len(services.services) >= services.limit) || services.hasService(service) {
 		return false
 	}
 	services.services = append(services.services, service)
